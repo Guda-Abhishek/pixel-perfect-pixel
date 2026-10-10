@@ -53,8 +53,10 @@ function Section({ id, kicker, title, children }: { id: string; kicker: string; 
 function Nav() {
   const [active, setActive] = useState("home");
   const [open, setOpen] = useState(false);
+  const navigatingUntil = useRef(0);
   useEffect(() => {
     const update = () => {
+      if (performance.now() < navigatingUntil.current) return;
       let current = "home";
       for (const [id] of NAV) {
         const el = document.getElementById(id);
@@ -68,7 +70,7 @@ function Nav() {
     window.addEventListener("resize", update);
     return () => { window.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
   }, []);
-  const go = (id: string) => { setOpen(false); scrollToSection(id); };
+  const go = (id: string) => { navigatingUntil.current = performance.now() + 1500; setActive(id); setOpen(false); scrollToSection(id); };
   useEffect(() => { const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); }; window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey); }, []);
   return (
     <header className="fixed inset-x-0 top-0 z-50 glass border-x-0 border-t-0">
