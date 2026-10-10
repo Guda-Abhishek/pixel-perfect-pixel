@@ -1,116 +1,61 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Play, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { DeveloperMark } from "@/components/DeveloperMark";
-import { Particles } from "@/components/Particles";
+import { ViewerAvatar } from "@/components/ViewerAvatar";
+import { VIEWERS } from "@/lib/viewer-profiles";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Who's exploring? — Guda Abhishek" },
-      { name: "description", content: "Enter the portfolio of Guda Abhishek, Software Engineer and AI & Full-Stack Developer." },
-      { property: "og:title", content: "Guda Abhishek — Developer Portfolio" },
-      { property: "og:description", content: "A cinematic, game-inspired portfolio of an AI & Full-Stack Developer." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: ProfileSelect,
+  head: () => ({ meta: [
+    { title: "Who's Watching? — Abhishek: The Series" },
+    { name: "description", content: "Choose your perspective on Guda Abhishek's software engineering, full-stack and AI portfolio." },
+    { property: "og:title", content: "Abhishek: The Series — Choose Your Profile" },
+    { property: "og:description", content: "Explore the projects, experience and AI work of Guda Abhishek." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
+  ] }), component: ProfileSelect,
 });
 
 function ProfileSelect() {
-  const navigate = useNavigate();
-  const [entering, setEntering] = useState(false);
-  const reduced = useReducedMotion();
+  const [intro, setIntro] = useState(false);
+  const [sound, setSound] = useState(false);
+  const audio = useRef<AudioContext | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
-  const skip = () => {
-    if (timer.current) clearTimeout(timer.current);
-    navigate({ to: "/portfolio" });
+  const reduced = useReducedMotion();
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); void audio.current?.close(); }, []);
+  const skip = () => { setIntro(false); if (timer.current) clearTimeout(timer.current); void audio.current?.close(); audio.current = null; };
+  const toggleSound = () => {
+    if (sound) { setSound(false); void audio.current?.close(); audio.current = null; return; }
+    try {
+      const context = new AudioContext(); audio.current = context;
+      const gain = context.createGain(); gain.connect(context.destination);
+      gain.gain.setValueAtTime(0.06, context.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.6);
+      const tone = context.createOscillator(); tone.type = "sine"; tone.frequency.setValueAtTime(146.83, context.currentTime); tone.connect(gain); tone.start(); tone.stop(context.currentTime + 0.6);
+      setSound(true);
+    } catch { setSound(false); }
   };
-
-  const enter = () => {
-    if (entering) return;
-    setEntering(true);
-    if (reduced) { skip(); return; }
-    timer.current = setTimeout(skip, 850);
-  };
-
-  return (
-    <div className="entry-screen relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-background px-6 py-24">
-      <div className="absolute inset-0 grid-bg opacity-30 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
-      <Particles count={12} />
-      <p className="absolute top-8 font-mono text-xs text-muted-foreground">GUDA ABHISHEK / PORTFOLIO</p>
-
-      <motion.div
-        animate={entering ? { scale: 1.6, opacity: 0 } : { scale: 1, opacity: 1 }}
-        transition={{ duration: 0.8, ease: [0.7, 0, 0.3, 1] }}
-        className="relative z-10 flex flex-col items-center"
-      >
-        <motion.h1
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
-          className="mb-14 text-center text-4xl font-bold text-foreground md:text-6xl"
-        >
-          Who's exploring?
-        </motion.h1>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          whileHover={{ scale: reduced ? 1 : 1.04 }}
-        >
-        <Button variant="bare" size="auto"
-          onClick={enter}
-          disabled={entering}
-          className="group flex max-w-sm flex-col items-center gap-5 rounded-lg text-foreground"
-          aria-label="Enter as Abhishek"
-        >
-          <div className="relative h-44 w-44 overflow-hidden rounded-lg ring-2 ring-transparent transition-all duration-300 group-hover:shadow-neon group-hover:ring-primary md:h-56 md:w-56">
-            <DeveloperMark className="h-full w-full transition-transform duration-500 group-hover:scale-105" />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-          </div>
-          <div className="text-center">
-            <p className="font-display text-2xl text-muted-foreground transition-colors group-hover:text-foreground">Abhishek</p>
-            <p className="mt-1 text-sm text-muted-foreground">Software Engineer | AI & Full-Stack Developer</p>
-          </div>
-        </Button>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
-          className="mt-10"
-        >
-          <Button variant="portfolio" size="lg" onClick={skip} className="min-h-11 font-mono text-xs">Skip intro / Enter portfolio <ArrowRight /></Button>
-        </motion.div>
+  const playIntro = () => { setIntro(true); timer.current = setTimeout(skip, reduced ? 1000 : 2400); };
+  return <div className="relative flex min-h-svh flex-col bg-background px-5 py-8 sm:px-12">
+    <header className="flex items-center justify-between"><span className="series-logo text-3xl">ABHISHEK <span className="ml-2 align-middle font-sans text-[9px] font-normal text-muted-foreground">THE SERIES</span></span><Button variant="ghost" onClick={playIntro} className="min-h-11 text-xs"><Play /> Play intro</Button></header>
+    <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center py-14">
+      <motion.div initial={{ opacity: 0, y: reduced ? 0 : 12 }} animate={{ opacity: 1, y: 0 }} className="w-full text-center">
+        <p className="mb-4 text-[10px] uppercase tracking-[0.2em] text-muted-foreground">ONE DEVELOPER. MANY PERSPECTIVES.</p>
+        <h1 className="text-5xl font-semibold sm:text-6xl">Who's Watching?</h1>
+        <div className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-x-5 gap-y-8 sm:mt-12 sm:grid-cols-4 sm:gap-6">
+          {VIEWERS.map(profile => <Button key={profile.id} asChild variant="bare" size="auto" className="group block text-center"><Link to="/portfolio" search={{ profile: profile.id }} className="min-w-0">
+            <span className="block rounded ring-2 ring-transparent transition-transform group-hover:scale-[1.03] group-hover:ring-foreground group-focus-visible:ring-foreground"><ViewerAvatar viewer={profile.id} /></span>
+            <span className="mt-4 block min-h-10 text-sm text-foreground sm:text-base">{profile.name}</span>
+            <span className="mt-1 block text-[10px] leading-relaxed text-muted-foreground">{profile.caption}</span>
+          </Link></Button>)}
+        </div>
+        <Button variant="outline" asChild className="mt-10 min-h-11 px-6 text-xs"><Link to="/portfolio" search={{ profile: "guest" }}>Skip intro / Enter portfolio <ArrowRight /></Link></Button>
       </motion.div>
-
-      <AnimatePresence>
-        {entering && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background"
-          >
-            <p role="status" className="px-6 text-center font-mono text-sm text-accent">Initializing Developer Environment…</p>
-            <div className="mt-5 h-0.5 w-64 overflow-hidden rounded bg-muted">
-              <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 0.5 }} className="h-full bg-primary" />
-            </div>
-            <Button variant="bare" onClick={skip} className="mt-6 min-h-11">Enter portfolio <ArrowRight /></Button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <footer className="absolute bottom-6 z-10 font-mono text-xs text-muted-foreground">
-        Designed & Developed by Abhishek.
-      </footer>
     </div>
-  );
+    <footer className="text-center text-[10px] text-muted-foreground">GUDA ABHISHEK · SOFTWARE ENGINEER & AI DEVELOPER</footer>
+    <AnimatePresence>{intro && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background px-6" role="dialog" aria-modal="true" aria-label="Abhishek series intro" onKeyDown={e => { if (e.key === "Escape") skip(); }}>
+      <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">A DEVELOPER ORIGINAL</p>
+      <motion.h2 initial={{ scale: reduced ? 1 : 0.95 }} animate={{ scale: 1 }} transition={{ duration: 1.4 }} className="series-logo text-center text-5xl sm:text-7xl">ABHISHEK:<br />THE SERIES</motion.h2>
+      <div className="mt-10 flex gap-4"><Button autoFocus variant="outline" className="min-h-11" onClick={skip}>Skip intro <ArrowRight /></Button><Button variant="ghost" className="min-h-11" onClick={toggleSound} aria-pressed={sound}>{sound ? <Volume2 /> : <VolumeX />} Sound {sound ? "on" : "off"}</Button></div>
+    </motion.div>}</AnimatePresence>
+  </div>;
 }
