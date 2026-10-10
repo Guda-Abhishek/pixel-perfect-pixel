@@ -15,3 +15,7 @@
 - Keep social URLs and the resume asset path nullable in shared configuration; missing verified resources must never produce broken links.
 - Validate contact drafts with the shared Zod schema and prepare mailto messages only; no delivery claim is possible without a connected service.
 - Use a code monogram instead of a portrait until a real image is supplied; generated portraits cannot represent the owner's likeness.
+
+- Validate viewer selection in route search parameters and derive section/project order from shared rules; URL-based selection survives refresh without storing personal data.
+- Reuse Radix dialogs, tabs and menus for portfolio details and switching; these preserve keyboard interaction and focus management.
+- Keep the contact form in its reusable component and career facts in shared data; presentation changes must not alter validated draft behavior.

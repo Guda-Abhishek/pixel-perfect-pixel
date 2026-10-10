@@ -3,9 +3,9 @@ import { CONTACT, MISSIONS, MILESTONES, PROJECTS } from "@/lib/portfolio-data";
 import { contactSchema, PORTFOLIO_FILES } from "@/lib/contact-schema";
 
 describe("Portfolio factual and contact rules", () => {
-  it("does not guess social profile URLs", () => {
-    expect(CONTACT.linkedin).toBeNull();
-    expect(CONTACT.github).toBeNull();
+  it("uses the exact supplied social profile URLs", () => {
+    expect(CONTACT.linkedin).toBe("https://linkedin.com/in/Guda-Abhishek");
+    expect(CONTACT.github).toBe("https://github.com/Guda-Abhishek");
     expect(CONTACT.socialName).toBe("Guda-Abhishek");
   });
   it("does not enable a resume without a real file", () => {
