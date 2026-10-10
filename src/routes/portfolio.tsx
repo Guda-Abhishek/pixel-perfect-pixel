@@ -1,418 +1,135 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { AnimatePresence, motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState, type FormEvent, type ReactNode, type MouseEvent } from "react";
-import hero from "@/assets/developer-constellation.jpg";
-import { DeveloperMark } from "@/components/DeveloperMark";
-import { ProjectVisual } from "@/components/ProjectVisual";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { motion } from "framer-motion";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import { ArrowUp, ArrowRight, ChevronLeft, ChevronRight, ChevronDown, Menu, X, Play, Info, Download, Github, Linkedin, Award, Code2, BriefcaseBusiness, GraduationCap, MapPin } from "lucide-react";
+import billboard from "@/assets/series-billboard.jpg";
 import { Button } from "@/components/ui/button";
-import { ArrowUp, ArrowDown, ChevronDown, Menu, X, Copy, Mail, FileDown, Code2, Cpu, Database, Cloud, GitBranch, Braces, Brain } from "lucide-react";
-import { contactSchema, PORTFOLIO_FILES } from "@/lib/contact-schema";
-import { Particles } from "@/components/Particles";
+import { Dialog, DialogTrigger, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuLabel } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ViewerAvatar } from "@/components/ViewerAvatar";
+import { ProjectVisual } from "@/components/ProjectVisual";
+import { DeveloperMark } from "@/components/DeveloperMark";
+import { PortfolioContact } from "@/components/PortfolioContact";
 import { CERTS, CONTACT, MILESTONES, MISSIONS, NAV, PROJECTS, SKILLS } from "@/lib/portfolio-data";
+import { PORTFOLIO_FILES } from "@/lib/contact-schema";
+import { parseViewer, projectOrder, sectionOrder, VIEWERS, VIEWER_FOCUS, type Viewer } from "@/lib/viewer-profiles";
 
 export const Route = createFileRoute("/portfolio")({
-  head: () => ({
-    meta: [
-      { title: "Guda Abhishek — Software Engineer | AI & Full-Stack Developer" },
-      { name: "description", content: "Experience, projects, skills and certifications of Guda Abhishek, AI & Full-Stack Developer from Hyderabad." },
-      { property: "og:title", content: "Guda Abhishek — Developer Command Center" },
-      { property: "og:description", content: "Mission log, projects, skill tree and contact terminal of Guda Abhishek." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: Portfolio,
+  validateSearch: (search: Record<string, unknown>) => ({ profile: parseViewer(search['profile']) }),
+  head: () => ({ meta: [
+    { title: "Guda Abhishek — Software Engineer & AI Developer | The Series" },
+    { name: "description", content: "Explore Guda Abhishek's React/MERN engineering, AI interfaces, career experience, projects and certifications. Hyderabad, India." },
+    { property: "og:title", content: "Guda Abhishek — A Developer Original" },
+    { property: "og:description", content: "A cinematic portfolio of full-stack engineering, Generative AI, practical projects and real-world experience." },
+    { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary_large_image" },
+  ] }), component: Portfolio,
 });
+const synopsis = "Software Engineer with hands-on experience across software development and AI development lifecycles. Specializing in responsive React/MERN platforms, API integration, and bringing Generative AI and AI-agent concepts into practical product features.";
+function go(id: string) { document.getElementById(id)?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' }); }
 
-const reveal = {
-  initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-80px" },
-  transition: { duration: 0.6 },
-};
-
-function scrollToSection(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth", block: "start" });
+function Details({ trigger, title, description, children }: { trigger: ReactNode; title: string; description: string; children: ReactNode }) {
+  return <Dialog><DialogTrigger asChild>{trigger}</DialogTrigger><DialogContent className="max-h-[85svh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-lg p-6 sm:p-8"><DialogTitle className="pr-8 font-display text-3xl leading-tight">{title}</DialogTitle><DialogDescription className="text-sm leading-relaxed">{description}</DialogDescription>{children}</DialogContent></Dialog>;
 }
-
-function Section({ id, kicker, title, children }: { id: string; kicker: string; title: string; children: ReactNode }) {
-  return (
-    <section id={id} className="relative scroll-mt-24 px-6 py-16 md:px-12 md:py-20">
-      <div className="mx-auto max-w-6xl">
-        <motion.div {...reveal} className="mb-9">
-          <p className="font-mono text-xs uppercase tracking-[0.35em] text-accent">{kicker}</p>
-          <h2 className="mt-3 text-3xl font-bold md:text-4xl">{title}</h2>
-          <div className="mt-4 h-0.5 w-20 bg-neon" />
-        </motion.div>
-        {children}
-      </div>
-    </section>
-  );
+function Bio({ trigger }: { trigger: ReactNode }) {
+  return <Details trigger={trigger} title="Guda Abhishek — Full Bio" description="Software Engineer | AI & Full-Stack Developer">
+    <p className="text-sm leading-relaxed">{synopsis}</p>
+    <div className="border-y border-border py-4 text-sm leading-7"><p className="font-semibold">TKR College of Engineering & Technology</p><p className="text-muted-foreground">B.Tech in Information Technology · 2022–2026 · CGPA 7.6</p><p className="text-muted-foreground">Hyderabad, India</p></div>
+    <h3 className="text-xl font-semibold">Experience highlights</h3>
+    {MISSIONS.map(m => <div key={m.id}><p className="font-semibold">{m.company}</p><p className="mt-1 text-xs text-muted-foreground">{m.role} · {m.period}</p></div>)}
+    <p className="text-sm leading-relaxed">React.js, JavaScript, Java, Python, SQL, REST APIs, full-stack development, AI/ML, Generative AI, RAG, AI agents and Agile collaboration.</p>
+    {PORTFOLIO_FILES.resume ? <Button asChild className="min-h-11"><a href={PORTFOLIO_FILES.resume} download><Download /> Download Resume</a></Button> : <div className="border-t border-border pt-4"><p className="mb-3 text-xs text-muted-foreground">A downloadable resume PDF has not been uploaded.</p><Button asChild className="min-h-11"><a href={`mailto:${CONTACT.email}?subject=Request%20for%20resume`}>Request resume by email <ArrowRight /></a></Button></div>}
+  </Details>;
 }
-
-function Nav() {
-  const [active, setActive] = useState("home");
-  const [open, setOpen] = useState(false);
-  const navigatingUntil = useRef(0);
+function ResumeButton({ compact = false }: { compact?: boolean }) {
+  const button = <Button className={`min-h-11 ${compact ? 'px-2 text-xs' : 'px-5'}`}><Download /><span className={compact ? 'hidden xl:inline' : ''}>Download Resume</span>{compact && <span className="xl:hidden">Resume</span>}</Button>;
+  return PORTFOLIO_FILES.resume ? <Button asChild className="min-h-11"><a href={PORTFOLIO_FILES.resume} download><Download /> Download Resume</a></Button> : <Bio trigger={button} />;
+}
+function Socials({ className = '' }: { className?: string }) {
+  return <div className={`flex ${className}`}>{CONTACT.github && <Button asChild variant="bare" size="icon" className="min-h-11 min-w-11"><a href={CONTACT.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub"><Github /></a></Button>}{CONTACT.linkedin && <Button asChild variant="bare" size="icon" className="min-h-11 min-w-11"><a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn"><Linkedin /></a></Button>}</div>;
+}
+function Nav({ viewer }: { viewer: Viewer }) {
+  const [menu, setMenu] = useState(false);
+  const [active, setActive] = useState('home');
+  const navigate = useNavigate({ from: '/portfolio' });
+  const current = VIEWERS.find(p => p.id === viewer) ?? VIEWERS[3];
   useEffect(() => {
     const update = () => {
-      if (performance.now() < navigatingUntil.current) return;
-      let current = "home";
-      for (const [id] of NAV) {
-        const el = document.getElementById(id);
-        if (el && el.getBoundingClientRect().top <= 180) current = id;
-      }
-      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 10) current = "contact";
-      setActive(current);
+      let last = 'home'; let closest = -Infinity;
+      for (const [id] of NAV) { const top = document.getElementById(id)?.getBoundingClientRect().top; if (top !== undefined && top <= 160 && top > closest) { last = id; closest = top; } }
+      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 4) last = 'contact';
+      setActive(last);
     };
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => { window.removeEventListener("scroll", update); window.removeEventListener("resize", update); };
-  }, []);
-  const go = (id: string) => { navigatingUntil.current = performance.now() + 1500; setActive(id); setOpen(false); scrollToSection(id); };
-  useEffect(() => { const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); }; window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey); }, []);
-  return (
-    <header className="fixed inset-x-0 top-0 z-50 glass border-x-0 border-t-0">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <Link to="/" className="font-display text-lg font-bold text-neon">GA://</Link>
-        <nav aria-label="Portfolio sections" className="hidden gap-1 lg:flex">
-          {NAV.map(([id, label]) => (
-            <Button variant="bare" size="auto" key={id} aria-current={active === id ? "location" : undefined} onClick={() => go(id)} className={`relative min-h-11 px-3 py-2 font-mono text-[11px] uppercase tracking-widest transition-colors ${active === id ? "text-foreground" : "text-muted-foreground hover:text-foreground"}`}>
-              {active === id && <motion.span layoutId="nav-ind" className="absolute inset-x-2 -bottom-0.5 h-0.5 bg-neon shadow-neon" />}
-              {label}
-            </Button>
-          ))}
-        </nav>
-        <Button variant="bare" size="auto" aria-label={open ? "Close menu" : "Open menu"} aria-controls="mobile-navigation" className="min-h-11 min-w-11 text-accent lg:hidden" onClick={() => setOpen(!open)} aria-expanded={open}>
-          {open ? <X /> : <Menu />}
-        </Button>
+    update(); window.addEventListener('scroll', update, { passive: true });
+    return () => window.removeEventListener('scroll', update);
+  }, [viewer]);
+  useEffect(() => { const close = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenu(false); }; window.addEventListener('keydown', close); return () => window.removeEventListener('keydown', close); }, []);
+  return <header className="series-nav sticky inset-x-0 top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
+    <div className="mx-auto flex h-18 max-w-[1440px] items-center justify-between gap-3 px-5 sm:px-10">
+      <Link to="/" className="series-logo flex shrink-0 items-center gap-2 text-3xl">ABHISHEK<span className="hidden border-l border-border pl-2 font-sans text-[8px] font-normal text-muted-foreground sm:block">SERIES</span></Link>
+      <nav className="hidden items-center xl:flex" aria-label="Portfolio sections">{NAV.map(([id, label]) => <Button key={id} variant="bare" className={`min-h-11 px-2.5 text-[11px] ${active === id ? 'font-semibold text-foreground' : 'text-muted-foreground'}`} aria-current={active === id ? 'location' : undefined} onClick={() => go(id)}>{label}</Button>)}</nav>
+      <div className="flex items-center gap-2"><Socials className="hidden md:flex" /><ResumeButton compact />
+        <DropdownMenu><DropdownMenuTrigger asChild><Button variant="bare" size="auto" className="min-h-11 gap-2" aria-label={`Switch profile, currently ${current.name}`}><ViewerAvatar viewer={viewer} compact /><ChevronDown className="hidden sm:block" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-60"><DropdownMenuLabel>Who's watching?</DropdownMenuLabel><DropdownMenuRadioGroup value={viewer} onValueChange={value => { navigate({ search: { profile: parseViewer(value) }, resetScroll: false }); }}>{VIEWERS.map(p => <DropdownMenuRadioItem key={p.id} value={p.id} className="min-h-11">{p.name}</DropdownMenuRadioItem>)}</DropdownMenuRadioGroup></DropdownMenuContent></DropdownMenu>
+        <Button variant="bare" size="icon" aria-label={menu ? 'Close menu' : 'Open menu'} aria-expanded={menu} aria-controls="mobile-navigation" onClick={() => setMenu(!menu)} className="min-h-11 min-w-11 xl:hidden">{menu ? <X /> : <Menu />}</Button>
       </div>
-      <AnimatePresence>
-        {open && (
-          <motion.nav id="mobile-navigation" aria-label="Mobile portfolio sections" initial={{ height: 0 }} animate={{ height: "auto" }} exit={{ height: 0 }} className="overflow-hidden lg:hidden">
-            {NAV.map(([id, label]) => (
-              <Button variant="bare" size="auto" key={id} aria-current={active === id ? "location" : undefined} onClick={() => go(id)} className={`block min-h-11 w-full px-6 py-3 text-left font-mono text-xs uppercase tracking-widest ${active === id ? "text-accent" : "text-muted-foreground"}`}>
-                {label}
-              </Button>
-            ))}
-          </motion.nav>
-        )}
-      </AnimatePresence>
-    </header>
-  );
+    </div>
+    {menu && <nav id="mobile-navigation" aria-label="Mobile portfolio sections" className="grid grid-cols-2 gap-1 border-t border-border p-4 xl:hidden">{NAV.map(([id, label]) => <Button key={id} variant="ghost" onClick={() => { go(id); setMenu(false); }} className="min-h-11 justify-start text-xs">{label}</Button>)}<Socials /></nav>}
+  </header>;
 }
-
-function Hero() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [0, 200]);
-  const go = scrollToSection;
-  const reduced = useReducedMotion();
-  return (
-    <section id="home" ref={ref} className="relative flex hero-section items-center overflow-hidden px-6 pb-20 pt-32 md:px-12">
-      <motion.img style={{ y: reduced ? 0 : y }} src={hero} alt="" width={1920} height={1088} className="absolute inset-0 h-full w-full object-cover opacity-75" />
-      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/20" />
-      <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
-      <Particles count={10} />
-      <div className="relative mx-auto grid w-full max-w-6xl items-center">
-        <motion.div initial={{ opacity: 0, x: -40 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
-          <p className="mb-6 font-mono text-xs uppercase text-accent">Hyderabad, India / Developer Portfolio</p>
-          <h1 className="hero-name text-4xl font-black leading-tight sm:text-6xl lg:text-7xl">GUDA<br /><span className="text-neon">ABHISHEK</span></h1>
-          <p className="mt-5 max-w-lg font-mono text-sm text-foreground">Software Engineer | AI & Full-Stack Developer</p>
-          <p className="mt-6 max-w-xl text-lg text-foreground/80">
-            Building practical software experiences at the intersection of full-stack engineering, AI, and intelligent automation.
-          </p>
-          <div className="mt-10 flex flex-wrap gap-4">
-            <Button variant="bare" size="auto" onClick={() => go("projects")} className="rounded-md bg-neon px-6 py-3 font-display text-xs font-bold text-primary-foreground transition-transform hover:scale-105 hover:shadow-neon">EXPLORE MY WORK</Button>
-            <Button variant="bare" size="auto" onClick={() => go("experience")} className="rounded-md glass px-6 py-3 font-display text-xs font-bold transition-all hover:border-primary hover:shadow-neon">VIEW EXPERIENCE</Button>
-            <Button variant="bare" size="auto" onClick={() => go("contact")} className="rounded-md border border-accent/50 px-6 py-3 font-display text-xs font-bold text-accent transition-all hover:bg-accent/10">CONTACT ME</Button>
-          </div>
-        </motion.div>
-        <div className="mt-10 flex flex-wrap gap-x-6 gap-y-3 border-t border-border pt-5 font-mono text-xs text-muted-foreground">
-          <span>REACT / FULL-STACK</span><span>AI / AUTOMATION</span><span>INTERFACES / APIs</span>
-        </div>
-      </div>
-      <Button variant="bare" size="auto" onClick={() => go("about")} aria-label="Explore about section" className="absolute bottom-5 left-6 min-h-11 gap-3 font-mono text-xs text-muted-foreground md:left-12"><ArrowDown /> Developer dossier</Button>
-    </section>
-  );
+function Hero({ viewer }: { viewer: Viewer }) {
+  return <section id="home" className="billboard relative flex items-center overflow-hidden px-5 py-14 sm:px-10">
+    <img src={billboard} alt="" width={1920} height={1024} fetchPriority="high" className="absolute inset-0 h-full w-full object-cover" />
+    <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-background/10" /><div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-background to-transparent" />
+    <div className="relative mx-auto w-full max-w-[1360px]"><motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: .4 }} className="max-w-2xl">
+      <p className="mb-5 flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.18em]"><span className="series-logo text-2xl">A</span> A DEVELOPER ORIGINAL <span className="text-muted-foreground">· 2026</span></p>
+      <h1 className="billboard-title">GUDA<br />ABHISHEK</h1>
+      <p className="mt-5 text-sm font-semibold sm:text-base">Software Engineer | AI & Full-Stack Developer</p>
+      <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px]"><span className="text-profile-green">2026 Batch</span><span className="text-muted-foreground">B.Tech IT · CGPA 7.6</span><span className="rounded-sm border border-border px-1.5 py-0.5 text-muted-foreground">MERN · PYTHON · GEN AI · OCI</span></div>
+      <p className="mt-5 max-w-xl text-sm leading-7 text-foreground/85">{synopsis}</p>
+      <div className="mt-6 flex flex-wrap gap-3"><Details title="The story so far" description="Guda Abhishek · Software Engineer & AI Developer" trigger={<Button className="min-h-11 px-6"><Play className="fill-current" /> Play Story</Button>}><p className="text-sm leading-7">Building practical software experiences at the intersection of full-stack engineering, AI, and intelligent automation.</p><p className="text-sm leading-7">From the TKR IT department website and innovation projects to frontend internships at Bilvantis and Paves Technologies, my work focuses on responsive interfaces, reliable API integration and reusable engineering.</p><p className="text-sm leading-7">I explore Generative AI, RAG and AI agents while bringing careful debugging, collaboration and practical product thinking to every project.</p></Details><Bio trigger={<Button variant="secondary" className="min-h-11 px-5"><Info /> View Resume / Full Bio</Button>} /></div>
+      <div className="mt-6 flex max-w-xl flex-wrap gap-x-3 gap-y-2 border-l-2 border-primary pl-3 text-[10px] leading-5 text-muted-foreground"><span>{CONTACT.location}</span><a href={`tel:${CONTACT.phone.replace(/\s/g, '')}`}>{CONTACT.phone}</a><a className="break-all" href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></div>
+    </motion.div></div>
+    <span className="absolute bottom-6 right-10 hidden border-l-2 border-primary pl-3 text-[10px] text-muted-foreground md:block">{VIEWER_FOCUS[viewer]}</span>
+  </section>;
 }
-
-function About() {
-  const stats = [["Name", "Guda Abhishek"], ["Role", "Software Engineer | AI & Full-Stack Developer"], ["Location", "Hyderabad, India"], ["Education", "B.Tech in Information Technology, TKR College of Engineering & Technology"], ["Education period", "2022–2026"], ["CGPA", "7.6"]];
-  const timeline = [["2022", "Began B.Tech IT · joined IEEE & student leadership"], ["2023", "SIH marketplace & IT Department website"], ["2024", "MSME Innovation Programme recognition"], ["2025", "AI Intern at Bilvantis Technologies"], ["2026", "Frontend Intern at Paves Technologies · Graduation"]];
-  return (
-    <Section id="about" kicker="Character Profile" title="About Me">
-      <div className="grid gap-10 lg:grid-cols-[280px_1fr]">
-        <motion.div {...reveal} className="relative mx-auto w-64">
-          <DeveloperMark className="w-full rounded-lg border border-border" />
-          <p className="mt-4 text-center font-mono text-xs text-muted-foreground">GUDA ABHISHEK / ENGINEER</p>
-        </motion.div>
-        <div>
-          <motion.p {...reveal} className="text-lg leading-relaxed text-foreground/85">
-            I'm a software engineer focused on React.js and full-stack development, working with JavaScript, Java, Python and SQL. I integrate REST APIs, build reusable components, and explore AI — machine learning, generative AI, RAG and AI agents — applying them practically across the software development lifecycle. I enjoy Agile collaboration and careful debugging.
-          </motion.p>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            {stats.map(([k, v], i) => (
-              <motion.div key={k} {...reveal} transition={{ delay: i * 0.06, duration: 0.5 }} className="glass rounded-lg p-4">
-                <p className="font-mono text-[10px] uppercase text-accent">{k}</p>
-                <p className="mt-1 text-sm">{v}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </div>
-      <div className="mt-16 grid gap-4 md:grid-cols-5">
-        {timeline.map(([y, t], i) => (
-          <motion.div key={y} {...reveal} transition={{ delay: i * 0.1, duration: 0.5 }} className="relative border-t-2 border-primary/40 pt-4">
-            <span className="absolute -top-[7px] left-0 h-3 w-3 rounded-full bg-primary shadow-neon" />
-            <p className="font-display text-lg text-primary">{y}</p>
-            <p className="mt-1 text-sm text-muted-foreground">{t}</p>
-          </motion.div>
-        ))}
-      </div>
-    </Section>
-  );
+function Band({ id, title, kicker, children }: { id: string; title: string; kicker: string; children: ReactNode }) {
+  return <section id={id} className="scroll-mt-24 px-5 py-8 sm:px-10"><div className="mx-auto max-w-[1360px]"><p className="mb-1 text-[9px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">{kicker}</p><h2 className="mb-5 text-3xl font-semibold">{title}</h2>{children}</div></section>;
 }
-
+function ContentRow({ label, children }: { label: string; children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [edge, setEdge] = useState({ start: true, end: false });
+  const update = () => { const el = ref.current; if (el) setEdge({ start: el.scrollLeft < 4, end: el.scrollLeft + el.clientWidth >= el.scrollWidth - 4 }); };
+  useEffect(() => { const el = ref.current; if (!el) return; const observer = new ResizeObserver(update); observer.observe(el); update(); return () => observer.disconnect(); }, [children]);
+  const scroll = (direction: number) => { const el = ref.current; el?.scrollBy({ left: direction * (el.clientWidth * .8), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' }); };
+  return <div className="relative"><div className="mb-3 flex justify-end gap-1"><Button variant="outline" size="icon" disabled={edge.start} onClick={() => scroll(-1)} aria-label={`Previous ${label}`} className="min-h-11 min-w-11"><ChevronLeft /></Button><Button variant="outline" size="icon" disabled={edge.end} onClick={() => scroll(1)} aria-label={`Next ${label}`} className="min-h-11 min-w-11"><ChevronRight /></Button></div><div ref={ref} onScroll={update} tabIndex={0} role="region" aria-label={label} className="series-row flex gap-4 overflow-x-auto pb-4 pt-1 focus-visible:outline-2 focus-visible:outline-ring" onKeyDown={e => { if (e.target !== e.currentTarget) return; if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') { e.preventDefault(); scroll(e.key === 'ArrowRight' ? 1 : -1); } }}>{children}</div></div>;
+}
+function Tags({ items }: { items: readonly string[] }) { return <div className="flex flex-wrap gap-1.5">{items.map(t => <span key={t} className="rounded-sm border border-border bg-secondary px-2 py-1 text-[10px] text-muted-foreground">{t}</span>)}</div>; }
+function Projects({ viewer }: { viewer: Viewer }) {
+  return <Band id="projects" title="Top Originals — Featured Projects" kicker="IDEAS INTO INTERFACES"><ContentRow label="featured projects">{projectOrder(viewer).map(index => { const p = PROJECTS[index]; if (!p) return null; return <Details key={p.title} title={p.title} description={p.badge} trigger={<Button variant="bare" size="auto" className="series-card block w-[280px] shrink-0 overflow-hidden rounded border border-border bg-card text-left sm:w-[310px]"><div className="relative"><ProjectVisual index={index === 3 ? 2 : index} /><span className="absolute left-3 top-3 rounded-sm bg-background/90 px-2 py-1 text-[9px] font-bold text-primary">A ORIGINAL</span></div><div className="flex h-40 flex-col px-4 pb-4"><p className="text-[9px] text-muted-foreground">{p.badge}</p><h3 className="mt-2 text-xl font-semibold leading-tight">{p.title}</h3><div className="mt-auto flex items-center justify-between pt-3"><span className="text-[10px] text-muted-foreground">{p.tech.slice(0, 3).join(' · ')}</span><Info className="text-muted-foreground" /></div></div></Button>}>
+    <ProjectVisual index={index === 3 ? 2 : index} /><p className="text-sm leading-7">{p.overview}</p><h3 className="text-xl font-semibold">The challenge</h3><p className="text-sm leading-7 text-muted-foreground">{p.problem}</p><h3 className="text-xl font-semibold">My contribution & context</h3><p className="text-sm leading-7 text-muted-foreground">{p.role}</p><Tags items={p.tech} />{index !== 2 && <><h3 className="text-xl font-semibold">{index < 2 ? 'Conceptual flow' : 'Implementation flow'}</h3><p className="text-sm text-muted-foreground">{p.flow.join(' → ')}</p></>}
+  </Details>; })}</ContentRow></Band>;
+}
 function Experience() {
-  const [open, setOpen] = useState<string | null>("01");
-  return (
-    <Section id="experience" kicker="Mission Log" title="Experience">
-      <div className="relative space-y-6 border-l border-border pl-8">
-        {MISSIONS.map((m) => (
-          <motion.div key={m.id} {...reveal} className="relative">
-            <span className="absolute -left-[37px] top-6 h-4 w-4 rounded-full border-2 border-primary bg-background shadow-neon" />
-            <Button variant="bare" size="auto" onClick={() => setOpen(open === m.id ? null : m.id)} aria-expanded={open === m.id} aria-controls={`mission-${m.id}`} className="glass block h-auto w-full rounded-lg p-6 text-left transition-all hover:border-primary/60">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="font-mono text-xs text-accent">MISSION {m.id} · {m.period.includes("Present") ? "IN PROGRESS" : "COMPLETED"}</p>
-                  <h3 className="mt-2 flex items-center gap-3 text-xl font-bold">{m.company}<ChevronDown className={`transition-transform ${open === m.id ? "rotate-180" : ""}`} /></h3>
-                  <p className="text-sm text-muted-foreground">{m.role}</p>
-                </div>
-                <p className="font-mono text-xs text-muted-foreground">{m.period}{m.location && ` · ${m.location}`}</p>
-              </div>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {m.tags.map((t) => <span key={t} className="rounded border border-primary/30 px-2 py-0.5 font-mono text-[10px] text-primary">{t}</span>)}
-              </div>
-            </Button>
-            <AnimatePresence>
-              {open === m.id && (
-                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                  <div id={`mission-${m.id}`} className="space-y-6 px-6 pt-6">
-                    {m.projects.map((p) => (
-                      <div key={p.name}>
-                        <p className="font-display text-sm text-foreground">{p.name}</p>
-                        <ul className="mt-3 space-y-2">
-                          {p.points.map((pt) => <li key={pt} className="flex gap-3 text-sm text-foreground/80"><span className="text-accent">▸</span>{pt}</li>)}
-                        </ul>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        ))}
-      </div>
-    </Section>
-  );
+  return <Band id="experience" title="Episodes & Career Journey" kicker="HANDS-ON EXPERIENCE"><ContentRow label="career episodes">{MISSIONS.map((m, index) => <Details key={m.id} title={m.company} description={`${m.role} · ${m.period}${m.location ? ` · ${m.location}` : ''}`} trigger={<Button variant="bare" size="auto" className="series-card block w-[300px] shrink-0 overflow-hidden rounded border border-border bg-card text-left sm:w-[420px]"><div className="relative flex h-32 items-center justify-between bg-secondary px-6"><span className="font-display text-7xl font-bold text-foreground/15">0{index + 1}</span><BriefcaseBusiness className="h-10 w-10 text-muted-foreground" /><span className="absolute bottom-3 left-6 text-[9px] text-primary">EPISODE {index + 1}</span></div><div className="h-40 p-5"><p className="text-[10px] text-muted-foreground">{m.period}</p><h3 className="mt-2 text-2xl font-semibold">{m.company}</h3><p className="mt-2 text-xs leading-5 text-muted-foreground">{m.role}</p><p className="mt-3 text-[10px] text-foreground">{index === 0 ? 'Enterprise finance & employee interfaces' : 'AI interfaces · approximately 25% lower delays'}</p></div></Button>}>
+    {m.projects.map(p => <div key={p.name}><h3 className="mb-3 text-xl font-semibold">{p.name}</h3><ul className="list-disc space-y-2 pl-5 text-sm leading-6 text-muted-foreground">{p.points.map(point => <li key={point}>{point}</li>)}</ul></div>)}<Tags items={m.tags} />
+  </Details>)}</ContentRow></Band>;
 }
-
-const hueClass = {
-  primary: { text: "text-primary", border: "hover:border-primary", glow: "bg-primary/30" },
-  accent: { text: "text-accent", border: "hover:border-accent", glow: "bg-accent/30" },
-  violet: { text: "text-violet", border: "hover:border-violet", glow: "bg-violet/30" },
-};
-
-function ProjectCard({ p, i }: { p: (typeof PROJECTS)[number]; i: number }) {
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [open, setOpen] = useState(false);
-  const h = hueClass[p.hue];
-  const reduced = useReducedMotion();
-  const move = (e: MouseEvent<HTMLDivElement>) => {
-    if (reduced) return;
-    const r = e.currentTarget.getBoundingClientRect();
-    setTilt({ x: ((e.clientY - r.top) / r.height - 0.5) * -8, y: ((e.clientX - r.left) / r.width - 0.5) * 8 });
-  };
-  return (
-    <motion.div {...reveal} transition={{ delay: i * 0.1, duration: 0.6 }} style={{ perspective: 1000 }}>
-      <div onMouseMove={move} onMouseLeave={() => setTilt({ x: 0, y: 0 })} style={{ transform: `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg)` }} className={`glass relative flex h-full flex-col overflow-hidden rounded-lg p-6 transition-[transform,border-color] duration-200 ${h.border}`}>
-        <ProjectVisual index={i} />
-        <p className={`relative font-mono text-xs ${h.text}`}>PROJECT / 0{i + 1}</p>
-        <p className={`relative mt-2 font-mono text-[10px] uppercase tracking-widest ${h.text}`}>{p.badge}</p>
-        <h3 className="relative mt-2 text-xl font-bold leading-snug">{p.title}</h3>
-        <p className="relative mt-3 text-sm text-foreground/75">{p.overview}</p>
-        <div className="relative mt-5 flex flex-wrap items-center gap-1.5 font-mono text-[10px]">
-          {p.flow.map((f, k) => (
-            <span key={f} className="flex items-center gap-1.5">
-              <span className="rounded bg-muted px-2 py-1">{f}</span>
-              {k < p.flow.length - 1 && <span className={h.text}>→</span>}
-            </span>
-          ))}
-        </div>
-        <AnimatePresence>
-          {open && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }} id={`project-${i}`} className="relative overflow-hidden">
-              <p className="mt-5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Problem</p>
-              <p className="mt-1 text-sm">{p.problem}</p>
-              <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">Solution</p>
-              <p className="mt-1 text-sm">{p.overview}</p>
-              <p className="mt-4 text-xs font-semibold uppercase text-muted-foreground">My contribution</p>
-              <p className="mt-1 text-sm">{p.role}</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <div className="relative mt-auto pt-6">
-          <div className="flex flex-wrap gap-1.5">
-            {p.tech.map((t) => <span key={t} className="rounded border border-border px-2 py-0.5 font-mono text-[10px] text-muted-foreground">{t}</span>)}
-          </div>
-          <Button variant="bare" size="auto" aria-expanded={open} aria-controls={`project-${i}`} onClick={() => setOpen(!open)} className={`mt-5 min-h-11 font-mono text-xs uppercase tracking-widest ${h.text}`}>{open ? "− Hide details" : "+ Mission details"}</Button>
-        </div>
-      </div>
-    </motion.div>
-  );
+function Skills({ viewer }: { viewer: Viewer }) {
+  return <Band id="skills" title="My Skill Universe" kicker="THE TOOLS BEHIND THE STORY"><Tabs key={viewer} defaultValue={viewer === 'ai' ? '2' : viewer === 'developer' ? '1' : '0'}><div className="overflow-x-auto pb-3"><TabsList className="h-auto min-w-max justify-start gap-1 bg-transparent p-0">{SKILLS.map((s, i) => <TabsTrigger key={s.cat} value={String(i)} className="min-h-11 rounded-sm border border-border px-4 text-[11px] data-[state=active]:border-primary data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">{s.cat}</TabsTrigger>)}</TabsList></div>{SKILLS.map((s, i) => <TabsContent key={s.cat} value={String(i)}><p className="mb-4 text-xs text-muted-foreground">{s.desc}</p><ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{s.items.map(item => <li key={item} className="flex min-h-16 items-center gap-3 rounded border border-border bg-card px-4 py-3 text-xs"><Code2 className="h-4 w-4 shrink-0 text-muted-foreground" />{item}</li>)}</ul></TabsContent>)}</Tabs></Band>;
 }
-
-const skillIcons = [Braces, Code2, Cpu, Brain, Database, Cloud, GitBranch];
-function Skills() {
-  const [sel, setSel] = useState(0);
-  const s = SKILLS[sel];
-  if (!s) return null;
-  return (
-    <Section id="skills" kicker="Connected Capabilities" title="Skill Tree">
-      <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
-        <div className="skill-tree relative grid grid-cols-2 gap-4 py-5 sm:grid-cols-3" role="group" aria-label="Skill categories">
-          <svg aria-hidden="true" viewBox="0 0 600 430" preserveAspectRatio="none" className="pointer-events-none absolute inset-0 hidden h-full w-full fill-none stroke-primary/30 sm:block"><path d="M100 70h400M100 70l200 140 200-140M100 210h400M100 210l200 140 200-140M300 70v280" /></svg>
-          {SKILLS.map((c, i) => { const Icon = skillIcons[i] ?? Code2; return (
-            <Button variant="portfolio" size="auto" key={c.cat} onClick={() => setSel(i)} aria-pressed={sel === i} aria-controls="skill-details" className={`skill-node relative flex min-h-28 flex-col gap-3 px-3 py-4 text-center text-xs ${sel === i ? "border-primary bg-secondary shadow-neon" : "text-muted-foreground"}`}>
-              <Icon className={sel === i ? "text-accent" : "text-primary"} />
-              {c.cat}
-            </Button>
-          ); })}
-        </div>
-        <div id="skill-details" className="glass relative min-h-80 overflow-hidden rounded-lg p-6 sm:p-8" aria-live="polite" aria-atomic="true">
-          <div className="absolute inset-0 grid-bg opacity-20" />
-          <div className="relative">
-            <p className="font-mono text-xs text-accent">CAPABILITY / {String(sel + 1).padStart(2, "0")}</p>
-            <h3 className="mt-4 font-display text-xl">{s.cat}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
-            <ul className="mt-7 flex flex-wrap gap-2">
-              {s.items.map(it => <li key={it} className="rounded border border-primary/30 bg-background/60 px-3 py-2 text-sm">{it}</li>)}
-            </ul>
-          </div>
-        </div>
-      </div>
-    </Section>
-  );
+function Certifications({ viewer }: { viewer: Viewer }) {
+  const certs = viewer === 'ai' ? [...CERTS].sort((a, b) => Number(!/AI|Generative/.test(a[0])) - Number(!/AI|Generative/.test(b[0]))) : CERTS;
+  return <Band id="certifications" title="Certified & Awards" kicker="LEARNING. LEADERSHIP. RECOGNITION."><div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">{certs.map(([name, issuer]) => <div key={name} className="flex min-h-32 gap-3 rounded border border-gold/20 bg-card p-4"><Award className="mt-1 h-6 w-6 shrink-0 text-gold" /><div><h3 className="font-sans text-sm font-semibold leading-6">{name}</h3><p className="mt-2 text-[10px] text-muted-foreground">{issuer}</p></div></div>)}</div><h3 id="achievements" className="mb-4 mt-8 text-2xl font-semibold">Beyond the code</h3><div className="grid gap-4 sm:grid-cols-2">{MILESTONES.map(([period, title, desc]) => <div key={title} className="border-l-2 border-gold/40 pl-4"><p className="text-[10px] text-gold">{period}</p><h4 className="mt-1 text-sm font-semibold">{title}</h4><p className="mt-2 text-xs leading-6 text-muted-foreground">{desc}</p></div>)}</div></Band>;
 }
-
-function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [copied, setCopied] = useState(false);
-  const [feedback, setFeedback] = useState("");
-  const [copyFeedback, setCopyFeedback] = useState("");
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    setFeedback("");
-    const result = contactSchema.safeParse(form);
-    if (!result.success) {
-      const next: Record<string, string> = {};
-      result.error.issues.forEach(issue => { const key = String(issue.path[0]); if (!next[key]) next[key] = issue.message; });
-      setErrors(next);
-      return;
-    }
-    setErrors({});
-    const data = result.data;
-    const body = `${data.message}\n\n— ${data.name} (${data.email})`;
-    window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(data.subject)}&body=${encodeURIComponent(body)}`;
-    setFeedback("Email draft prepared. Send it in your email app; no message has been sent from this website.");
-  };
-  const copy = async () => {
-    try { await navigator.clipboard.writeText(CONTACT.email); setCopied(true); setCopyFeedback("Email copied to clipboard."); }
-    catch { setCopyFeedback("Could not copy. Select the email address to copy it manually."); }
-  };
-  const field = "w-full rounded-md border border-input bg-background/60 px-4 py-3 text-sm outline-none transition-colors focus:border-primary focus-visible:ring-2 focus-visible:ring-ring placeholder:text-muted-foreground";
-  return (
-    <Section id="contact" kicker="Establish Connection" title="Contact">
-      <div className="grid gap-8 lg:grid-cols-2">
-        <motion.div {...reveal} className="space-y-5 py-4 font-mono text-sm">
-          <p className="text-accent">&gt; open_channel --to abhishek</p>
-          <div className="flex flex-wrap items-center justify-between gap-2"><span className="min-w-0 break-all"><span className="text-muted-foreground">email:</span> <a href={`mailto:${CONTACT.email}`} className="hover:text-accent">{CONTACT.email}</a></span><Button variant="bare" size="auto" onClick={copy} aria-label="Copy email" className="min-h-11 min-w-11 rounded border border-border px-2 py-1 text-xs hover:border-accent hover:text-accent"><Copy />{copied ? "Copied" : "Copy"}</Button></div>
-          <p><span className="text-muted-foreground">phone:</span> <a href={`tel:${CONTACT.phone.replace(/\s/g, "")}`} className="hover:text-accent">{CONTACT.phone}</a></p>
-          <p><span className="text-muted-foreground">location:</span> {CONTACT.location}</p>
-          <p role="status" className="text-xs text-accent">{copyFeedback}</p>
-          <div className="flex flex-wrap gap-3 pt-4">
-            {CONTACT.linkedin && <Button variant="portfolio" asChild><a href={CONTACT.linkedin} target="_blank" rel="noreferrer">LinkedIn</a></Button>}
-            {CONTACT.github && <Button variant="portfolio" asChild><a href={CONTACT.github} target="_blank" rel="noreferrer">GitHub</a></Button>}
-            {PORTFOLIO_FILES.resume ? <Button variant="portfolio" asChild><a href={PORTFOLIO_FILES.resume} download><FileDown /> Resume</a></Button> : <p className="text-xs text-muted-foreground">Resume · Not yet provided</p>}
-          </div>
-        </motion.div>
-        <motion.form {...reveal} onSubmit={submit} noValidate className="glass space-y-4 rounded-lg p-5 sm:p-8">
-          {(["name", "email", "subject"] as const).map((k) => (
-            <div key={k}>
-              <label htmlFor={`contact-${k}`} className="mb-2 block text-xs font-medium capitalize">{k}</label>
-              <input id={`contact-${k}`} aria-invalid={Boolean(errors[k])} aria-describedby={errors[k] ? `error-${k}` : undefined} required autoComplete={k === "subject" ? "off" : k} aria-label={k} placeholder={k.charAt(0).toUpperCase() + k.slice(1)} type={k === "email" ? "email" : "text"} value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} className={field} maxLength={k === "subject" ? 150 : k === "email" ? 255 : 100} />
-              {errors[k] && <p id={`error-${k}`} role="alert" className="mt-1 text-xs text-destructive">{errors[k]}</p>}
-            </div>
-          ))}
-          <div>
-            <label htmlFor="contact-message" className="mb-2 block text-xs font-medium">Message</label>
-            <textarea id="contact-message" required aria-invalid={Boolean(errors["message"])} aria-describedby={errors["message"] ? "error-message" : undefined} aria-label="message" placeholder="Message" rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={field} maxLength={2000} />
-            {errors["message"] && <p id="error-message" role="alert" className="mt-1 text-xs text-destructive">{errors["message"]}</p>}
-          </div>
-          <Button variant="bare" size="auto" type="submit" className="w-full rounded-md bg-neon py-3 font-display text-xs font-bold text-primary-foreground transition-shadow hover:shadow-neon"><Mail /> PREPARE EMAIL</Button>
-          <p className="text-xs leading-relaxed text-muted-foreground">Opens your email app. Messages are not delivered by this website.</p>
-          <p role="status" className="text-xs leading-relaxed text-accent">{feedback}</p>
-        </motion.form>
-      </div>
-    </Section>
-  );
+function About() {
+  return <Band id="about" title="Behind the Series" kicker="THE DEVELOPER DOSSIER"><div className="grid items-center gap-8 md:grid-cols-[180px_1fr]"><DeveloperMark className="mx-auto h-36 w-36" /><div><p className="max-w-4xl text-sm leading-7 text-muted-foreground">I'm a software engineer focused on React.js and full-stack development, working with JavaScript, Java, Python and SQL. I integrate REST APIs, build reusable components, and explore machine learning, Generative AI, RAG and AI agents — applying them practically across the software development lifecycle. I enjoy Agile collaboration and careful debugging.</p><div className="mt-5 flex flex-wrap gap-5 text-xs"><span className="flex items-center gap-2"><GraduationCap className="h-4 w-4 text-gold" />B.Tech IT · TKR College · 2022–2026 · CGPA 7.6</span><span className="flex items-center gap-2 text-muted-foreground"><MapPin className="h-4 w-4" />Hyderabad, India</span></div><div className="mt-5 flex flex-wrap gap-3"><ResumeButton /><Button variant="outline" onClick={() => go('contact')} className="min-h-11">Contact Me <ArrowRight /></Button></div></div></div></Band>;
 }
-
 function Portfolio() {
-  return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.35 }} className="relative min-h-screen bg-background">
-      <Nav />
-      <Hero />
-      <About />
-      <Experience />
-      <Section id="projects" kicker="Select Your Mission" title="Projects">
-        <div className="grid gap-6 md:grid-cols-3">
-          {PROJECTS.map((p, i) => <ProjectCard key={p.title} p={p} i={i} />)}
-        </div>
-      </Section>
-      <Skills />
-      <Section id="certifications" kicker="Achievements Collection" title="Certifications">
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {CERTS.map(([n, by], i) => (
-            <motion.div key={n} {...reveal} transition={{ delay: i * 0.06, duration: 0.5 }} whileHover={{ y: -6, rotate: -1 }} className="group relative rounded-lg border border-border hover:border-accent">
-              <div className="flex h-full flex-col rounded-lg bg-background p-5 transition-colors group-hover:bg-secondary">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full border border-accent/50 font-display text-sm text-accent">✦</span>
-                <p className="mt-4 font-semibold leading-snug">{n}</p>
-                <p className="mt-auto pt-3 font-mono text-[11px] text-muted-foreground">{by}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </Section>
-      <Section id="achievements" kicker="Progression" title="Achievements & Leadership">
-        <div className="grid gap-5 md:grid-cols-2">
-          {MILESTONES.map(([when, t, d], i) => (
-            <motion.div key={t} {...reveal} transition={{ delay: i * 0.08, duration: 0.5 }} className="glass flex gap-5 rounded-lg p-6 transition-shadow hover:shadow-violet">
-              <span className="font-display text-3xl font-black text-violet">{String(i + 1).padStart(2, "0")}</span>
-              <div>
-                <p className="font-mono text-[11px] text-accent">{when}</p>
-                <p className="mt-1 font-semibold">{t}</p>
-                <p className="mt-1 text-sm text-muted-foreground">{d}</p>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </Section>
-      <Contact />
-      <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-border px-6 py-8 font-mono text-xs text-muted-foreground md:px-12"><span>© {new Date().getFullYear()} Guda Abhishek</span><Button variant="bare" size="auto" onClick={() => scrollToSection("home")} className="min-h-11">Back to top <ArrowUp /></Button></footer>
-    </motion.div>
-  );
+  const { profile } = Route.useSearch();
+  const sections: Record<string, ReactNode> = { projects: <Projects viewer={profile} />, experience: <Experience />, skills: <Skills viewer={profile} />, certifications: <Certifications viewer={profile} />, about: <About /> };
+  return <div className="min-h-screen bg-background"><Nav viewer={profile} /><Hero viewer={profile} />
+    <div className="mx-auto flex max-w-[1360px] items-center gap-2 px-5 pb-2 pt-3 sm:px-10"><ViewerAvatar viewer={profile} compact /><p className="text-[10px] text-muted-foreground">{VIEWER_FOCUS[profile]}</p></div>
+    {sectionOrder(profile).map(id => <div key={id}>{sections[id]}</div>)}<PortfolioContact />
+    <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-border px-5 py-6 text-[10px] leading-5 text-muted-foreground sm:px-10"><span>© 2026 Guda Abhishek. All rights reserved. Netflix-inspired portfolio concept.</span><Button variant="bare" className="min-h-11 text-xs" onClick={() => go('home')}>Back to top <ArrowUp /></Button></footer>
+  </div>;
 }

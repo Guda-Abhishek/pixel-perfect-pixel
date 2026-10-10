@@ -1,5 +1,6 @@
-# Portfolio refinement
-- [x] Refine profile picker, immediate skip, and motion handling.
-- [x] Refine hero, navigation, dossier, project visuals, and skill nodes.
-- [x] Remove unverified links and add validated, honest contact feedback.
-- [x] Verify factual rules, desktop/mobile interactions, and preview errors.
+# Netflix-inspired portfolio enhancement
+- [x] Add four selectable profiles, optional intro, and profile switching.
+- [x] Apply cinematic red/charcoal design, billboard and accessible details.
+- [x] Add horizontal project/episode rows, skill categories, and awards.
+- [x] Connect supplied social URLs and honest bio/resume/contact actions.
+- [x] Test factual rules, desktop/mobile interactions, accessibility and errors.
