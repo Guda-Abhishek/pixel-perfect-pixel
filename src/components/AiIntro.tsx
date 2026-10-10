@@ -5,14 +5,12 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogTitle, Dia
 import { DeveloperMark } from "@/components/DeveloperMark";
 import { useAiIntro } from "@/hooks/use-ai-intro";
 import { AI_INTRO_DURATION, AI_INTRO_SEGMENTS, INTRO_PORTRAITS } from "@/lib/ai-intro";
-import liftVideo from "@/assets/lift.mp4.asset.json";
-import sittingVideo from "@/assets/sitting_video.mp4.asset.json";
+import videoSet from "@/assets/video_set.mp4";
 
-const INTRO_VIDEOS = [{ url: liftVideo.url, name: "Lift" }, { url: sittingVideo.url, name: "Sitting" }];
+const INTRO_VIDEO = { url: videoSet, name: "Introduction" };
 
 function IntroPlayer() {
   const player = useAiIntro({ narrateOnPlay: true });
-  const [clip, setClip] = useState(0);
   const [videoError, setVideoError] = useState(false);
   const video = useRef<HTMLVideoElement>(null);
   useEffect(() => {
@@ -21,16 +19,15 @@ function IntroPlayer() {
     if (player.status === "playing") void element.play().catch(() => setVideoError(true));
     else element.pause();
     return () => element.pause();
-  }, [clip, player.status]);
-  const replay = () => { if (video.current) video.current.currentTime = 0; setClip(0); player.replay(); };
+  }, [player.status]);
+  const replay = () => { if (video.current) video.current.currentTime = 0; player.replay(); };
   const segment = AI_INTRO_SEGMENTS[player.segmentIndex];
   return <>
     <div className="grid gap-5 sm:grid-cols-[240px_1fr]">
       <div className="space-y-3">
         <div className="flex aspect-[768/1052] items-center justify-center overflow-hidden rounded border border-border bg-secondary">
-          {videoError ? <DeveloperMark className="h-28 w-28" /> : <video key={clip} ref={video} src={INTRO_VIDEOS[clip]?.url} muted playsInline preload="metadata" aria-label={`${INTRO_VIDEOS[clip]?.name} · AI portfolio host video`} className="h-full w-full object-contain" onError={() => setVideoError(true)} onEnded={() => { if (player.status === "playing") setClip(current => (current + 1) % INTRO_VIDEOS.length); }} />}
+          {videoError ? <DeveloperMark className="h-28 w-28" /> : <video ref={video} src={INTRO_VIDEO.url} muted playsInline loop preload="metadata" aria-label={`${INTRO_VIDEO.name} · AI portfolio host video`} className="h-full w-full object-contain" onError={() => setVideoError(true)} />}
         </div>
-        <div className="flex gap-2" role="group" aria-label="Introduction videos">{INTRO_VIDEOS.map((item, index) => <Button key={item.name} variant={clip === index ? "secondary" : "outline"} className="min-h-11 flex-1 text-xs" aria-pressed={clip === index} onClick={() => { setVideoError(false); setClip(index); }}>{item.name}</Button>)}</div>
         {videoError && <p role="status" className="text-xs text-muted-foreground">Video unavailable. Narration and transcript remain available.</p>}
         <p className="flex items-center gap-2 text-xs font-semibold"><Bot className="size-4 text-primary" /> AI portfolio host</p>
         {INTRO_PORTRAITS.real && <figure><img src={INTRO_PORTRAITS.real} alt="Real portrait of Guda Abhishek" className="aspect-square w-16 rounded object-contain" /><figcaption className="mt-1 text-xs text-muted-foreground">Guda Abhishek · real portrait</figcaption></figure>}
