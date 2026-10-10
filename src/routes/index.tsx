@@ -24,7 +24,7 @@ function ProfileSelect() {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reduced = useReducedMotion();
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); void audio.current?.close(); }, []);
-  const skip = () => { setIntro(false); if (timer.current) clearTimeout(timer.current); void audio.current?.close(); audio.current = null; };
+  const skip = () => { setIntro(false); setSound(false); if (timer.current) clearTimeout(timer.current); void audio.current?.close(); audio.current = null; };
   const toggleSound = () => {
     if (sound) { setSound(false); void audio.current?.close(); audio.current = null; return; }
     try {
