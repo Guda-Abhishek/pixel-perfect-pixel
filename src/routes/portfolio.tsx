@@ -258,7 +258,7 @@ function ProjectCard({ p, i }: { p: (typeof PROJECTS)[number]; i: number }) {
 
 function Skills() {
   const [sel, setSel] = useState(0);
-  const s = SKILLS[sel];
+  const s = SKILLS[sel]!;
   return (
     <Section id="skills" kicker="Upgrade Tree" title="Skills">
       <div className="grid gap-8 lg:grid-cols-[300px_1fr]">
@@ -298,10 +298,10 @@ function Contact() {
   const submit = (e: FormEvent) => {
     e.preventDefault();
     const er: Record<string, string> = {};
-    if (!form.name.trim()) er.name = "Please enter your name";
-    if (!/^\S+@\S+\.\S+$/.test(form.email)) er.email = "Enter a valid email";
-    if (!form.subject.trim()) er.subject = "Add a subject";
-    if (form.message.trim().length < 10) er.message = "Message should be at least 10 characters";
+    if (!form.name.trim()) er["name"] = "Please enter your name";
+    if (!/^\S+@\S+\.\S+$/.test(form.email)) er["email"] = "Enter a valid email";
+    if (!form.subject.trim()) er["subject"] = "Add a subject";
+    if (form.message.trim().length < 10) er["message"] = "Message should be at least 10 characters";
     setErrors(er);
     if (Object.keys(er).length) return;
     const body = `${form.message}\n\n— ${form.name} (${form.email})`;
@@ -325,13 +325,13 @@ function Contact() {
         <motion.form {...reveal} onSubmit={submit} noValidate className="glass space-y-4 rounded-xl p-8">
           {(["name", "email", "subject"] as const).map((k) => (
             <div key={k}>
-              <input aria-label={k} placeholder={k[0].toUpperCase() + k.slice(1)} type={k === "email" ? "email" : "text"} value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} className={field} maxLength={k === "subject" ? 150 : 100} />
+              <input aria-label={k} placeholder={k.charAt(0).toUpperCase() + k.slice(1)} type={k === "email" ? "email" : "text"} value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} className={field} maxLength={k === "subject" ? 150 : 100} />
               {errors[k] && <p className="mt-1 text-xs text-destructive">{errors[k]}</p>}
             </div>
           ))}
           <div>
             <textarea aria-label="message" placeholder="Message" rows={5} value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} className={field} maxLength={2000} />
-            {errors.message && <p className="mt-1 text-xs text-destructive">{errors.message}</p>}
+            {errors["message"] && <p className="mt-1 text-xs text-destructive">{errors["message"]}</p>}
           </div>
           <button type="submit" className="w-full rounded-md bg-neon py-3 font-display text-xs font-bold tracking-widest text-primary-foreground transition-shadow hover:shadow-neon">TRANSMIT MESSAGE</button>
           <p className="text-center text-xs text-muted-foreground">Opens your email app with the message ready to send.</p>
