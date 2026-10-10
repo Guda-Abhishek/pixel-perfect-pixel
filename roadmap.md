@@ -9,3 +9,7 @@
 - [ ] Inspect video and connect authentic/AI portraits — blocked: the video, refer real.jpeg and ai refer.jpeg are absent from both upload mounts; needs re-upload.
 - [x] Add shared accessible intro with transcript and optional browser voice to picker and hero.
 - [x] Verify playback, fallback, mobile layout and existing portfolio interactions; portrait verification awaits missing images.
+
+# Video-backed introduction
+- [ ] Add both supplied clips with user-started background intro narration.
+- [ ] Verify video selection, playback, pause, replay and cleanup.
