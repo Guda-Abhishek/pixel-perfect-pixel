@@ -6,6 +6,6 @@
 - [x] Test factual rules, desktop/mobile interactions, accessibility and errors.
 
 # Optional AI portfolio introduction
-- [ ] Inspect supplied video and portrait references.
-- [ ] Add shared accessible intro with transcript and optional browser voice to picker and hero.
-- [ ] Verify playback, fallback, portraits, mobile layout and existing portfolio interactions.
+- [ ] Inspect video and connect authentic/AI portraits — blocked: the video, refer real.jpeg and ai refer.jpeg are absent from both upload mounts; needs re-upload.
+- [x] Add shared accessible intro with transcript and optional browser voice to picker and hero.
+- [x] Verify playback, fallback, mobile layout and existing portfolio interactions; portrait verification awaits missing images.

@@ -20,7 +20,7 @@ export function useAiIntro() {
   }, []);
 
   useEffect(() => {
-    setVoiceAvailable("speechSynthesis" in window && "SpeechSynthesisUtterance" in window);
+    setVoiceAvailable(Boolean(window.speechSynthesis) && typeof window.SpeechSynthesisUtterance === "function");
     return silence;
   }, [silence]);
 

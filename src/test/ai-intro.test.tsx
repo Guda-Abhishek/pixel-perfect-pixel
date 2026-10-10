@@ -28,6 +28,7 @@ describe("Optional AI intro playback", () => {
     vi.stubGlobal("SpeechSynthesisUtterance", undefined);
     vi.useFakeTimers({ toFake: ["setInterval", "clearInterval", "performance"] });
     const { result } = renderHook(useAiIntro);
+    expect(result.current.voiceAvailable).toBe(false);
     act(() => result.current.play());
     act(() => vi.advanceTimersByTime(7000));
     expect(result.current.segmentIndex).toBe(1);
