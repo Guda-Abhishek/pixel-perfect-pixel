@@ -12,6 +12,14 @@ function mockSpeech() {
 }
 
 describe("Optional AI intro playback", () => {
+  it("keeps video narration silent until Play even when narration is selected", () => {
+    const speech = mockSpeech();
+    const { result } = renderHook(() => useAiIntro({ narrateOnPlay: true }));
+    expect(result.current.voiceEnabled).toBe(true);
+    expect(speech.speak).not.toHaveBeenCalled();
+    act(() => result.current.play());
+    expect(speech.speak).toHaveBeenCalledTimes(1);
+  });
   it("never speaks on opening, enabling voice alone, or silent play", () => {
     const speech = mockSpeech();
     const { result } = renderHook(useAiIntro);

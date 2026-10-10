@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AI_INTRO_DURATION, AI_INTRO_SEGMENTS, introSegmentAt } from "@/lib/ai-intro";
 
-export function useAiIntro() {
+export function useAiIntro({ narrateOnPlay = false }: { narrateOnPlay?: boolean } = {}) {
   const [status, setStatus] = useState<"ready" | "playing" | "paused" | "ended">("ready");
   const [elapsed, setElapsed] = useState(0);
   const [voiceAvailable, setVoiceAvailable] = useState(false);
-  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(narrateOnPlay);
   const [voiceError, setVoiceError] = useState(false);
   const [revision, setRevision] = useState(0);
   const speaking = useRef(false);
@@ -20,7 +20,9 @@ export function useAiIntro() {
   }, []);
 
   useEffect(() => {
-    setVoiceAvailable(Boolean(window.speechSynthesis) && typeof window.SpeechSynthesisUtterance === "function");
+    const available = Boolean(window.speechSynthesis) && typeof window.SpeechSynthesisUtterance === "function";
+    setVoiceAvailable(available);
+    if (!available) setVoiceEnabled(false);
     return silence;
   }, [silence]);
 

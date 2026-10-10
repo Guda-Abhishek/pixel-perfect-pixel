@@ -21,3 +21,4 @@
 - Keep the contact form in its reusable component and career facts in shared data; presentation changes must not alter validated draft behavior.
 - Keep the optional AI introduction in one shared dialog with a mount-scoped playback hook; opening stays silent and closing cancels only its own speech and timers.
 - Keep real and AI-host portrait references separately nullable until the exact uploaded assets are available; never substitute generated faces or conflate identities.
+- Serve uploaded intro clips through asset pointers and tie muted video playback to the shared narration state; this keeps Play, Pause and close consistent without autoplay.
