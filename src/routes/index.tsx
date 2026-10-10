@@ -5,6 +5,7 @@ import { ArrowRight, Play, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ViewerAvatar } from "@/components/ViewerAvatar";
+import { AiIntro } from "@/components/AiIntro";
 import { VIEWERS } from "@/lib/viewer-profiles";
 
 export const Route = createFileRoute("/")({
@@ -49,7 +50,7 @@ function ProfileSelect() {
             <span className="mt-1 block text-[10px] leading-relaxed text-muted-foreground">{profile.caption}</span>
           </Link></Button>)}
         </div>
-        <Button variant="outline" asChild className="mt-10 min-h-11 px-6 text-xs"><Link to="/portfolio" search={{ profile: "guest" }}>Skip intro / Enter portfolio <ArrowRight /></Link></Button>
+        <div className="mt-10 flex flex-wrap justify-center gap-3"><Button variant="outline" asChild className="min-h-11 px-6 text-xs"><Link to="/portfolio" search={{ profile: "guest" }}>Skip intro / Enter portfolio <ArrowRight /></Link></Button><AiIntro compact /></div>
       </motion.div>
     </div>
     <footer className="text-center text-[10px] text-muted-foreground">GUDA ABHISHEK · SOFTWARE ENGINEER & AI DEVELOPER</footer>

@@ -4,3 +4,8 @@
 - [x] Add horizontal project/episode rows, skill categories, and awards.
 - [x] Connect supplied social URLs and honest bio/resume/contact actions.
 - [x] Test factual rules, desktop/mobile interactions, accessibility and errors.
+
+# Optional AI portfolio introduction
+- [ ] Inspect video and connect authentic/AI portraits — blocked: the video, refer real.jpeg and ai refer.jpeg are absent from both upload mounts; needs re-upload.
+- [x] Add shared accessible intro with transcript and optional browser voice to picker and hero.
+- [x] Verify playback, fallback, mobile layout and existing portfolio interactions; portrait verification awaits missing images.

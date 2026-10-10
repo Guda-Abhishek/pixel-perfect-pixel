@@ -19,3 +19,5 @@
 - Validate viewer selection in route search parameters and derive section/project order from shared rules; URL-based selection survives refresh without storing personal data.
 - Reuse Radix dialogs, tabs and menus for portfolio details and switching; these preserve keyboard interaction and focus management.
 - Keep the contact form in its reusable component and career facts in shared data; presentation changes must not alter validated draft behavior.
+- Keep the optional AI introduction in one shared dialog with a mount-scoped playback hook; opening stays silent and closing cancels only its own speech and timers.
+- Keep real and AI-host portrait references separately nullable until the exact uploaded assets are available; never substitute generated faces or conflate identities.
