@@ -42,7 +42,7 @@ function Bio({ trigger }: { trigger: ReactNode }) {
   </Details>;
 }
 function ResumeButton({ compact = false }: { compact?: boolean }) {
-  const button = <Button className={`min-h-11 ${compact ? 'px-3 text-xs' : 'px-5'}`}><Download /><span className={compact ? 'hidden xl:inline' : ''}>Download Resume</span>{compact && <span className="xl:hidden">Resume</span>}</Button>;
+  const button = <Button className={`min-h-11 ${compact ? 'px-2 text-xs' : 'px-5'}`}><Download /><span className={compact ? 'hidden xl:inline' : ''}>Download Resume</span>{compact && <span className="xl:hidden">Resume</span>}</Button>;
   return PORTFOLIO_FILES.resume ? <Button asChild className="min-h-11"><a href={PORTFOLIO_FILES.resume} download><Download /> Download Resume</a></Button> : <Bio trigger={button} />;
 }
 function Socials({ className = '' }: { className?: string }) {
@@ -64,7 +64,7 @@ function Nav({ viewer }: { viewer: Viewer }) {
     return () => window.removeEventListener('scroll', update);
   }, [viewer]);
   useEffect(() => { const close = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenu(false); }; window.addEventListener('keydown', close); return () => window.removeEventListener('keydown', close); }, []);
-  return <header className="sticky inset-x-0 top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
+  return <header className="series-nav sticky inset-x-0 top-0 z-40 border-b border-border bg-background/95 backdrop-blur-md">
     <div className="mx-auto flex h-18 max-w-[1440px] items-center justify-between gap-3 px-5 sm:px-10">
       <Link to="/" className="series-logo flex shrink-0 items-center gap-2 text-3xl">ABHISHEK<span className="hidden border-l border-border pl-2 font-sans text-[8px] font-normal text-muted-foreground sm:block">SERIES</span></Link>
       <nav className="hidden items-center xl:flex" aria-label="Portfolio sections">{NAV.map(([id, label]) => <Button key={id} variant="bare" className={`min-h-11 px-2.5 text-[11px] ${active === id ? 'font-semibold text-foreground' : 'text-muted-foreground'}`} aria-current={active === id ? 'location' : undefined} onClick={() => go(id)}>{label}</Button>)}</nav>

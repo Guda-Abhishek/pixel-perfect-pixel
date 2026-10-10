@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Play, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { ViewerAvatar } from "@/components/ViewerAvatar";
 import { VIEWERS } from "@/lib/viewer-profiles";
 
@@ -52,10 +53,10 @@ function ProfileSelect() {
       </motion.div>
     </div>
     <footer className="text-center text-[10px] text-muted-foreground">GUDA ABHISHEK · SOFTWARE ENGINEER & AI DEVELOPER</footer>
-    <AnimatePresence>{intro && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background px-6" role="dialog" aria-modal="true" aria-label="Abhishek series intro" onKeyDown={e => { if (e.key === "Escape") skip(); }}>
+    <Dialog open={intro} onOpenChange={open => { if (!open) skip(); }}><DialogContent className="flex h-svh w-screen max-w-none flex-col items-center justify-center border-0 bg-background px-6 sm:rounded-none"><DialogTitle className="sr-only">Abhishek series intro</DialogTitle><DialogDescription className="sr-only">An optional brief cinematic title sequence.</DialogDescription>
       <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">A DEVELOPER ORIGINAL</p>
       <motion.h2 initial={{ scale: reduced ? 1 : 0.95 }} animate={{ scale: 1 }} transition={{ duration: 1.4 }} className="series-logo text-center text-5xl sm:text-7xl">ABHISHEK:<br />THE SERIES</motion.h2>
       <div className="mt-10 flex gap-4"><Button autoFocus variant="outline" className="min-h-11" onClick={skip}>Skip intro <ArrowRight /></Button><Button variant="ghost" className="min-h-11" onClick={toggleSound} aria-pressed={sound}>{sound ? <Volume2 /> : <VolumeX />} Sound {sound ? "on" : "off"}</Button></div>
-    </motion.div>}</AnimatePresence>
+    </DialogContent></Dialog>
   </div>;
 }

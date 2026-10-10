@@ -174,3 +174,6 @@ section { overflow-wrap: anywhere; }
 .billboard { min-height: 650px; }
 .billboard-title { font-size: 88px; line-height: .92; font-weight: 800; }
 @media (max-width:639px) { .billboard { min-height: 660px; } .billboard-title { font-size: 56px; } }
+
+@media (max-width:359px) { .series-nav .series-logo { font-size: 24px; } .series-nav > div { padding-inline: 12px; gap: 6px; } .series-nav > div > div { gap: 3px; } }
+@media (prefers-reduced-motion: reduce) { .series-card:hover, .entry-screen a:hover { transform: none; } }
