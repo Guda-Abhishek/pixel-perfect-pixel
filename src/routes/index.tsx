@@ -1,7 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
-import avatar from "@/assets/avatar.jpg";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { DeveloperMark } from "@/components/DeveloperMark";
 import { Particles } from "@/components/Particles";
 
 export const Route = createFileRoute("/")({
@@ -11,6 +13,8 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "Enter the portfolio of Guda Abhishek, Software Engineer and AI & Full-Stack Developer." },
       { property: "og:title", content: "Guda Abhishek — Developer Portfolio" },
       { property: "og:description", content: "A cinematic, game-inspired portfolio of an AI & Full-Stack Developer." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ProfileSelect,
@@ -19,19 +23,26 @@ export const Route = createFileRoute("/")({
 function ProfileSelect() {
   const navigate = useNavigate();
   const [entering, setEntering] = useState(false);
+  const reduced = useReducedMotion();
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
+  const skip = () => {
+    if (timer.current) clearTimeout(timer.current);
+    navigate({ to: "/portfolio" });
+  };
 
   const enter = () => {
     if (entering) return;
     setEntering(true);
-    setTimeout(() => navigate({ to: "/portfolio" }), 1400);
+    if (reduced) { skip(); return; }
+    timer.current = setTimeout(skip, 850);
   };
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-background px-6">
+    <div className="entry-screen relative flex min-h-svh flex-col items-center justify-center overflow-hidden bg-background px-6 py-24">
       <div className="absolute inset-0 grid-bg opacity-30 [mask-image:radial-gradient(ellipse_at_center,black,transparent_70%)]" />
-      <div className="absolute left-1/2 top-1/3 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-primary/20 blur-[140px]" />
-      <div className="absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-violet/20 blur-[120px]" />
-      <Particles />
+      <Particles count={12} />
+      <p className="absolute top-8 font-mono text-xs text-muted-foreground">GUDA ABHISHEK / PORTFOLIO</p>
 
       <motion.div
         animate={entering ? { scale: 1.6, opacity: 0 } : { scale: 1, opacity: 1 }}
@@ -47,35 +58,37 @@ function ProfileSelect() {
           Who's exploring?
         </motion.h1>
 
-        <motion.button
-          onClick={enter}
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.6 }}
-          whileHover={{ scale: 1.07 }}
-          whileTap={{ scale: 0.97 }}
-          className="group flex flex-col items-center gap-5 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          whileHover={{ scale: reduced ? 1 : 1.04 }}
+        >
+        <Button variant="bare" size="auto"
+          onClick={enter}
+          disabled={entering}
+          className="group flex max-w-sm flex-col items-center gap-5 rounded-lg text-foreground"
           aria-label="Enter as Abhishek"
         >
           <div className="relative h-44 w-44 overflow-hidden rounded-lg ring-2 ring-transparent transition-all duration-300 group-hover:shadow-neon group-hover:ring-primary md:h-56 md:w-56">
-            <img src={avatar} alt="Abhishek avatar" width={1024} height={1024} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+            <DeveloperMark className="h-full w-full transition-transform duration-500 group-hover:scale-105" />
             <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
           </div>
           <div className="text-center">
             <p className="font-display text-2xl text-muted-foreground transition-colors group-hover:text-foreground">Abhishek</p>
             <p className="mt-1 text-sm text-muted-foreground">Software Engineer | AI & Full-Stack Developer</p>
           </div>
-        </motion.button>
+        </Button>
+        </motion.div>
 
-        <motion.button
-          onClick={enter}
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="mt-12 rounded-md border border-border px-6 py-2 font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground transition-colors hover:border-accent hover:text-accent"
+          className="mt-10"
         >
-          View as Guest
-        </motion.button>
+          <Button variant="portfolio" size="lg" onClick={skip} className="min-h-11 font-mono text-xs">Skip intro / Enter portfolio <ArrowRight /></Button>
+        </motion.div>
       </motion.div>
 
       <AnimatePresence>
@@ -86,10 +99,11 @@ function ProfileSelect() {
             transition={{ delay: 0.4 }}
             className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-background"
           >
-            <p className="font-mono text-sm tracking-widest text-accent">Initializing Developer Environment…</p>
+            <p role="status" className="px-6 text-center font-mono text-sm text-accent">Initializing Developer Environment…</p>
             <div className="mt-5 h-0.5 w-64 overflow-hidden rounded bg-muted">
-              <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 0.9, delay: 0.45 }} className="h-full bg-neon" />
+              <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 0.5 }} className="h-full bg-primary" />
             </div>
+            <Button variant="bare" onClick={skip} className="mt-6 min-h-11">Enter portfolio <ArrowRight /></Button>
           </motion.div>
         )}
       </AnimatePresence>
@@ -97,6 +111,6 @@ function ProfileSelect() {
       <footer className="absolute bottom-6 z-10 font-mono text-xs text-muted-foreground">
         Designed & Developed by Abhishek.
       </footer>
-    </main>
+    </div>
   );
 }

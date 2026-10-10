@@ -2,8 +2,9 @@ export const CONTACT = {
   email: "abhishek.guda123@gmail.com",
   phone: "+91 9391732446",
   location: "Hyderabad, India",
-  linkedin: "https://www.linkedin.com/in/Guda-Abhishek",
-  github: "https://github.com/Guda-Abhishek",
+  linkedin: null as string | null,
+  github: null as string | null,
+  socialName: "Guda-Abhishek",
 };
 
 export const NAV = [
@@ -73,14 +74,14 @@ export const PROJECTS = [
     title: "AI Farmer-to-Buyer Marketplace",
     badge: "Smart India Hackathon 2023",
     hue: "primary",
-    overview: "A MERN-based marketplace connecting farmers directly with buyers.",
+    overview: "A MERN-based marketplace concept connecting farmers directly with buyers through AI-assisted price suggestions and matching.",
     problem: "Farmers often lack fair price discovery and direct access to buyers.",
     role: "Designed system architecture, data flow and feasibility analysis; worked on AI/ML logic for price suggestions and buyer-seller matching.",
     flow: ["Farmer listing", "AI price suggestion", "Buyer matching", "Deal"],
     tech: ["MongoDB", "Express", "React", "Node.js", "ML"],
   },
   {
-    title: "IoT–AI Disaster Notification & Coastal Safety",
+    title: "IoT–AI Disaster Notification & Coastal Safety System",
     badge: "MSME Innovation Programme 2024",
     hue: "accent",
     overview: "Real-time notification flow using IoT sensor inputs and AI-based analysis for coastal climate and beach safety monitoring.",
@@ -107,8 +108,8 @@ export const SKILLS: { cat: string; desc: string; items: string[] }[] = [
   { cat: "AI & Generative AI", desc: "Working with LLM-powered systems.", items: ["Generative AI", "Large Language Models", "RAG", "Prompt Engineering", "AI Agents", "AI-Assisted Development"] },
   { cat: "Machine Learning", desc: "Foundations of learning systems.", items: ["Supervised & Unsupervised Learning", "Model Training & Evaluation", "Neural Networks", "NLP"] },
   { cat: "Databases", desc: "Relational and document stores.", items: ["MySQL", "MongoDB", "PostgreSQL"] },
-  { cat: "Cloud & Dev Tools", desc: "Platforms and everyday tooling.", items: ["Oracle Cloud Infrastructure", "Microsoft Azure", "AWS Fundamentals", "Git & GitHub", "Postman", "Swagger", "VS Code", "Jupyter Notebook", "Docker"] },
-  { cat: "Engineering Practices", desc: "How the work gets shipped.", items: ["Agile SDLC", "AI-SDLC", "Sprint-Based Development", "Code Reviews", "Unit Testing", "Debugging"] },
+  { cat: "Cloud & Dev Tools", desc: "Platforms and everyday tooling.", items: ["Oracle Cloud Infrastructure", "Microsoft Azure", "AWS Fundamentals", "Git", "GitHub", "Postman", "Swagger", "VS Code", "Jupyter Notebook", "Docker"] },
+  { cat: "Engineering Practices", desc: "How the work gets shipped.", items: ["SDLC", "Agile Collaboration", "AI-SDLC", "Sprint-Based Development", "Code Reviews", "Unit Testing", "Debugging"] },
 ];
 
 export const CERTS = [
