@@ -51,7 +51,7 @@ export function PortfolioContact() {
           {(["name", "email"] as const).map((k) => (
             <div key={k}>
               <label htmlFor={`contact-${k}`} className="mb-2 block text-xs font-medium capitalize">{k}</label>
-              <input id={`contact-${k}`} aria-invalid={Boolean(errors[k])} aria-describedby={errors[k] ? `error-${k}` : undefined} required autoComplete={k === "subject" ? "off" : k} aria-label={k} placeholder={k.charAt(0).toUpperCase() + k.slice(1)} type={k === "email" ? "email" : "text"} value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} className={field} maxLength={k === "subject" ? 150 : k === "email" ? 255 : 100} />
+              <input id={`contact-${k}`} aria-invalid={Boolean(errors[k])} aria-describedby={errors[k] ? `error-${k}` : undefined} required autoComplete={k} aria-label={k} placeholder={k.charAt(0).toUpperCase() + k.slice(1)} type={k === "email" ? "email" : "text"} value={form[k]} onChange={(e) => setForm({ ...form, [k]: e.target.value })} className={field} maxLength={k === "email" ? 255 : 100} />
               {errors[k] && <p id={`error-${k}`} role="alert" className="mt-1 text-xs text-destructive">{errors[k]}</p>}
             </div>
           ))}
