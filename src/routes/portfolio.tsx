@@ -11,6 +11,7 @@ import { ViewerAvatar } from "@/components/ViewerAvatar";
 import { ProjectVisual } from "@/components/ProjectVisual";
 import { DeveloperMark } from "@/components/DeveloperMark";
 import { PortfolioContact } from "@/components/PortfolioContact";
+import { AiIntro } from "@/components/AiIntro";
 import { CERTS, CONTACT, MILESTONES, MISSIONS, NAV, PROJECTS, SKILLS } from "@/lib/portfolio-data";
 import { PORTFOLIO_FILES } from "@/lib/contact-schema";
 import { parseViewer, projectOrder, sectionOrder, VIEWERS, VIEWER_FOCUS, type Viewer } from "@/lib/viewer-profiles";
@@ -87,6 +88,7 @@ function Hero({ viewer }: { viewer: Viewer }) {
       <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 text-[11px]"><span className="text-profile-green">2026 Batch</span><span className="text-muted-foreground">B.Tech IT · CGPA 7.6</span><span className="rounded-sm border border-border px-1.5 py-0.5 text-muted-foreground">MERN · PYTHON · GEN AI · OCI</span></div>
       <p className="mt-5 max-w-xl text-sm leading-7 text-foreground/85">{synopsis}</p>
       <div className="mt-6 flex flex-wrap gap-3"><Details title="The story so far" description="Guda Abhishek · Software Engineer & AI Developer" trigger={<Button className="min-h-11 px-6"><Play className="fill-current" /> Play Story</Button>}><p className="text-sm leading-7">Building practical software experiences at the intersection of full-stack engineering, AI, and intelligent automation.</p><p className="text-sm leading-7">From the TKR IT department website and innovation projects to frontend internships at Bilvantis and Paves Technologies, my work focuses on responsive interfaces, reliable API integration and reusable engineering.</p><p className="text-sm leading-7">I explore Generative AI, RAG and AI agents while bringing careful debugging, collaboration and practical product thinking to every project.</p></Details><Bio trigger={<Button variant="secondary" className="min-h-11 px-5"><Info /> View Resume / Full Bio</Button>} /></div>
+      <div className="mt-3"><AiIntro /></div>
       <div className="mt-6 flex max-w-xl flex-wrap gap-x-3 gap-y-2 border-l-2 border-primary pl-3 text-[10px] leading-5 text-muted-foreground"><span>{CONTACT.location}</span><a href={`tel:${CONTACT.phone.replace(/\s/g, '')}`}>{CONTACT.phone}</a><a className="break-all" href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a></div>
     </motion.div></div>
     <span className="absolute bottom-6 right-10 hidden border-l-2 border-primary pl-3 text-[10px] text-muted-foreground md:block">{VIEWER_FOCUS[viewer]}</span>
