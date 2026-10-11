@@ -1,0 +1,85 @@
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { Bot, Minus, Send, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { fallbackAnswer, SUGGESTED_PROMPTS, type ChatMessage } from "@/lib/portfolio-chat";
+
+const uid = () => Math.random().toString(36).slice(2);
+const time = (t: number) => new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+
+/** Light markdown: **bold** and "- " bullets, rendered safely as React nodes. */
+function Rich({ text }: { text: string }) {
+  return <>{text.split("\n").map((line, i) => {
+    const bullet = /^\s*[-*] /.test(line);
+    const parts = line.replace(/^\s*[-*] /, "").split(/(\*\*[^*]+\*\*)/g).map((p, j) => p.startsWith("**") && p.endsWith("**") ? <strong key={j}>{p.slice(2, -2)}</strong> : p);
+    return bullet ? <p key={i} className="pl-3 before:-ml-3 before:mr-1.5 before:content-['•'] before:text-primary">{parts}</p> : <p key={i} className={line ? "" : "h-2"}>{parts}</p>;
+  })}</>;
+}
+
+async function askAi(history: ChatMessage[], onDelta: (t: string) => void, signal: AbortSignal) {
+  const res = await fetch("/api/chat", { method: "POST", signal, headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: history.map(m => ({ role: m.role, content: m.content })) }) });
+  if (!res.ok || !res.body) throw new Error(String(res.status));
+  const reader = res.body.getReader(); const dec = new TextDecoder(); let got = "";
+  for (;;) { const { done, value } = await reader.read(); if (done) break; const t = dec.decode(value, { stream: true }); got += t; onDelta(t); }
+  if (!got.trim()) throw new Error("empty");
+}
+
+export function PortfolioChat() {
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [input, setInput] = useState("");
+  const [busy, setBusy] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const launcherRef = useRef<HTMLButtonElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => { const el = listRef.current; if (el) el.scrollTop = el.scrollHeight; }, [messages, busy]);
+  useEffect(() => { if (open) inputRef.current?.focus(); }, [open, busy]);
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  const close = () => { setOpen(false); requestAnimationFrame(() => launcherRef.current?.focus()); };
+
+  async function send(text: string) {
+    const q = text.trim(); if (!q || busy) return;
+    const user: ChatMessage = { id: uid(), role: "user", content: q, at: Date.now() };
+    const history = [...messages, user];
+    const replyId = uid();
+    setMessages([...history, { id: replyId, role: "assistant", content: "", at: Date.now(), source: "ai" }]);
+    setInput(""); setBusy(true);
+    const ctrl = new AbortController(); abortRef.current = ctrl;
+    const patch = (fn: (m: ChatMessage) => ChatMessage) => setMessages(ms => ms.map(m => m.id === replyId ? fn(m) : m));
+    try {
+      await askAi(history.slice(-12), d => patch(m => ({ ...m, content: m.content + d })), ctrl.signal);
+    } catch {
+      if (ctrl.signal.aborted) return;
+      patch(m => ({ ...m, content: fallbackAnswer(q), source: "fallback" }));
+    } finally { setBusy(false); }
+  }
+
+  const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); void send(input); } if (e.key === "Escape") close(); };
+
+  if (!open) return <Button ref={launcherRef} onClick={() => setOpen(true)} className="fixed bottom-20 right-4 z-40 min-h-12 gap-2 rounded-full px-4 shadow-lg sm:bottom-6 sm:right-6" aria-label="Open portfolio assistant chat"><Bot /> <span className="hidden sm:inline">Ask about Abhishek</span></Button>;
+
+  return <section role="dialog" aria-label="Portfolio assistant" onKeyDown={e => { if (e.key === "Escape") close(); }} className="fixed inset-x-2 bottom-2 z-50 flex h-[min(600px,calc(100svh-5rem))] flex-col overflow-hidden rounded-lg border border-border bg-card shadow-2xl motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-4 sm:inset-x-auto sm:bottom-6 sm:right-6 sm:w-[400px]">
+    <header className="flex items-center gap-3 border-b border-border bg-background px-4 py-3">
+      <span className="grid size-9 place-items-center rounded-sm bg-primary font-display text-lg font-bold text-primary-foreground">A</span>
+      <div className="min-w-0 flex-1"><h2 className="font-display text-lg leading-tight">Portfolio Assistant</h2><p className="text-[10px] text-muted-foreground">Answers from Abhishek's portfolio only</p></div>
+      <Button variant="bare" size="icon" className="min-h-11 min-w-11" aria-label="Minimize chat" onClick={close}><Minus /></Button>
+      <Button variant="bare" size="icon" className="min-h-11 min-w-11" aria-label="Close and clear chat" onClick={() => { abortRef.current?.abort(); setMessages([]); setBusy(false); close(); }}><X /></Button>
+    </header>
+    <div ref={listRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-4 text-sm" aria-live="polite">
+      <div className="space-y-1 text-sm leading-6"><p>Hi! I can tell you about Abhishek's skills, experience, projects, certifications and how to reach him.</p><p className="text-[10px] text-muted-foreground">Please don't share sensitive personal information.</p></div>
+      {messages.length === 0 && <div className="flex flex-wrap gap-2">{SUGGESTED_PROMPTS.map(p => <Button key={p} variant="outline" size="sm" className="h-auto min-h-9 whitespace-normal py-1.5 text-left text-xs" onClick={() => void send(p)}>{p}</Button>)}</div>}
+      {messages.map(m => <div key={m.id} className={m.role === "user" ? "flex flex-col items-end" : "flex flex-col items-start"}>
+        {m.content ? <div className={m.role === "user" ? "max-w-[85%] rounded-lg bg-primary px-3 py-2 text-primary-foreground" : "max-w-[95%] space-y-1 leading-6"}><Rich text={m.content} /></div>
+          : <div className="flex gap-1 py-2" aria-label="Assistant is typing">{[0, 1, 2].map(i => <span key={i} className="size-1.5 rounded-full bg-muted-foreground motion-safe:animate-pulse" style={{ animationDelay: `${i * 150}ms` }} />)}</div>}
+        <span className="mt-1 text-[9px] text-muted-foreground">{time(m.at)}{m.source === "fallback" ? " · offline answer from portfolio data" : ""}</span>
+      </div>)}
+    </div>
+    <form className="flex items-end gap-2 border-t border-border p-3" onSubmit={e => { e.preventDefault(); void send(input); }}>
+      <label htmlFor="chat-input" className="sr-only">Ask a question</label>
+      <textarea id="chat-input" ref={inputRef} rows={1} value={input} onChange={e => setInput(e.target.value)} onKeyDown={onKey} maxLength={1000} placeholder="Ask about skills, projects…" className="max-h-28 min-h-11 flex-1 resize-none rounded-md border border-border bg-background px-3 py-2.5 text-sm focus-visible:outline-2 focus-visible:outline-ring" />
+      <Button type="submit" size="icon" className="min-h-11 min-w-11" disabled={busy || !input.trim()} aria-label="Send message"><Send /></Button>
+    </form>
+  </section>;
+}
