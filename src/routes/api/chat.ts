@@ -22,6 +22,7 @@ export const Route = createFileRoute("/api/chat")({
             input: parsed.data.messages.map(m => ({ role: m.role, content: m.content })),
           }),
         });
+        console.log("[chat] upstream", upstream.status);
         if (!upstream.ok || !upstream.body) {
           const text = await upstream.text().catch(() => "");
           return Response.json({ error: text.slice(0, 300) || "AI request failed" }, { status: upstream.status || 502 });
