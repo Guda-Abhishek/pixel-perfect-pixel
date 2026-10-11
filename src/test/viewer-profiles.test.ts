@@ -12,11 +12,19 @@ describe("Viewer emphasis without hiding content", () => {
   });
   it("prioritizes AI projects and certifications for specialists", () => {
     expect(sectionOrder("ai").slice(0, 2)).toEqual(["projects", "certifications"]);
-    expect(PROJECTS[projectOrder("ai")[0] ?? -1]?.title).toBe("NEO AI — Enterprise AI Product Interface");
+    expect(PROJECTS[projectOrder("ai")[0] ?? -1]?.title).toBe(
+      "NEO AI — Enterprise AI Product Interface",
+    );
   });
   it("keeps every content group for every profile", () => {
     for (const profile of ["recruiter", "developer", "ai", "guest"] as const) {
-      expect(sectionOrder(profile).sort()).toEqual(["about", "certifications", "experience", "projects", "skills"]);
+      expect(sectionOrder(profile).sort()).toEqual([
+        "about",
+        "certifications",
+        "experience",
+        "projects",
+        "skills",
+      ]);
       expect(projectOrder(profile).sort()).toEqual([0, 1, 2, 3]);
     }
   });

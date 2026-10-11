@@ -20,7 +20,8 @@ export function useAiIntro({ narrateOnPlay = false }: { narrateOnPlay?: boolean 
   }, []);
 
   useEffect(() => {
-    const available = Boolean(window.speechSynthesis) && typeof window.SpeechSynthesisUtterance === "function";
+    const available =
+      Boolean(window.speechSynthesis) && typeof window.SpeechSynthesisUtterance === "function";
     setVoiceAvailable(available);
     if (!available) setVoiceEnabled(false);
     return silence;
@@ -33,7 +34,7 @@ export function useAiIntro({ narrateOnPlay = false }: { narrateOnPlay?: boolean 
       const now = performance.now();
       const delta = now - lastTick.current;
       lastTick.current = now;
-      setElapsed(previous => Math.min(AI_INTRO_DURATION, previous + delta));
+      setElapsed((previous) => Math.min(AI_INTRO_DURATION, previous + delta));
     }, 100);
     return () => window.clearInterval(timer);
   }, [status, voiceEnabled]);
@@ -43,9 +44,18 @@ export function useAiIntro({ narrateOnPlay = false }: { narrateOnPlay?: boolean 
   }, [elapsed]);
 
   useEffect(() => {
-    if (!voiceEnabled || !voiceAvailable || status === "ended" || status === "ready") { silence(); return; }
-    if (status === "paused") { if (speaking.current) window.speechSynthesis.pause(); return; }
-    if (speaking.current) { window.speechSynthesis.resume(); return; }
+    if (!voiceEnabled || !voiceAvailable || status === "ended" || status === "ready") {
+      silence();
+      return;
+    }
+    if (status === "paused") {
+      if (speaking.current) window.speechSynthesis.pause();
+      return;
+    }
+    if (speaking.current) {
+      window.speechSynthesis.resume();
+      return;
+    }
     const segment = AI_INTRO_SEGMENTS[segmentIndex];
     if (!segment) return;
     const currentGeneration = generation.current;
@@ -63,7 +73,12 @@ export function useAiIntro({ narrateOnPlay = false }: { narrateOnPlay?: boolean 
       utterance.onend = () => {
         if (generation.current !== currentGeneration) return;
         speaking.current = false;
-        setElapsed(AI_INTRO_SEGMENTS.slice(0, segmentIndex + 1).reduce((total, part) => total + part.duration, 0));
+        setElapsed(
+          AI_INTRO_SEGMENTS.slice(0, segmentIndex + 1).reduce(
+            (total, part) => total + part.duration,
+            0,
+          ),
+        );
       };
       speaking.current = true;
       window.speechSynthesis.resume();
@@ -77,13 +92,36 @@ export function useAiIntro({ narrateOnPlay = false }: { narrateOnPlay?: boolean 
   }, [status, segmentIndex, voiceEnabled, voiceAvailable, silence, revision]);
 
   useEffect(() => {
-    const pauseWhenHidden = () => { if (document.hidden) setStatus(current => current === "playing" ? "paused" : current); };
+    const pauseWhenHidden = () => {
+      if (document.hidden) setStatus((current) => (current === "playing" ? "paused" : current));
+    };
     document.addEventListener("visibilitychange", pauseWhenHidden);
     return () => document.removeEventListener("visibilitychange", pauseWhenHidden);
   }, []);
 
-  const play = () => { if (status === "ended") setElapsed(0); setStatus("playing"); };
-  const pause = () => { setStatus("paused"); };
-  const replay = () => { silence(); setElapsed(0); setRevision(current => current + 1); setStatus("playing"); };
-  return { status, elapsed, segmentIndex, voiceAvailable, voiceEnabled, voiceError, setVoiceEnabled, play, pause, replay };
+  const play = () => {
+    if (status === "ended") setElapsed(0);
+    setStatus("playing");
+  };
+  const pause = () => {
+    setStatus("paused");
+  };
+  const replay = () => {
+    silence();
+    setElapsed(0);
+    setRevision((current) => current + 1);
+    setStatus("playing");
+  };
+  return {
+    status,
+    elapsed,
+    segmentIndex,
+    voiceAvailable,
+    voiceEnabled,
+    voiceError,
+    setVoiceEnabled,
+    play,
+    pause,
+    replay,
+  };
 }

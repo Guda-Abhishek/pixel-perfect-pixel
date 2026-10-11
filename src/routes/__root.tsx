@@ -90,7 +90,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Sora:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Sora:wght@300;400;600&family=JetBrains+Mono:wght@400;500&display=swap",
+      },
       { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
     ],
   }),
@@ -105,6 +108,11 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en" className="dark">
       <head>
         <HeadContent />
+        <noscript>
+          <style>
+            {`[data-motion-entrance], [data-motion-entrance] * { opacity: 1 !important; transform: none !important; }`}
+          </style>
+        </noscript>
       </head>
       <body>
         {children}
@@ -120,7 +128,11 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <MotionConfig reducedMotion="user"><main id="main-content"><Outlet /></main></MotionConfig>
+      <MotionConfig reducedMotion="user">
+        <main id="main-content">
+          <Outlet />
+        </main>
+      </MotionConfig>
     </QueryClientProvider>
   );
 }

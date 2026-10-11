@@ -72,7 +72,8 @@ export const PROJECTS = [
     title: "AI Farmer-to-Buyer Marketplace",
     badge: "Smart India Hackathon 2023",
     hue: "primary",
-    overview: "A MERN-based marketplace concept connecting farmers directly with buyers through AI-assisted price suggestions and matching.",
+    overview:
+      "A MERN-based marketplace concept connecting farmers directly with buyers through AI-assisted price suggestions and matching.",
     problem: "Farmers often lack fair price discovery and direct access to buyers.",
     role: "Designed system architecture, data flow and feasibility analysis; worked on AI/ML logic for price suggestions and buyer-seller matching.",
     flow: ["Farmer listing", "AI price suggestion", "Buyer matching", "Deal"],
@@ -82,7 +83,8 @@ export const PROJECTS = [
     title: "IoT–AI Disaster Notification & Coastal Safety System",
     badge: "MSME Innovation Programme 2024",
     hue: "accent",
-    overview: "A coastal safety monitoring and early-warning concept using IoT sensor inputs, AI analysis and a real-time notification flow.",
+    overview:
+      "A coastal safety monitoring and early-warning concept using IoT sensor inputs, AI analysis and a real-time notification flow.",
     problem: "Coastal visitors and communities need timely warnings about hazardous conditions.",
     role: "Worked on the real-time notification flow and AI-based analysis of sensor data. Recognized under the Government of India MSME Innovation Programme 2024.",
     flow: ["IoT sensors", "AI analysis", "Risk detection", "Alerts"],
@@ -92,7 +94,8 @@ export const PROJECTS = [
     title: "NEO AI — Enterprise AI Product Interface",
     badge: "Bilvantis Technologies · 2025",
     hue: "violet",
-    overview: "A responsive React interface integrating AI-service APIs, with optimization associated with approximately 25% reduction in user-facing delays.",
+    overview:
+      "A responsive React interface integrating AI-service APIs, with optimization associated with approximately 25% reduction in user-facing delays.",
     problem: "AI-driven features need reliable request handling and a responsive interface.",
     role: "As AI Intern, developed React UI, integrated AI-service APIs with response parsing, retries and error handling, and optimized API communication and rendering.",
     flow: ["React UI", "AI-service APIs", "Response handling"],
@@ -111,13 +114,83 @@ export const PROJECTS = [
 ] as const;
 
 export const SKILLS: { cat: string; desc: string; items: string[] }[] = [
-  { cat: "Programming Languages", desc: "Core languages used across coursework and projects.", items: ["JavaScript", "Java", "Python", "C", "SQL"] },
-  { cat: "Frontend & Frameworks", desc: "Building interfaces and APIs end to end.", items: ["React.js", "Node.js", "Express.js", "MERN Stack", "HTML5", "CSS3", "Tailwind CSS", "REST APIs"] },
-  { cat: "AI & Generative AI", desc: "Working with LLM-powered systems.", items: ["Generative AI", "Large Language Models", "RAG", "Prompt Engineering", "AI Agents", "AI-SDLC", "LangChain concepts", "AI-Assisted Development"] },
-  { cat: "Machine Learning", desc: "Foundations of learning systems.", items: ["Supervised & Unsupervised Learning", "Model Training & Evaluation", "Neural Networks", "NLP"] },
-  { cat: "Databases", desc: "Relational and document stores.", items: ["MySQL", "MongoDB", "PostgreSQL"] },
-  { cat: "Cloud & Dev Tools", desc: "Platforms and everyday tooling.", items: ["Oracle Cloud Infrastructure", "Microsoft Azure", "AWS Fundamentals", "Git", "GitHub", "Postman", "Swagger", "VS Code", "Jupyter Notebook", "Docker"] },
-  { cat: "Engineering Practices", desc: "How the work gets shipped.", items: ["SDLC", "Agile Collaboration", "AI-SDLC", "Sprint-Based Development", "Code Reviews", "Unit Testing", "Debugging"] },
+  {
+    cat: "Programming Languages",
+    desc: "Core languages used across coursework and projects.",
+    items: ["JavaScript", "Java", "Python", "C", "SQL"],
+  },
+  {
+    cat: "Frontend & Frameworks",
+    desc: "Building interfaces and APIs end to end.",
+    items: [
+      "React.js",
+      "Node.js",
+      "Express.js",
+      "MERN Stack",
+      "HTML5",
+      "CSS3",
+      "Tailwind CSS",
+      "REST APIs",
+    ],
+  },
+  {
+    cat: "AI & Generative AI",
+    desc: "Working with LLM-powered systems.",
+    items: [
+      "Generative AI",
+      "Large Language Models",
+      "RAG",
+      "Prompt Engineering",
+      "AI Agents",
+      "AI-SDLC",
+      "LangChain concepts",
+      "AI-Assisted Development",
+    ],
+  },
+  {
+    cat: "Machine Learning",
+    desc: "Foundations of learning systems.",
+    items: [
+      "Supervised & Unsupervised Learning",
+      "Model Training & Evaluation",
+      "Neural Networks",
+      "NLP",
+    ],
+  },
+  {
+    cat: "Databases",
+    desc: "Relational and document stores.",
+    items: ["MySQL", "MongoDB", "PostgreSQL"],
+  },
+  {
+    cat: "Cloud & Dev Tools",
+    desc: "Platforms and everyday tooling.",
+    items: [
+      "Oracle Cloud Infrastructure",
+      "Microsoft Azure",
+      "AWS Fundamentals",
+      "Git",
+      "GitHub",
+      "Postman",
+      "Swagger",
+      "VS Code",
+      "Jupyter Notebook",
+      "Docker",
+    ],
+  },
+  {
+    cat: "Engineering Practices",
+    desc: "How the work gets shipped.",
+    items: [
+      "SDLC",
+      "Agile Collaboration",
+      "AI-SDLC",
+      "Sprint-Based Development",
+      "Code Reviews",
+      "Unit Testing",
+      "Debugging",
+    ],
+  },
 ];
 
 export const CERTS = [
@@ -132,8 +205,20 @@ export const CERTS = [
 ] as const;
 
 export const MILESTONES = [
-  ["2022 – Present", "IEEE Membership Committee, TKR College", "Outreach activities increased chapter participation by around 15%."],
-  ["2022 – Present", "Student Coordinator, IT Branch", "Planned and managed departmental events for more than 250 participants."],
-  ["2022 – 2026", "Class Representative, IT Branch", "Coordinated communication between students and faculty."],
+  [
+    "2022 – Present",
+    "IEEE Membership Committee, TKR College",
+    "Outreach activities increased chapter participation by around 15%.",
+  ],
+  [
+    "2022 – Present",
+    "Student Coordinator, IT Branch",
+    "Planned and managed departmental events for more than 250 participants.",
+  ],
+  [
+    "2022 – 2026",
+    "Class Representative, IT Branch",
+    "Coordinated communication between students and faculty.",
+  ],
   ["2024", "MSME Innovation Programme", "Recognition for two innovation projects."],
 ] as const;

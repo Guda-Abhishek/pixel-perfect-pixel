@@ -1,4 +1,5 @@
 <!-- LOVABLE:BEGIN -->
+
 > [!IMPORTANT]
 > This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
 > published git history — force pushing, or rebasing/amending/squashing commits
@@ -7,9 +8,11 @@
 >
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
+
 <!-- LOVABLE:END -->
 
 ## Architecture
+
 - Keep the profile picker at `/` and the single scrolling portfolio at `/portfolio`; direct visits bypass the intro and existing URLs remain stable.
 - Use reusable Button controls and global semantic visual tokens; this keeps focus, interaction, and theming consistent.
 - Keep social URLs and the resume asset path nullable in shared configuration; missing verified resources must never produce broken links.

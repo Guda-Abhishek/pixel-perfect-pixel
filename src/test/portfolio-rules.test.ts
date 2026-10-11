@@ -17,10 +17,12 @@ describe("Portfolio factual and contact rules", () => {
     expect(CONTACT.location).toBe("Hyderabad, India");
   });
   it("keeps the supplied internship dates", () => {
-    expect(MISSIONS.map(m => m.period)).toEqual(["May 2026 – Present", "Feb 2025 – Apr 2025"]);
+    expect(MISSIONS.map((m) => m.period)).toEqual(["May 2026 – Present", "Feb 2025 – Apr 2025"]);
   });
   it("preserves the approximate 25 percent impact", () => {
-    expect(MISSIONS[1]?.projects[0]?.points.some(p => p.includes("approximately 25%"))).toBe(true);
+    expect(MISSIONS[1]?.projects[0]?.points.some((p) => p.includes("approximately 25%"))).toBe(
+      true,
+    );
   });
   it("preserves honest leadership impact", () => {
     expect(MILESTONES[0]?.[2]).toContain("around 15%");
@@ -31,7 +33,12 @@ describe("Portfolio factual and contact rules", () => {
     expect(PROJECTS[0].overview).toContain("concept");
   });
   it("rejects empty, malformed, and overlong drafts", () => {
-    const valid = { name: "Recruiter", email: "recruiter@example.com", subject: "Opportunity", message: "Let's discuss a role." };
+    const valid = {
+      name: "Recruiter",
+      email: "recruiter@example.com",
+      subject: "Opportunity",
+      message: "Let's discuss a role.",
+    };
     expect(contactSchema.safeParse(valid).success).toBe(true);
     expect(contactSchema.safeParse({ ...valid, name: " " }).success).toBe(false);
     expect(contactSchema.safeParse({ ...valid, email: "not-an-email" }).success).toBe(false);
