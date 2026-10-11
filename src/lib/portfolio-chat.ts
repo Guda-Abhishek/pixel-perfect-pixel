@@ -32,8 +32,8 @@ export function fallbackAnswer(question: string): string {
   const has = (...w: string[]) => w.some(x => q.includes(x));
   if (has("contact", "email", "reach", "hire", "phone", "linkedin", "github"))
     return `You can reach Abhishek at **${CONTACT.email}** or ${CONTACT.phone}. LinkedIn: ${CONTACT.linkedin} · GitHub: ${CONTACT.github}. See the **Contact** section to draft an email.`;
-  if (has("paves")) { const m = MISSIONS[0]; return `**${m.company}** — ${m.role} (${m.period}).\n\n${m.projects.map(p => `- **${p.name}**: ${p.points[0]}`).join("\n")}\n\nOpen **Episodes** for full details.`; }
-  if (has("bilvantis", "neo")) { const m = MISSIONS[1]; return `**${m.company}** — ${m.role} (${m.period}).\n\n${m.projects.flatMap(p => p.points).map(p => `- ${p}`).join("\n")}`; }
+  if (has("paves")) { const m = MISSIONS[0]!; return `**${m.company}** — ${m.role} (${m.period}).\n\n${m.projects.map(p => `- **${p.name}**: ${p.points[0]}`).join("\n")}\n\nOpen **Episodes** for full details.`; }
+  if (has("bilvantis", "neo")) { const m = MISSIONS[1]!; return `**${m.company}** — ${m.role} (${m.period}).\n\n${m.projects.flatMap(p => p.points).map(p => `- ${p}`).join("\n")}`; }
   if (has("experience", "work", "intern", "job")) return MISSIONS.map(m => `- **${m.company}** — ${m.role}, ${m.period}`).join("\n") + "\n\nSee **Episodes** for more.";
   if (has("ai project", "ai ", "genai", "generative", "rag", "agent")) return PROJECTS.filter(p => /AI/.test(p.title)).map(p => `- **${p.title}** (${p.badge})`).join("\n") + "\n\nHe also works with: " + (SKILLS[2]?.items.join(", ") ?? "") + ". Explore **Originals**.";
   if (has("project")) return PROJECTS.map(p => `- **${p.title}** (${p.badge})`).join("\n") + "\n\nExplore **Originals** for details.";
