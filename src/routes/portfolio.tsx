@@ -12,6 +12,7 @@ import { ProjectVisual } from "@/components/ProjectVisual";
 import { DeveloperMark } from "@/components/DeveloperMark";
 import { PortfolioContact } from "@/components/PortfolioContact";
 import { AiIntro } from "@/components/AiIntro";
+import { PortfolioChat } from "@/components/PortfolioChat";
 import { CERTS, CONTACT, MILESTONES, MISSIONS, NAV, PROJECTS, SKILLS } from "@/lib/portfolio-data";
 import { PORTFOLIO_FILES } from "@/lib/contact-schema";
 import { parseViewer, projectOrder, sectionOrder, VIEWERS, VIEWER_FOCUS, type Viewer } from "@/lib/viewer-profiles";
@@ -132,6 +133,6 @@ function Portfolio() {
   return <div className="min-h-screen bg-background"><Nav viewer={profile} /><Hero viewer={profile} />
     <div className="mx-auto flex max-w-[1360px] items-center gap-2 px-5 pb-2 pt-3 sm:px-10"><ViewerAvatar viewer={profile} compact /><p className="text-[10px] text-muted-foreground">{VIEWER_FOCUS[profile]}</p></div>
     {sectionOrder(profile).map(id => <div key={id}>{sections[id]}</div>)}<PortfolioContact />
-    <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-border px-5 py-6 text-[10px] leading-5 text-muted-foreground sm:px-10"><span>© 2026 Guda Abhishek. All rights reserved. Netflix-inspired portfolio concept.</span><Button variant="bare" className="min-h-11 text-xs" onClick={() => go('home')}>Back to top <ArrowUp /></Button></footer>
+    <footer className="flex flex-wrap items-center justify-between gap-4 border-t border-border px-5 py-6 text-[10px] leading-5 text-muted-foreground sm:px-10"><span>© 2026 Guda Abhishek. All rights reserved. Netflix-inspired portfolio concept.</span><Button variant="bare" className="min-h-11 text-xs" onClick={() => go('home')}>Back to top <ArrowUp /></Button></footer><PortfolioChat />
   </div>;
 }

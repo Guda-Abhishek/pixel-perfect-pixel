@@ -22,3 +22,4 @@
 - Keep the optional AI introduction in one shared dialog with a mount-scoped playback hook; opening stays silent and closing cancels only its own speech and timers.
 - Keep real and AI-host portrait references separately nullable until the exact uploaded assets are available; never substitute generated faces or conflate identities.
 - Serve uploaded intro clips through asset pointers and tie muted video playback to the shared narration state; this keeps Play, Pause and close consistent without autoplay.
+- Portfolio chatbot answers only from shared portfolio data via a server endpoint; keeps the AI key server-side and facts consistent.

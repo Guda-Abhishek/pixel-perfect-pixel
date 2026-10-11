@@ -13,3 +13,6 @@
 # Video-backed introduction
 - [ ] Add both supplied clips with user-started background intro narration.
 - [ ] Verify video selection, playback, pause, replay and cleanup.
+# AI portfolio chatbot
+- [x] Floating launcher + chat panel, grounded AI replies with honest offline fallback.
+- [ ] GitHub sync — managed by Lovable's GitHub connector; cannot be driven from chat.
