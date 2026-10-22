@@ -16,7 +16,18 @@ describe("App routing", () => {
   });
   it("preserves the legacy portfolio and profile picker alongside all new pages", () => {
     const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
-    for (const path of ["/", "/profiles", "/portfolio", "/about", "/skills", "/projects", "/projects/neo-ai", "/experience", "/certifications", "/contact"]) {
+    for (const path of [
+      "/",
+      "/profiles",
+      "/portfolio",
+      "/about",
+      "/skills",
+      "/projects",
+      "/projects/neo-ai",
+      "/experience",
+      "/certifications",
+      "/contact",
+    ]) {
       expect(router.matchRoutes(path).at(-1)?.routeId, path).not.toBe(rootRouteId);
     }
   });

@@ -132,7 +132,9 @@ function RootComponent() {
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <MotionConfig reducedMotion="user">
         <main id="main-content">
-          <SiteShell><Outlet /></SiteShell>
+          <SiteShell>
+            <Outlet />
+          </SiteShell>
         </main>
       </MotionConfig>
     </QueryClientProvider>

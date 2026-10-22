@@ -1,7 +1,16 @@
 import { PROJECTS } from "@/lib/portfolio-data";
 
-export const projectSlugs = ["ai-farmer-marketplace", "coastal-safety", "neo-ai", "tkr-it-portal"] as const;
-export const siteProjects = PROJECTS.map((project, index) => ({ ...project, slug: projectSlugs[index] ?? "", index }));
+export const projectSlugs = [
+  "ai-farmer-marketplace",
+  "coastal-safety",
+  "neo-ai",
+  "tkr-it-portal",
+] as const;
+export const siteProjects = PROJECTS.map((project, index) => ({
+  ...project,
+  slug: projectSlugs[index] ?? "",
+  index,
+}));
 export function findProject(slug: string) {
   return siteProjects.find((project) => project.slug === slug);
 }
