@@ -1,11 +1,12 @@
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Menu, X, ArrowUpRight } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
-import { Link } from "@tanstack/react-router";
-import { ArrowUpRight, Github, Linkedin, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PortfolioChat } from "@/components/PortfolioChat";
+import { SocialLinks, ResumeAction } from "@/components/SitePrimitives";
 import { CONTACT } from "@/lib/portfolio-data";
-import { PORTFOLIO_FILES } from "@/lib/contact-schema";
 
-const navigation = [
+const links = [
   ["/", "Home"],
   ["/about", "About"],
   ["/skills", "Skills"],
@@ -13,147 +14,121 @@ const navigation = [
   ["/experience", "Experience"],
   ["/certifications", "Certifications"],
   ["/contact", "Contact"],
-  ["/profiles", "Profiles"],
 ] as const;
-
-export function SiteShell({ active, children }: { active: string; children: ReactNode }) {
-  const [open, setOpen] = useState(false);
+export function SiteShell({ children }: { children: ReactNode }) {
+  const path = useRouterState({ select: (state) => state.location.pathname });
+  const [menu, setMenu] = useState(false);
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+    setMenu(false);
+  }, [path]);
+  useEffect(() => {
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenu(false);
     };
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    document.addEventListener("keydown", escape);
+    return () => document.removeEventListener("keydown", escape);
   }, []);
-
+  if (path === "/portfolio" || path === "/profiles" || path.startsWith("/api/")) return children;
   return (
-    <div className="site-shell min-h-svh bg-background text-foreground">
-      <a href="#page-content" className="skip-link">
+    <div className="site-shell">
+      <a
+        href="#page-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-background focus:p-4"
+      >
         Skip to content
       </a>
-      <header className="site-header sticky top-0 z-40 border-b border-white/10 bg-background/85 backdrop-blur-xl">
-        <div className="mx-auto flex h-[72px] max-w-[1440px] items-center justify-between gap-5 px-5 sm:px-10">
-          <Link to="/" className="brand-mark shrink-0" aria-label="Guda Abhishek home">
-            <span className="brand-symbol">G</span>
-            <span>
-              GUDA <b>ABHISHEK</b>
+      <header className="site-nav">
+        <div className="site-container flex min-h-20 items-center justify-between gap-3">
+          <Link to="/" className="flex shrink-0 items-center gap-3" aria-label="Guda Abhishek home">
+            <span className="brand-monogram">
+              GA<span className="text-primary">.</span>
+            </span>
+            <span className="hidden font-mono text-[9px] text-muted-foreground xl:block">
+              GUDA ABHISHEK
+              <br />
+              THE DEVELOPER SERIES
             </span>
           </Link>
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Main navigation">
-            {navigation.map(([to, label]) => (
-              <Link
-                key={to}
-                to={to}
-                aria-current={active === to ? "page" : undefined}
-                className={`site-nav-link ${active === to ? "is-active" : ""}`}
-              >
-                {label}
-              </Link>
+          <nav aria-label="Main navigation" className="hidden items-center gap-1 lg:flex">
+            {links.map(([to, label]) => (
+              <Button key={to} asChild variant="bare" className="px-2 text-xs">
+                <Link
+                  to={to}
+                  activeOptions={{ exact: to === "/" }}
+                  activeProps={{ className: "text-violet" }}
+                >
+                  {label}
+                </Link>
+              </Button>
             ))}
           </nav>
-          <div className="flex shrink-0 items-center gap-2">
-            {PORTFOLIO_FILES.resume && (
-              <Button asChild className="hidden min-h-10 px-4 text-xs sm:inline-flex">
-                <a href={PORTFOLIO_FILES.resume} download>
-                  Resume <ArrowUpRight />
-                </a>
-              </Button>
-            )}
+          <div className="flex items-center gap-2">
+            <Button asChild variant="bare" className="hidden text-xs sm:inline-flex">
+              <Link to="/profiles">Choose profile</Link>
+            </Button>
+            <Button asChild className="hidden text-xs xl:inline-flex">
+              <Link to="/contact">
+                Let's talk <ArrowUpRight />
+              </Link>
+            </Button>
             <Button
               variant="outline"
               size="icon"
               className="min-h-11 min-w-11 lg:hidden"
-              aria-label={open ? "Close navigation" : "Open navigation"}
-              aria-expanded={open}
-              aria-controls="mobile-site-navigation"
-              onClick={() => setOpen((value) => !value)}
+              aria-label={menu ? "Close navigation" : "Open navigation"}
+              aria-expanded={menu}
+              aria-controls="mobile-navigation"
+              onClick={() => setMenu(!menu)}
             >
-              {open ? <X /> : <Menu />}
+              {menu ? <X /> : <Menu />}
             </Button>
           </div>
         </div>
-        {open && (
+        {menu && (
           <nav
-            id="mobile-site-navigation"
-            className="grid grid-cols-2 gap-1 border-t border-white/10 p-4 lg:hidden"
+            id="mobile-navigation"
             aria-label="Mobile navigation"
+            className="site-container grid grid-cols-2 gap-2 border-t border-border py-4 lg:hidden"
           >
-            {navigation.map(([to, label]) => (
-              <Link
-                key={to}
-                to={to}
-                aria-current={active === to ? "page" : undefined}
-                onClick={() => setOpen(false)}
-                className={`site-nav-link min-h-11 ${active === to ? "is-active" : ""}`}
-              >
-                {label}
-              </Link>
+            {links.map(([to, label]) => (
+              <Button key={to} asChild variant="ghost" className="min-h-11 justify-start">
+                <Link to={to}>{label}</Link>
+              </Button>
             ))}
-            <div className="col-span-2 flex gap-2 border-t border-white/10 pt-3">
-              {CONTACT.github && (
-                <a
-                  className="icon-link"
-                  href={CONTACT.github}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="GitHub"
-                >
-                  <Github />
-                </a>
-              )}
-              {CONTACT.linkedin && (
-                <a
-                  className="icon-link"
-                  href={CONTACT.linkedin}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="LinkedIn"
-                >
-                  <Linkedin />
-                </a>
-              )}
-            </div>
+            <Button asChild variant="ghost" className="min-h-11 justify-start">
+              <Link to="/profiles">Choose profile</Link>
+            </Button>
           </nav>
         )}
       </header>
-      <main id="page-content">{children}</main>
+      <div id="page-content">{children}</div>
       <footer className="site-footer">
-        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 px-5 py-7 sm:flex-row sm:items-center sm:justify-between sm:px-10">
-          <Link to="/" className="brand-mark">
-            <span className="brand-symbol">G</span>
-            <span>
-              GUDA <b>ABHISHEK</b>
-            </span>
-          </Link>
-          <p className="text-xs text-muted-foreground">
-            Dream. Build. Repeat. <span className="mx-2 text-white/20">/</span> Hyderabad, India
-          </p>
-          <div className="flex items-center gap-2">
-            {CONTACT.github && (
+        <div className="site-container">
+          <div className="flex flex-wrap items-center justify-between gap-8">
+            <div>
+              <p className="font-mono text-xs text-violet">THE NEXT CHAPTER</p>
+              <h2 className="mt-3 text-4xl font-semibold">Let's build something meaningful.</h2>
               <a
-                className="icon-link"
-                href={CONTACT.github}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="GitHub"
+                href={`mailto:${CONTACT.email}`}
+                className="mt-4 inline-block break-all text-sm text-muted-foreground hover:text-foreground"
               >
-                <Github />
+                {CONTACT.email} <ArrowUpRight className="inline size-4" />
               </a>
-            )}
-            {CONTACT.linkedin && (
-              <a
-                className="icon-link"
-                href={CONTACT.linkedin}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="LinkedIn"
-              >
-                <Linkedin />
-              </a>
-            )}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <SocialLinks />
+              <ResumeAction />
+            </div>
+          </div>
+          <div className="mt-10 flex flex-wrap justify-between gap-4 border-t border-border pt-6 text-[10px] leading-5 text-muted-foreground">
+            <p>© 2026 Guda Abhishek. All rights reserved. Netflix-inspired portfolio concept.</p>
+            <Link to="/portfolio" search={{ profile: "guest" }}>
+              Explore The Series <ArrowUpRight className="inline size-3" />
+            </Link>
           </div>
         </div>
       </footer>
+      <PortfolioChat />
     </div>
   );
 }

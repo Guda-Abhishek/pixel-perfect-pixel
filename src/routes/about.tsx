@@ -1,121 +1,89 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, GraduationCap, MapPin } from "lucide-react";
-import my2 from "@/assets/my_2.jpeg";
-import { Button } from "@/components/ui/button";
-import { PageIntro } from "@/components/PageIntro";
-import { SiteShell } from "@/components/SiteShell";
-import { MISSIONS, MILESTONES } from "@/lib/portfolio-data";
+import { createFileRoute } from "@tanstack/react-router";
+import { GraduationCap, MapPin, Sparkles } from "lucide-react";
+import { PageBody, PageHeading, ResumeAction } from "@/components/SitePrimitives";
+import { AiIntro } from "@/components/AiIntro";
+import { MILESTONES } from "@/lib/portfolio-data";
+import { pageHead } from "@/lib/site-data";
+import collaboration from "@/assets/code-contribution.svg.asset.json";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About — Guda Abhishek" },
-      {
-        name: "description",
-        content: "Learn about Guda Abhishek's education, experience and engineering interests.",
-      },
-    ],
-  }),
-  component: AboutPage,
+  head: () =>
+    pageHead(
+      "About",
+      "Meet Guda Abhishek: software engineer, IT graduate, AI enthusiast and student leader in Hyderabad.",
+      "/about",
+    ),
+  component: About,
 });
-
-function AboutPage() {
+function About() {
   return (
-    <SiteShell active="/about">
-      <div className="page-content">
-        <PageIntro
-          eyebrow="THE PERSON BEHIND THE CODE"
-          title={
-            <>
-              Engineering with
-              <br />
-              <span>curiosity and care.</span>
-            </>
-          }
-          description="Software Engineer | AI & Full-Stack Developer, based in Hyderabad, India."
-        />
-        <section className="about-editorial">
-          <figure className="about-photo about-page-photo">
-            <img src={my2} alt="Guda Abhishek" width={1440} height={1920} fetchPriority="high" />
-            <figcaption>GUDA ABHISHEK · HYDERABAD</figcaption>
-          </figure>
-          <div className="about-prose">
-            <p>
-              I’m a software engineer focused on building responsive web experiences and dependable
-              full-stack applications. My work has included React interfaces, API integrations,
-              reusable UI, and product features that bring AI capabilities into practical workflows.
-            </p>
-            <p>
-              I enjoy working across the software development lifecycle: understanding a problem,
-              shaping its interface and data flow, implementing carefully, then debugging and
-              improving it with a team.
-            </p>
-            <div className="about-facts">
-              <span>
-                <MapPin /> Hyderabad, India
-              </span>
-              <span>
-                <GraduationCap /> B.Tech Information Technology
-              </span>
-            </div>
-            <Button asChild variant="outline" className="mt-6 min-h-11">
-              <Link to="/experience">
-                View experience <ArrowRight />
-              </Link>
-            </Button>
-          </div>
-        </section>
-        <section className="page-section">
-          <h2 className="page-section-title">Education</h2>
-          <div className="editorial-card">
-            <p className="section-kicker">2022 — 2026</p>
-            <h3>TKR College of Engineering & Technology</h3>
-            <p className="text-sm text-muted-foreground">
-              B.Tech in Information Technology · CGPA 7.6
-            </p>
-          </div>
-        </section>
-        <section className="page-section">
-          <h2 className="page-section-title">Career timeline</h2>
-          <div className="timeline">
-            {MISSIONS.map((job) => (
-              <article key={job.id} className="timeline-item">
-                <span className="timeline-dot" />
-                <p className="section-kicker">{job.period}</p>
-                <h3>{job.company}</h3>
-                <p className="text-sm text-primary">{job.role}</p>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                  {job.projects[0]?.points.slice(0, 2).join(" ")}
-                </p>
-              </article>
-            ))}
-          </div>
-        </section>
-        <section className="page-section">
-          <h2 className="page-section-title">Beyond the day job</h2>
-          <div className="grid gap-4 md:grid-cols-2">
-            {MILESTONES.map(([period, title, detail]) => (
-              <article key={title} className="editorial-card">
-                <p className="section-kicker">{period}</p>
-                <h3>{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">{detail}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-        <section className="page-section compact-callout">
-          <p className="section-kicker">WHAT I’M EXPLORING</p>
-          <h2>
-            Full-stack systems, AI interfaces,
-            <br />
-            and better ways to build.
-          </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-muted-foreground">
-            I’m interested in Generative AI, retrieval-augmented generation, AI agents, and the
-            engineering practices that make useful software reliable.
+    <PageBody>
+      <PageHeading
+        number="01"
+        title="The person behind the code."
+        description="Guda Abhishek · Software Engineer | AI & Full-Stack Developer"
+      />
+      <div className="grid gap-12 lg:grid-cols-[1.35fr_1fr]">
+        <div>
+          <p className="text-lg leading-8">
+            I build practical software experiences at the intersection of full-stack engineering, AI
+            and intelligent automation.
           </p>
-        </section>
+          <p className="mt-5 text-sm leading-7 text-muted-foreground">
+            My work spans responsive React interfaces, MERN platforms and REST API integration. At
+            Paves Technologies, I work on enterprise finance and internal employee workflows. At
+            Bilvantis Technologies, I contributed to the NEO AI product interface.
+          </p>
+          <div className="my-8 border-y border-border py-6">
+            <p className="flex items-center gap-3 font-semibold">
+              <GraduationCap className="size-5 text-violet" /> TKR College of Engineering &
+              Technology
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              B.Tech in Information Technology · 2022–2026 · CGPA 7.6
+            </p>
+            <p className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+              <MapPin className="size-4" /> Hyderabad, India
+            </p>
+          </div>
+          <h2 className="flex items-center gap-3 text-3xl font-semibold">
+            <Sparkles className="size-5 text-violet" /> What I explore
+          </h2>
+          <p className="mt-4 text-sm leading-7 text-muted-foreground">
+            Generative AI, RAG, AI agents and practical full-stack engineering — with an emphasis on
+            connecting intelligent systems to useful product features.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <AiIntro />
+            <ResumeAction />
+          </div>
+        </div>
+        <figure className="flex flex-col items-center justify-center">
+          <img
+            src={collaboration.url}
+            alt="Illustration of developers collaborating on code"
+            width={836}
+            height={800}
+            loading="lazy"
+            className="w-full max-w-sm"
+          />
+          <figcaption className="mt-4 font-mono text-[10px] text-muted-foreground">
+            COLLABORATION / A SHARED ENGINEERING MINDSET
+          </figcaption>
+        </figure>
       </div>
-    </SiteShell>
+      <section className="mt-16 border-t border-border pt-10">
+        <h2 className="mb-8 text-4xl font-semibold">Leadership & participation.</h2>
+        <div className="grid gap-x-10 md:grid-cols-2">
+          {MILESTONES.map(([period, title, description]) => (
+            <article key={title} className="border-b border-border py-6">
+              <p className="font-mono text-xs text-violet">{period}</p>
+              <h3 className="mt-3 text-2xl font-semibold">{title}</h3>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">{description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    </PageBody>
   );
 }

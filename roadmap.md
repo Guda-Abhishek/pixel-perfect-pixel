@@ -1,5 +1,11 @@
 # Netflix-inspired portfolio enhancement
 
+# Multi-page cinematic update
+- [ ] Add Home, About, Skills, Projects/detail, Experience, Certifications and Contact with shared navigation/footer.
+- [ ] Preserve profile picker, legacy portfolio, portraits, optional intro and chatbot.
+- [ ] Apply design-reference guidance and verify local asset/icon licenses.
+- [ ] Validate routes, factual rules, interactions and mobile layout.
+
 - [x] Add four selectable profiles, optional intro, and profile switching.
 - [x] Apply cinematic red/charcoal design, billboard and accessible details.
 - [x] Add horizontal project/episode rows, skill categories, and awards.

@@ -1,3 +1,5 @@
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+export const Route = createFileRoute("/projects")({ component: () => <Outlet /> });
 import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
 import { PageIntro } from "@/components/PageIntro";
 import { ProjectCard } from "@/components/ProjectCard";
