@@ -9,7 +9,7 @@ import { AiIntro } from "@/components/AiIntro";
 import { VIEWERS } from "@/lib/viewer-profiles";
 import { MOTION_TOKENS } from "@/lib/motion";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/profiles")({
   head: () => ({
     meta: [
       { title: "Who's Watching? — Abhishek: The Series" },
