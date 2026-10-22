@@ -1,219 +1,141 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Play, Volume2, VolumeX } from "lucide-react";
+import { ArrowRight, ArrowUpRight, MapPin, Code2, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ViewerAvatar } from "@/components/ViewerAvatar";
 import { AiIntro } from "@/components/AiIntro";
-import { VIEWERS } from "@/lib/viewer-profiles";
-import { MOTION_TOKENS } from "@/lib/motion";
+import { Reveal } from "@/components/Reveal";
+import { ProjectCard, ResumeAction, SocialLinks } from "@/components/SitePrimitives";
+import { pageHead, siteProjects } from "@/lib/site-data";
+import portrait from "@/assets/my_1.jpeg";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "Who's Watching? — Abhishek: The Series" },
-      {
-        name: "description",
-        content:
-          "Choose your perspective on Guda Abhishek's software engineering, full-stack and AI portfolio.",
-      },
-      { property: "og:title", content: "Abhishek: The Series — Choose Your Profile" },
-      {
-        property: "og:description",
-        content: "Explore the projects, experience and AI work of Guda Abhishek.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-  }),
-  component: ProfileSelect,
+  head: () =>
+    pageHead(
+      "Software Engineer & AI Developer",
+      "Guda Abhishek's portfolio: React and MERN platforms, Java, REST APIs, Generative AI, projects and engineering experience.",
+      "/",
+    ),
+  component: Home,
 });
-
-function ProfileSelect() {
-  const [intro, setIntro] = useState(false);
-  const [sound, setSound] = useState(false);
-  const audio = useRef<AudioContext | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const reduced = useReducedMotion();
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-      void audio.current?.close();
-    },
-    [],
-  );
-  const skip = () => {
-    setIntro(false);
-    setSound(false);
-    if (timer.current) clearTimeout(timer.current);
-    void audio.current?.close();
-    audio.current = null;
-  };
-  const toggleSound = () => {
-    if (sound) {
-      setSound(false);
-      void audio.current?.close();
-      audio.current = null;
-      return;
-    }
-    try {
-      const context = new AudioContext();
-      audio.current = context;
-      const gain = context.createGain();
-      gain.connect(context.destination);
-      gain.gain.setValueAtTime(0.06, context.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.6);
-      const tone = context.createOscillator();
-      tone.type = "sine";
-      tone.frequency.setValueAtTime(146.83, context.currentTime);
-      tone.connect(gain);
-      tone.start();
-      tone.stop(context.currentTime + 0.6);
-      setSound(true);
-    } catch {
-      setSound(false);
-    }
-  };
-  const playIntro = () => {
-    setIntro(true);
-    timer.current = setTimeout(skip, reduced ? 1000 : 2400);
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: MOTION_TOKENS.stagger.tight,
-        delayChildren: 0.1,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 16 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: MOTION_TOKENS.duration.section,
-        ease: MOTION_TOKENS.ease.entrance,
-      },
-    },
-  };
-
+function Home() {
   return (
-    <div className="relative flex min-h-svh flex-col bg-background px-5 py-8 sm:px-12">
-      <header className="flex items-center justify-between">
-        <span className="series-logo text-3xl">
-          ABHISHEK{" "}
-          <span className="ml-2 align-middle font-sans text-[9px] font-normal text-muted-foreground">
-            THE SERIES
-          </span>
-        </span>
-        <Button
-          variant="ghost"
-          onClick={playIntro}
-          className="min-h-11 text-xs transition-transform active:scale-95"
-        >
-          <Play /> Play intro
-        </Button>
-      </header>
-      <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center py-14">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={containerVariants}
-          className="w-full text-center"
-          data-motion-entrance
-        >
-          <motion.p
-            variants={itemVariants}
-            className="mb-4 text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
-          >
-            ONE DEVELOPER. MANY PERSPECTIVES.
-          </motion.p>
-          <motion.h1 variants={itemVariants} className="text-5xl font-semibold sm:text-6xl">
-            Who's Watching?
-          </motion.h1>
-          <motion.div
-            variants={itemVariants}
-            className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-x-5 gap-y-8 sm:mt-12 sm:grid-cols-4 sm:gap-6"
-          >
-            {VIEWERS.map((profile) => (
-              <Button
-                key={profile.id}
-                asChild
-                variant="bare"
-                size="auto"
-                className="group block text-center"
-              >
-                <Link to="/portfolio" search={{ profile: profile.id }} className="min-w-0">
-                  <span className="block rounded ring-2 ring-transparent transition-all duration-200 group-hover:scale-[1.04] group-hover:ring-foreground group-focus-visible:ring-foreground group-active:scale-95">
-                    <ViewerAvatar viewer={profile.id} />
-                  </span>
-                  <span className="mt-4 block min-h-10 text-sm text-foreground transition-colors group-hover:text-primary sm:text-base">
-                    {profile.name}
-                  </span>
-                  <span className="mt-1 block text-[10px] leading-relaxed text-muted-foreground">
-                    {profile.caption}
-                  </span>
-                </Link>
-              </Button>
+    <>
+      <section className="home-hero">
+        <img
+          src={portrait}
+          alt="Existing AI-stylized portrait of Guda Abhishek"
+          width={768}
+          height={768}
+          fetchPriority="high"
+          className="home-portrait"
+        />
+        <div className="hero-shade" aria-hidden="true" />
+        <div className="site-container relative z-10 py-12 sm:py-20">
+          <Reveal>
+            <div className="hero-copy">
+              <p className="mb-6 flex items-center gap-2 font-mono text-[10px] text-muted-foreground">
+                <span className="h-px w-8 bg-primary" /> SOFTWARE / INTELLIGENCE / IMPACT
+              </p>
+              <h1 className="home-title">
+                GUDA
+                <br />
+                <span>ABHISHEK</span>
+                <span className="text-primary">.</span>
+              </h1>
+              <p className="mt-6 max-w-md text-lg font-semibold leading-7">
+                Software Engineer
+                <br />
+                <span className="text-violet">AI & Full-Stack Developer</span>
+              </p>
+              <p className="mt-5 max-w-md text-sm leading-7 text-muted-foreground">
+                Building practical products with React, Java, REST APIs and Generative AI.
+                Thoughtful interfaces. Reliable integrations. Engineering that connects ideas to
+                real experiences.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Button asChild className="min-h-11 px-5">
+                  <Link to="/projects">
+                    Explore my work <ArrowUpRight />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="min-h-11">
+                  <Link to="/about">
+                    The full story <ArrowRight />
+                  </Link>
+                </Button>
+                <ResumeAction />
+              </div>
+              <div className="mt-5 flex flex-wrap items-center gap-4">
+                <AiIntro compact />
+                <SocialLinks />
+              </div>
+              <p className="mt-7 flex items-center gap-2 text-xs text-muted-foreground">
+                <MapPin className="size-3 text-violet" /> Hyderabad, India{" "}
+                <span className="mx-1">/</span> B.Tech IT · 2026
+              </p>
+            </div>
+          </Reveal>
+        </div>
+        <p className="portrait-credit">GUDA ABHISHEK / AI-STYLIZED PORTRAIT</p>
+      </section>
+      <section className="home-disciplines">
+        <div className="site-container grid gap-6 py-7 sm:grid-cols-3">
+          {[
+            ["01", "Full-stack engineering", "React · MERN · Java · REST APIs", Code2],
+            ["02", "Intelligent experiences", "Generative AI · RAG · AI agents", Sparkles],
+            ["03", "Practical product thinking", "Reusable UI · Integration · Agile", ArrowUpRight],
+          ].map(([number, title, sub, Icon]) => {
+            const Symbol = Icon as typeof Code2;
+            return (
+              <div key={String(number)} className="flex items-start gap-4">
+                <span className="font-mono text-xs text-primary">{String(number)}</span>
+                <div>
+                  <p className="text-sm font-semibold">{String(title)}</p>
+                  <p className="mt-2 text-[10px] text-muted-foreground">{String(sub)}</p>
+                </div>
+                <Symbol className="ml-auto size-4 text-violet" />
+              </div>
+            );
+          })}
+        </div>
+      </section>
+      <section className="site-container py-14">
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="font-mono text-xs text-violet">SELECTED ORIGINALS</p>
+            <h2 className="mt-3 text-4xl font-semibold">Ideas, engineered.</h2>
+          </div>
+          <Button asChild variant="bare">
+            <Link to="/projects">
+              All projects <ArrowUpRight />
+            </Link>
+          </Button>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2">
+          {siteProjects
+            .filter((p) => p.index === 0 || p.index === 2)
+            .map((p) => (
+              <ProjectCard key={p.slug} project={p} />
             ))}
-          </motion.div>
-          <motion.div variants={itemVariants} className="mt-10 flex flex-wrap justify-center gap-3">
-            <Button
-              variant="outline"
-              asChild
-              className="min-h-11 px-6 text-xs transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0"
-            >
-              <Link to="/portfolio" search={{ profile: "guest" }}>
-                Skip intro / Enter portfolio <ArrowRight />
+        </div>
+      </section>
+      <section className="home-about">
+        <div className="site-container grid gap-8 py-12 md:grid-cols-[1fr_1.4fr]">
+          <h2 className="text-4xl font-semibold">Beyond the interface.</h2>
+          <div>
+            <p className="max-w-xl text-sm leading-7 text-muted-foreground">
+              From enterprise finance workflows at Paves Technologies to AI product interfaces at
+              Bilvantis, I focus on responsive software, clear communication and purposeful
+              integration. My foundation is a B.Tech in Information Technology from TKR College of
+              Engineering & Technology.
+            </p>
+            <Button asChild variant="bare" className="mt-4 px-0">
+              <Link to="/experience">
+                Explore my career <ArrowRight />
               </Link>
             </Button>
-            <AiIntro compact />
-          </motion.div>
-        </motion.div>
-      </div>
-      <footer className="text-center text-[10px] text-muted-foreground">
-        GUDA ABHISHEK · SOFTWARE ENGINEER & AI DEVELOPER
-      </footer>
-      <Dialog
-        open={intro}
-        onOpenChange={(open) => {
-          if (!open) skip();
-        }}
-      >
-        <DialogContent className="flex h-svh w-screen max-w-none flex-col items-center justify-center border-0 bg-background px-6 sm:rounded-none">
-          <DialogTitle className="sr-only">Abhishek series intro</DialogTitle>
-          <DialogDescription className="sr-only">
-            An optional brief cinematic title sequence.
-          </DialogDescription>
-          <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            A DEVELOPER ORIGINAL
-          </p>
-          <motion.h2
-            initial={{ scale: reduced ? 1 : 0.95 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 1.4 }}
-            className="series-logo text-center text-5xl sm:text-7xl"
-          >
-            ABHISHEK:
-            <br />
-            THE SERIES
-          </motion.h2>
-          <div className="mt-10 flex gap-4">
-            <Button autoFocus variant="outline" className="min-h-11" onClick={skip}>
-              Skip intro <ArrowRight />
-            </Button>
-            <Button variant="ghost" className="min-h-11" onClick={toggleSound} aria-pressed={sound}>
-              {sound ? <Volume2 /> : <VolumeX />} Sound {sound ? "on" : "off"}
-            </Button>
           </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+        </div>
+      </section>
+    </>
   );
 }

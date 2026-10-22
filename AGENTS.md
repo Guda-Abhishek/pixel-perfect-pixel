@@ -13,7 +13,7 @@
 
 ## Architecture
 
-- Keep the profile picker at `/` and the single scrolling portfolio at `/portfolio`; direct visits bypass the intro and existing URLs remain stable.
+- Use `/` for multi-page Home, `/profiles` for the preserved optional profile picker, and retain `/portfolio` as the legacy scrolling experience; shared navigation belongs around new content routes in the root shell.
 - Use reusable Button controls and global semantic visual tokens; this keeps focus, interaction, and theming consistent.
 - Keep social URLs and the resume asset path nullable in shared configuration; missing verified resources must never produce broken links.
 - Validate contact drafts with the shared Zod schema and prepare mailto messages only; no delivery claim is possible without a connected service.
@@ -26,3 +26,5 @@
 - Keep real and AI-host portrait references separately nullable until the exact uploaded assets are available; never substitute generated faces or conflate identities.
 - Serve uploaded intro clips through asset pointers and tie muted video playback to the shared narration state; this keeps Play, Pause and close consistent without autoplay.
 - Portfolio chatbot answers only from shared portfolio data via a server endpoint; keeps the AI key server-side and facts consistent.
+- New content pages reuse shared factual data, stable project slugs, common page metadata and presentation primitives; edits stay consistent across legacy and multi-page views.
+- Bundle Lucide icons and serve selected unDraw illustrations through asset pointers; this avoids runtime icon API dependence and keeps media out of source bundles.
