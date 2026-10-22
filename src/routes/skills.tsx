@@ -1,9 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Code2, Braces, Database, BrainCircuit, Cloud, Workflow, Server } from "lucide-react";
+import { Braces, BrainCircuit, Cloud, Code2, Database, Server, Workflow } from "lucide-react";
+import { PageBody } from "@/components/SitePrimitives";
+import { Reveal } from "@/components/Reveal";
+import { TechLogo } from "@/components/TechLogo";
 import { SKILLS } from "@/lib/portfolio-data";
 import { pageHead } from "@/lib/site-data";
-import { PageBody, PageHeading, Tags } from "@/components/SitePrimitives";
-const icons = [Code2, Braces, BrainCircuit, Workflow, Database, Cloud, Workflow];
+import constellation from "@/assets/developer-constellation.jpg";
+
 export const Route = createFileRoute("/skills")({
   head: () =>
     pageHead(
@@ -13,135 +16,125 @@ export const Route = createFileRoute("/skills")({
     ),
   component: Skills,
 });
-function Skills() {
-  return (
-    <PageBody>
-      <PageHeading
-        number="02"
-        title="My skill universe."
-        description="The languages, systems and practices behind my work. Grounded in projects, coursework and continuous exploration."
-      />
-      <div className="grid gap-x-12 md:grid-cols-2">
-        {SKILLS.map((group, index) => {
-          const Icon = icons[index] ?? Code2;
-          return (
-            <section key={group.cat} className="border-b border-border py-7">
-              <div className="flex items-center gap-4">
-                <Icon className="size-6 text-violet" />
-                <h2 className="text-3xl font-semibold">{group.cat}</h2>
-              </div>
-              <p className="mt-3 text-xs leading-6 text-muted-foreground">{group.desc}</p>
-              <Tags items={group.items} />
-            </section>
-          );
-        })}
-        <section className="border-b border-border py-7">
-          <div className="flex items-center gap-4">
-            <Server className="size-6 text-violet" />
-            <h2 className="text-3xl font-semibold">Backend & API engineering</h2>
-          </div>
-          <p className="mt-3 text-xs leading-6 text-muted-foreground">
-            Connecting interfaces to services and data.
-          </p>
-          <Tags items={["Node.js", "Express.js", "REST APIs", "MongoDB", "SQL"]} />
-        </section>
-      </div>
-    </PageBody>
-  );
-}
-import { createFileRoute } from "@tanstack/react-router";
-import { BrainCircuit, Cloud, Code2, Database, Server, Wrench } from "lucide-react";
-import { PageIntro } from "@/components/PageIntro";
-import { SiteShell } from "@/components/SiteShell";
-import { SKILLS } from "@/lib/portfolio-data";
-
-export const Route = createFileRoute("/skills")({
-  head: () => ({
-    meta: [
-      { title: "Skills — Guda Abhishek" },
-      { name: "description", content: "Technologies and engineering tools used by Guda Abhishek." },
-    ],
-  }),
-  component: SkillsPage,
-});
 
 const groups = [
-  { title: "Programming languages", icon: Code2, categories: ["Programming Languages"] },
+  { title: "Languages", icon: Code2, cats: ["Programming Languages"] },
   {
-    title: "Frontend development",
-    icon: Code2,
-    categories: ["Frontend & Frameworks"],
-    picks: ["React.js", "HTML5", "CSS3", "Tailwind CSS", "JavaScript"],
+    title: "Frontend",
+    icon: Braces,
+    cats: ["Frontend & Frameworks"],
+    picks: ["React.js", "HTML5", "CSS3", "Tailwind CSS"],
   },
   {
-    title: "Backend development",
+    title: "Backend & APIs",
     icon: Server,
-    categories: ["Frontend & Frameworks"],
-    picks: ["Node.js", "Express.js", "REST APIs", "Spring"],
+    cats: ["Frontend & Frameworks"],
+    picks: ["Node.js", "Express.js", "REST APIs", "MERN Stack"],
   },
-  { title: "Databases", icon: Database, categories: ["Databases"] },
+  { title: "Databases", icon: Database, cats: ["Databases"] },
   {
     title: "AI & machine learning",
     icon: BrainCircuit,
-    categories: ["AI & Generative AI", "Machine Learning"],
+    cats: ["AI & Generative AI", "Machine Learning"],
   },
   {
-    title: "Cloud & developer tools",
-    icon: Cloud,
-    categories: ["Cloud & Dev Tools", "Engineering Practices"],
+    title: "Tools & practice",
+    icon: Workflow,
+    cats: ["Cloud & Dev Tools", "Engineering Practices"],
   },
 ];
-
-function SkillsPage() {
+function Skills() {
   return (
-    <SiteShell active="/skills">
-      <div className="page-content">
-        <PageIntro
-          eyebrow="TOOLS & PRACTICE"
-          title={
-            <>
-              A practical
-              <br />
-              <span>skill set.</span>
-            </>
-          }
-          description="Technologies used across academic, personal, and professional work. No scores or proficiency claims—just the tools and practices behind the projects."
+    <>
+      <section className="chapter-hero skills-hero">
+        <img
+          src={constellation}
+          alt="Developer technology constellation artwork"
+          width={1536}
+          height={1024}
+          fetchPriority="high"
         />
-        <div className="skill-groups">
-          {groups.map(({ title, icon: Icon, categories, picks }) => {
-            const items = [
-              ...new Set(
-                SKILLS.filter((group) => categories.includes(group.cat))
-                  .flatMap((group) => group.items)
-                  .filter((item) => !picks || picks.includes(item)),
-              ),
-            ];
-            return (
-              <section key={title} className="skill-group">
-                <div className="skill-group-heading">
-                  <span>
-                    <Icon />
-                  </span>
-                  <div>
-                    <p className="section-kicker">ENGINEERING TOOLKIT</p>
-                    <h2>{title}</h2>
-                  </div>
-                </div>
-                <ul>
-                  {items.map((item) => (
-                    <li key={item}>
-                      <span className="skill-mark">
-                        <Wrench />
-                      </span>
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            );
-          })}
+        <div className="chapter-hero-shade" />
+        <div className="site-container chapter-hero-copy">
+          <Reveal>
+            <p className="chapter-kicker">02 / THE TOOLKIT</p>
+            <h1>
+              A LIVING
+              <br />
+              <span>ECOSYSTEM.</span>
+            </h1>
+            <p className="chapter-lede">
+              Languages, frameworks, and ideas connected by the work they help make possible.
+            </p>
+          </Reveal>
         </div>
-      </div>
-    </SiteShell>
+        <span className="chapter-hero-index">TOOLS IN PRACTICE · NO SCORES, JUST WORK</span>
+      </section>
+      <PageBody>
+        <div className="skills-intro">
+          <p className="chapter-kicker">DEVELOPER CONSTELLATION</p>
+          <h2>
+            Every tool has a place
+            <br />
+            in the <span>system.</span>
+          </h2>
+          <p>
+            Technologies represented across academic, personal, and professional work. Select a
+            group to explore its parts.
+          </p>
+        </div>
+        <div className="skill-constellation">
+          <div className="constellation-art">
+            <img src={constellation} alt="" loading="lazy" />
+            <div className="constellation-core">
+              <Code2 />
+              <span>
+                BUILD
+                <br />
+                WITH INTENT
+              </span>
+            </div>
+            <span className="orbit orbit-one" />
+            <span className="orbit orbit-two" />
+          </div>
+          <div className="skill-groups">
+            {groups.map(({ title, icon: Icon, cats, picks }, index) => {
+              const items = [
+                ...new Set(
+                  SKILLS.filter((g) => cats.includes(g.cat))
+                    .flatMap((g) => g.items)
+                    .filter((x) => !picks || picks.includes(x)),
+                ),
+              ];
+              return (
+                <Reveal key={title} delay={index * 0.04}>
+                  <details className="skill-group" open={index === 0}>
+                    <summary>
+                      <span className="skill-group-icon">
+                        <Icon />
+                      </span>
+                      <span>
+                        <small>SECTOR 0{index + 1}</small>
+                        <strong>{title}</strong>
+                        <em>{items.length} technologies</em>
+                      </span>
+                      <span className="skill-group-plus">+</span>
+                    </summary>
+                    <ul>
+                      {items.map((item) => (
+                        <li key={item}>
+                          <TechLogo name={item} />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </details>
+                </Reveal>
+              );
+            })}
+          </div>
+        </div>
+      </PageBody>
+    </>
   );
 }

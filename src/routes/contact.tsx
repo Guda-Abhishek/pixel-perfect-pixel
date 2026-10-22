@@ -1,7 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { ArrowDown, Clapperboard } from "lucide-react";
 import { PortfolioContact } from "@/components/PortfolioContact";
-import { PageBody, PageHeading } from "@/components/SitePrimitives";
+import { PageBody } from "@/components/SitePrimitives";
+import { Reveal } from "@/components/Reveal";
 import { pageHead } from "@/lib/site-data";
+import { CONTACT } from "@/lib/portfolio-data";
+
 export const Route = createFileRoute("/contact")({
   head: () =>
     pageHead(
@@ -14,106 +18,46 @@ export const Route = createFileRoute("/contact")({
 function Contact() {
   return (
     <>
+      <section className="chapter-hero contact-hero">
+        <div className="contact-backdrop" />
+        <div className="site-container chapter-hero-copy">
+          <Reveal>
+            <p className="chapter-kicker">06 / THE FINALE</p>
+            <h1>
+              LET’S MAKE
+              <br />
+              <span>THE NEXT THING.</span>
+            </h1>
+            <p className="chapter-lede">
+              For thoughtful opportunities, engineering conversations, and collaborations.
+            </p>
+            <a className="chapter-scroll" href="#contact">
+              <ArrowDown /> Start a conversation
+            </a>
+          </Reveal>
+        </div>
+        <span className="chapter-hero-index">
+          <Clapperboard /> END CREDITS · HYDERABAD, INDIA
+        </span>
+      </section>
       <PageBody>
-        <PageHeading
-          number="06"
-          title="Let's start a conversation."
-          description="For opportunities, engineering conversations and collaborations. Hyderabad, India."
-        />
+        <div className="contact-endcard">
+          <div>
+            <p className="chapter-kicker">A GOOD STORY STARTS SOMEWHERE</p>
+            <h2>Have a project in mind?</h2>
+            <p>Send a note and I’ll get back to you through email.</p>
+            <a href={`mailto:${CONTACT.email}`} className="contact-email">
+              {CONTACT.email}
+            </a>
+          </div>
+          <span className="endcard-mark" aria-hidden="true">
+            GA<span>.</span>
+          </span>
+        </div>
       </PageBody>
-      <div className="contact-page">
+      <div className="contact-page cinematic-contact">
         <PortfolioContact />
       </div>
     </>
-  );
-}
-import { createFileRoute } from "@tanstack/react-router";
-import { Github, Linkedin, Mail, MapPin, Phone } from "lucide-react";
-import { PageIntro } from "@/components/PageIntro";
-import { PortfolioContact } from "@/components/PortfolioContact";
-import { SiteShell } from "@/components/SiteShell";
-import { CONTACT } from "@/lib/portfolio-data";
-
-export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: "Contact — Guda Abhishek" },
-      {
-        name: "description",
-        content:
-          "Contact Guda Abhishek in Hyderabad about software engineering and AI development.",
-      },
-    ],
-  }),
-  component: ContactPage,
-});
-
-function ContactPage() {
-  return (
-    <SiteShell active="/contact">
-      <div className="page-content contact-page">
-        <PageIntro
-          eyebrow="CONTACT"
-          title={
-            <>
-              Have something
-              <br />
-              <span>in mind?</span>
-            </>
-          }
-          description="For opportunities, collaborations, or a good engineering conversation, get in touch."
-        />
-        <div className="contact-links">
-          <a href={`mailto:${CONTACT.email}`}>
-            <Mail />
-            <span>
-              <small>EMAIL</small>
-              {CONTACT.email}
-            </span>
-          </a>
-          <a href={`tel:${CONTACT.phone.replace(/\s/g, "")}`}>
-            <Phone />
-            <span>
-              <small>PHONE</small>
-              {CONTACT.phone}
-            </span>
-          </a>
-          <div>
-            <MapPin />
-            <span>
-              <small>BASED IN</small>
-              {CONTACT.location}
-            </span>
-          </div>
-          {CONTACT.linkedin && (
-            <a href={CONTACT.linkedin} target="_blank" rel="noopener noreferrer">
-              <Linkedin />
-              <span>
-                <small>LINKEDIN</small>Connect professionally
-              </span>
-            </a>
-          )}
-          {CONTACT.github && (
-            <a href={CONTACT.github} target="_blank" rel="noopener noreferrer">
-              <Github />
-              <span>
-                <small>GITHUB</small>Explore my code
-              </span>
-            </a>
-          )}
-        </div>
-        <div className="contact-form-wrap">
-          <div>
-            <p className="section-kicker">SEND A NOTE</p>
-            <h2 className="font-display text-3xl font-semibold">Open an email draft.</h2>
-            <p className="mt-3 text-sm leading-7 text-muted-foreground">
-              The form validates your draft and opens your email app. The website does not send or
-              store messages.
-            </p>
-          </div>
-          <PortfolioContact showHeading={false} />
-        </div>
-      </div>
-    </SiteShell>
   );
 }

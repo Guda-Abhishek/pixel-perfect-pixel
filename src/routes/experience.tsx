@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { BriefcaseBusiness } from "lucide-react";
+import { ArrowDown, BriefcaseBusiness, MapPin } from "lucide-react";
+import { PageBody } from "@/components/SitePrimitives";
+import { Reveal } from "@/components/Reveal";
+import { TechnologyList } from "@/components/TechLogo";
 import { MISSIONS } from "@/lib/portfolio-data";
 import { pageHead } from "@/lib/site-data";
-import { PageBody, PageHeading, Tags } from "@/components/SitePrimitives";
+
 export const Route = createFileRoute("/experience")({
   head: () =>
     pageHead(
@@ -14,123 +17,77 @@ export const Route = createFileRoute("/experience")({
 });
 function Experience() {
   return (
-    <PageBody>
-      <PageHeading
-        number="04"
-        title="The career episodes."
-        description="Hands-on work across frontend engineering, API integration and AI product experiences."
-      />
-      <div className="space-y-12">
-        {MISSIONS.map((mission) => (
-          <article
-            key={mission.id}
-            className="grid gap-6 border-b border-border pb-12 md:grid-cols-[230px_1fr]"
-          >
-            <div>
-              <p className="font-mono text-xs text-violet">EPISODE {mission.id}</p>
-              <p className="mt-4 text-sm text-muted-foreground">{mission.period}</p>
-              {mission.location && (
-                <p className="mt-2 text-xs text-muted-foreground">{mission.location}</p>
-              )}
-            </div>
-            <div>
-              <h2 className="flex items-start gap-3 text-4xl font-semibold">
-                <BriefcaseBusiness className="mt-2 size-5 shrink-0 text-violet" />
-                {mission.company}
-              </h2>
-              <p className="mt-3 text-sm text-muted-foreground">{mission.role}</p>
-              <Tags items={mission.tags} />
-              {mission.projects.map((project) => (
-                <section key={project.name} className="mt-8">
-                  <h3 className="text-2xl font-semibold">{project.name}</h3>
-                  <ul className="mt-4 space-y-3">
-                    {project.points.map((point) => (
-                      <li
-                        key={point}
-                        className="border-l border-violet/50 pl-4 text-sm leading-7 text-muted-foreground"
-                      >
-                        {point}
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              ))}
-            </div>
-          </article>
-        ))}
-      </div>
-    </PageBody>
-  );
-}
-import { createFileRoute } from "@tanstack/react-router";
-import { BriefcaseBusiness, MapPin } from "lucide-react";
-import { PageIntro } from "@/components/PageIntro";
-import { SiteShell } from "@/components/SiteShell";
-import { MISSIONS } from "@/lib/portfolio-data";
-
-export const Route = createFileRoute("/experience")({
-  head: () => ({
-    meta: [
-      { title: "Experience — Guda Abhishek" },
-      {
-        name: "description",
-        content: "Professional software development and AI interface experience.",
-      },
-    ],
-  }),
-  component: ExperiencePage,
-});
-
-function ExperiencePage() {
-  return (
-    <SiteShell active="/experience">
-      <div className="page-content">
-        <PageIntro
-          eyebrow="PROFESSIONAL EXPERIENCE"
-          title={
-            <>
-              Learning by
+    <>
+      <section className="chapter-hero experience-hero">
+        <div className="experience-backdrop" />
+        <div className="site-container chapter-hero-copy">
+          <Reveal>
+            <p className="chapter-kicker">04 / PROFESSIONAL TIMELINE</p>
+            <h1>
+              LEARNING
               <br />
-              <span>building.</span>
-            </>
-          }
-          description="Software development and AI product interface work across collaborative teams."
-        />
-        <div className="timeline experience-timeline">
-          {MISSIONS.map((job) => (
-            <article key={job.id} className="timeline-item experience-item">
-              <span className="timeline-dot" />
-              <div className="experience-meta">
-                <span>
-                  <BriefcaseBusiness /> {job.period}
-                </span>
-                {job.location && (
-                  <span>
-                    <MapPin /> {job.location}
-                  </span>
-                )}
-              </div>
-              <h2>{job.company}</h2>
-              <p className="text-primary">{job.role}</p>
-              {job.projects.map((project) => (
-                <section key={project.name} className="experience-project">
-                  <h3>{project.name}</h3>
-                  <ul>
-                    {project.points.map((point) => (
-                      <li key={point}>{point}</li>
-                    ))}
-                  </ul>
-                </section>
-              ))}
-              <div className="technology-list">
-                {job.tags.map((tag) => (
-                  <span key={tag}>{tag}</span>
-                ))}
-              </div>
-            </article>
+              <span>BY BUILDING.</span>
+            </h1>
+            <p className="chapter-lede">
+              Two teams, different challenges, and a shared focus on making software work for
+              people.
+            </p>
+            <a className="chapter-scroll" href="#timeline">
+              <ArrowDown /> Follow the timeline
+            </a>
+          </Reveal>
+        </div>
+        <span className="chapter-hero-index">WORK IN PROGRESS · WORK THAT SHIPS</span>
+      </section>
+      <PageBody>
+        <section className="experience-summary">
+          <p className="chapter-kicker">ON THE JOB</p>
+          <p>
+            Frontend engineering, API integration, AI product experiences, and close work with
+            design, backend, and QA teams.
+          </p>
+        </section>
+        <div id="timeline" className="career-timeline">
+          {MISSIONS.map((job, i) => (
+            <Reveal key={job.id} delay={i * 0.08}>
+              <article className="career-chapter">
+                <div className="career-rail">
+                  <span>EPISODE {job.id}</span>
+                  <i />
+                </div>
+                <div className="career-content">
+                  <header>
+                    <div>
+                      <p className="chapter-kicker">{job.period}</p>
+                      <h2>{job.company}</h2>
+                      <p className="career-role">
+                        <BriefcaseBusiness /> {job.role}
+                      </p>
+                    </div>
+                    {job.location && (
+                      <span className="career-location">
+                        <MapPin />
+                        {job.location}
+                      </span>
+                    )}
+                  </header>
+                  {job.projects.map((project) => (
+                    <section key={project.name} className="career-project">
+                      <h3>{project.name}</h3>
+                      <ul>
+                        {project.points.map((point) => (
+                          <li key={point}>{point}</li>
+                        ))}
+                      </ul>
+                    </section>
+                  ))}
+                  <TechnologyList items={job.tags} />
+                </div>
+              </article>
+            </Reveal>
           ))}
         </div>
-      </div>
-    </SiteShell>
+      </PageBody>
+    </>
   );
 }

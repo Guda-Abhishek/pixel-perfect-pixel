@@ -1,9 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Award, ArrowUpRight } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowUpRight, Award, BadgeCheck } from "lucide-react";
+import { PageBody } from "@/components/SitePrimitives";
+import { Reveal } from "@/components/Reveal";
 import { CERTS } from "@/lib/portfolio-data";
 import { pageHead } from "@/lib/site-data";
-import { PageBody, PageHeading } from "@/components/SitePrimitives";
+
 export const Route = createFileRoute("/certifications")({
   head: () =>
     pageHead(
@@ -15,34 +16,70 @@ export const Route = createFileRoute("/certifications")({
 });
 function Certifications() {
   return (
-    <PageBody>
-      <PageHeading
-        number="05"
-        title="Learning, collected."
-        description="A continuing foundation in AI, cloud infrastructure, machine learning and software development."
-      />
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {CERTS.map(([title, issuer], index) => (
-          <article key={title} className="cert-card">
-            <div className="flex items-center justify-between">
-              <Award className="size-7 text-gold" />
-              <span className="font-mono text-[10px] text-muted-foreground">0{index + 1}</span>
-            </div>
-            <p className="mt-8 text-xs text-gold">{issuer}</p>
-            <h2 className="mt-3 text-3xl font-semibold">{title}</h2>
-          </article>
-        ))}
-      </div>
-      <section className="mt-12 border-t border-border pt-8">
-        <h2 className="text-3xl font-semibold">Recognition & leadership</h2>
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-muted-foreground">
-          Two innovation projects recognized under the MSME Innovation Programme 2024, alongside
-          IEEE membership activities and IT branch student coordination.
-        </p>
-        <Link to="/about" className="mt-4 inline-flex items-center gap-2 text-sm text-violet">
-          Explore leadership <ArrowUpRight className="size-4" />
-        </Link>
+    <>
+      <section className="chapter-hero certs-hero">
+        <div className="certs-backdrop" />
+        <div className="site-container chapter-hero-copy">
+          <Reveal>
+            <p className="chapter-kicker">05 / THE LEARNING ARCHIVE</p>
+            <h1>
+              PROGRESS,
+              <br />
+              <span>DOCUMENTED.</span>
+            </h1>
+            <p className="chapter-lede">
+              A collection of learning milestones across AI, cloud, machine learning, and software
+              development.
+            </p>
+          </Reveal>
+        </div>
+        <span className="chapter-hero-index">
+          CONTINUOUS LEARNING · VERIFIED DETAILS SHOWN WHEN AVAILABLE
+        </span>
       </section>
-    </PageBody>
+      <PageBody>
+        <div className="certs-note">
+          <BadgeCheck />
+          <p>
+            Credentials are listed from the portfolio record. Certificate scans, issue dates, IDs,
+            and verification links have not been provided.
+          </p>
+        </div>
+        <div className="certificate-archive">
+          {CERTS.map(([title, issuer], i) => (
+            <Reveal key={title} delay={i * 0.035}>
+              <article className="certificate-item">
+                <div className="certificate-art" aria-hidden="true">
+                  <span className="certificate-stamp">
+                    <Award />
+                  </span>
+                  <span>LEARNING ARCHIVE</span>
+                  <i>0{i + 1}</i>
+                </div>
+                <div className="certificate-copy">
+                  <p>{issuer}</p>
+                  <h2>{title}</h2>
+                  <span>Credential details not supplied</span>
+                </div>
+                <Award className="certificate-award" aria-hidden="true" />
+              </article>
+            </Reveal>
+          ))}
+        </div>
+        <section className="cert-recognition">
+          <div>
+            <p className="chapter-kicker">BEYOND THE CLASSROOM</p>
+            <h2>Recognition & leadership.</h2>
+            <p>
+              Two innovation projects recognized under the MSME Innovation Programme 2024, alongside
+              IEEE membership activities and IT branch student coordination.
+            </p>
+          </div>
+          <Link to="/about">
+            Explore the story <ArrowUpRight />
+          </Link>
+        </section>
+      </PageBody>
+    </>
   );
 }
