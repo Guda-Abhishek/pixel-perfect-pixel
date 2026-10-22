@@ -309,6 +309,28 @@ section {
 .contact-hero{min-height:580px}.contact-backdrop{background:radial-gradient(ellipse at 80% 55%,rgba(229,9,20,.23),transparent 30%),linear-gradient(110deg,#141414 20%,#211719 65%,#141414)}.contact-backdrop:after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#141414,transparent 55%),repeating-linear-gradient(90deg,transparent 0 119px,rgba(255,255,255,.022) 120px)}.contact-endcard{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:32px 0 46px}.contact-endcard h2{margin-top:12px;font-size:clamp(2.2rem,5vw,4rem)}.contact-endcard p:not(.chapter-kicker){margin-top:10px;color:#aaa;font-size:12px}.contact-email{display:inline-block;margin-top:15px;color:#fff;font-size:14px}.endcard-mark{font:800 clamp(5rem,14vw,12rem)/.8 var(--font-display);color:#292326}.endcard-mark span{color:#e50914}.cinematic-contact>section{border-top:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,#171719,#141414)}
 @media(max-width:800px){.chapter-hero{min-height:590px}.chapter-hero-copy{padding-block:80px 105px}.chapter-hero h1{font-size:clamp(4rem,13vw,7rem)}.about-story,.skill-constellation,.featured-project{grid-template-columns:1fr}.about-story{gap:25px}.constellation-art{position:relative;top:auto;min-height:330px}.featured-project-art,.featured-project-art .project-visual{min-height:290px}.project-showcase{grid-template-columns:1fr}.showcase-project{min-height:250px}.career-chapter{grid-template-columns:110px 1fr;gap:20px}.experience-summary{grid-template-columns:1fr;gap:14px}.certificate-archive{grid-template-columns:1fr}.contact-hero{min-height:520px}}
 @media(max-width:520px){.chapter-hero{min-height:530px}.chapter-hero h1{font-size:clamp(3.6rem,15vw,5.6rem)}.chapter-lede{max-width:360px;font-size:13px}.chapter-hero-index{right:20px;font-size:8px}.milestone{grid-template-columns:1fr 34px;gap:10px}.milestone>span:first-child{grid-column:1/-1}.milestone-number{grid-column:2;grid-row:2}.milestone h3{font-size:23px}.skill-constellation{grid-template-columns:minmax(0,1fr)}.skill-group ul{margin-left:0}.skill-group summary strong{font-size:20px}.showcase-project{grid-template-columns:1fr}.showcase-art,.showcase-art .project-visual{min-height:220px}.showcase-copy{min-height:230px}.career-chapter{grid-template-columns:1fr;gap:16px}.career-rail{display:flex;align-items:center;gap:14px}.career-rail i{position:static;width:28px;height:1px}.career-content header{display:block}.career-location{margin-top:9px}.certificate-item{grid-template-columns:105px 1fr 18px}.certificate-art{min-height:138px}.certificate-copy h2{font-size:17px}.cert-recognition,.contact-endcard{align-items:flex-start;flex-direction:column}.endcard-mark{display:none}}
+/* Keep the same visual system usable across desktop, tablet, and phone viewports. */
+@media(max-width:767px){
+  #page-content .chapter-hero + .site-container{--space-page:clamp(16px,5vw,24px)}
+  .chapter-hero{min-height:min(610px,82vh);min-height:min(610px,82svh)}
+  .chapter-hero>img{object-position:62% center}
+  .about-hero>img{object-position:66% center}
+  .skills-hero>img,.projects-hero>img{object-position:62% center}
+  .chapter-hero-index{max-width:calc(100% - 40px);line-height:1.5}
+  .chapter-hero-copy{padding-top:max(70px,env(safe-area-inset-top));padding-bottom:100px}
+  .contact-page input,.contact-page textarea,.contact-page select{font-size:16px}
+}
+@media(max-width:380px){
+  .chapter-hero h1{font-size:clamp(3.15rem,14vw,4rem);letter-spacing:-.045em}
+  .chapter-kicker{font-size:9px;letter-spacing:.15em}
+  .chapter-hero-index{font-size:7px;letter-spacing:.08em}
+  .skill-group summary{grid-template-columns:38px minmax(0,1fr) 16px;gap:10px;padding-inline:0}
+  .skill-group-icon{width:36px;height:36px}
+  .skill-group summary strong{font-size:18px}
+  .certificate-item{grid-template-columns:88px minmax(0,1fr) 16px}
+  .certificate-copy{padding:12px}
+  .certificate-copy h2{font-size:15px}
+}
 
 .profile-blue {
   background: var(--profile-blue);
