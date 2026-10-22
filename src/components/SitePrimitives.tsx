@@ -9,10 +9,8 @@ import { ProjectVisual } from "@/components/ProjectVisual";
 import { siteProjects } from "@/lib/site-data";
 
 export function SocialLinks() {
-  return <div className="flex gap-2">{[[CONTACT.github, Github, "GitHub"], [CONTACT.linkedin, Linkedin, "LinkedIn"]].map(([url, Icon, label]) => {
-    if (typeof url !== "string" || typeof Icon === "string" || !Icon) return null;
-    return <Button key={String(label)} asChild variant="outline" size="icon" className="min-h-11 min-w-11"><a href={url} target="_blank" rel="noopener noreferrer" aria-label={String(label)} title={String(label)}><Icon /></a></Button>;
-  })}</div>;
+  const socials = [{ url: CONTACT.github, Icon: Github, label: "GitHub" }, { url: CONTACT.linkedin, Icon: Linkedin, label: "LinkedIn" }];
+  return <div className="flex gap-2">{socials.map(({url, Icon, label}) => url ? <Button key={label} asChild variant="outline" size="icon" className="min-h-11 min-w-11"><a href={url} target="_blank" rel="noopener noreferrer" aria-label={label} title={label}><Icon /></a></Button> : null)}</div>;
 }
 export function ResumeAction() {
   if (PORTFOLIO_FILES.resume) return <Button asChild className="min-h-11"><a href={PORTFOLIO_FILES.resume} download><Download /> Download resume</a></Button>;
