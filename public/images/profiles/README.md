@@ -1,17 +1,27 @@
 # Portfolio profile image assets
 
-The profile selector and profile pages use static files under this directory.
+All listed assets are committed to this branch under `public/images/profiles/`.
 
-## Integrated image paths
-
-- Abhishek: `abhishek/abhishek_main.jpeg`, `abhishek/abhishek_1.jpeg`, `abhishek/abhishek_2.jpg`
-- Anjini: `anjini/anjini_main.jpg`, `anjini/anjini_1.jpg`, `anjini/anjini_2.jpg`
-- Sai: `sai/sai_main.png`, `sai/sai_1.jpeg`, `sai/sai_2.jpeg`
-
-Use each `*_main` file as the profile selector avatar and the remaining two images in the profile's About gallery. The profile selector eagerly loads avatars because they appear above the fold, and keeps the initials layer visible if an image fails to load.
+## Abhishek
+- `abhishek/abhishek_main.jpeg` — profile selector avatar and main personal photo
+- `abhishek/abhishek_1.jpeg` — classroom photo
+- `abhishek/abhishek_2.jpg` — campus photo
 
 ## Amulya
+- `amulya/amulya_main.webp` — profile selector avatar and main portrait
+- `amulya/amulya_1.webp` — gallery photo
+- `amulya/amulya_2.webp` — gallery photo
 
-The code expects `amulya/amulya_main.webp`, `amulya/amulya_1.webp`, and `amulya/amulya_2.webp`. Those three files are not yet present in this Git branch, so the Amulya image paths still need to be committed from the supplied corrected image package before her avatar/gallery can display.
+## Anjini
+- `anjini/anjini_main.jpg` — profile selector avatar
+- `anjini/anjini_1.jpg`
+- `anjini/anjini_2.jpg`
 
-Anjini's profile remains Coming Soon while her resume is pending. No portfolio details are invented.
+Anjini's portfolio remains Coming Soon while her resume is pending. Her photos are used only for the profile card, not to invent portfolio details.
+
+## Sai
+- `sai/sai_main.png` — profile artwork/avatar
+- `sai/sai_1.jpeg`
+- `sai/sai_2.jpeg`
+
+The profile selector eagerly loads the avatar images because they appear above the fold. If an image fails to load, the initials layer remains visible as a graceful fallback. The About galleries use the two additional photos for Abhishek, Amulya, and Sai.
