@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Play, Volume2, VolumeX } from "lucide-react";
+import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { AiIntro } from "@/components/AiIntro";
@@ -31,50 +31,21 @@ export const Route = createFileRoute("/profiles")({
 
 function ProfileSelect() {
   const [intro, setIntro] = useState(false);
-  const [sound, setSound] = useState(false);
-  const audio = useRef<AudioContext | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reduced = useReducedMotion();
   useEffect(
     () => () => {
       if (timer.current) clearTimeout(timer.current);
-      void audio.current?.close();
     },
     [],
   );
   const skip = () => {
     setIntro(false);
-    setSound(false);
     if (timer.current) clearTimeout(timer.current);
-    void audio.current?.close();
-    audio.current = null;
-  };
-  const toggleSound = () => {
-    if (sound) {
-      setSound(false);
-      void audio.current?.close();
-      audio.current = null;
-      return;
-    }
-    try {
-      const context = new AudioContext();
-      audio.current = context;
-      const gain = context.createGain();
-      gain.connect(context.destination);
-      gain.gain.setValueAtTime(0.06, context.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.6);
-      const tone = context.createOscillator();
-      tone.type = "sine";
-      tone.frequency.setValueAtTime(146.83, context.currentTime);
-      tone.connect(gain);
-      tone.start();
-      tone.stop(context.currentTime + 0.6);
-      setSound(true);
-    } catch {
-      setSound(false);
-    }
+    timer.current = null;
   };
   const playIntro = () => {
+    if (timer.current) clearTimeout(timer.current);
     setIntro(true);
     timer.current = setTimeout(skip, reduced ? 1000 : 2400);
   };
@@ -229,9 +200,7 @@ function ProfileSelect() {
             <Button autoFocus variant="outline" className="min-h-11" onClick={skip}>
               Skip intro <ArrowRight />
             </Button>
-            <Button variant="ghost" className="min-h-11" onClick={toggleSound} aria-pressed={sound}>
-              {sound ? <Volume2 /> : <VolumeX />} Sound {sound ? "on" : "off"}
-            </Button>
+            {/* Sound is intentionally omitted until a real, synchronized intro soundtrack is available. */}
           </div>
         </DialogContent>
       </Dialog>
