@@ -27,4 +27,5 @@
 - Serve uploaded intro clips through asset pointers and tie muted video playback to the shared narration state; this keeps Play, Pause and close consistent without autoplay.
 - Portfolio chatbot answers only from shared portfolio data via a server endpoint; keeps the AI key server-side and facts consistent.
 - New content pages reuse shared factual data, stable project slugs, common page metadata and presentation primitives; edits stay consistent across legacy and multi-page views.
+- Person portfolios use typed, isolated resume data and a shared shell under `/people/$person`; `/profiles` selects people and Abhishek redirects to the preserved root site. This prevents facts, navigation, and Abhishek-specific chat from crossing person boundaries.
 - Bundle Lucide icons and serve selected unDraw illustrations through asset pointers; this avoids runtime icon API dependence and keeps media out of source bundles.
