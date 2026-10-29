@@ -152,9 +152,21 @@ function ProfileSelect() {
                   <span className="block rounded ring-2 ring-transparent transition-all duration-200 group-hover:scale-[1.04] group-hover:ring-foreground group-focus-visible:ring-foreground group-active:scale-95">
                     <span
                       aria-hidden="true"
-                      className={`${profile.color} flex aspect-square w-full items-center justify-center rounded font-display text-6xl text-primary-foreground sm:text-7xl`}
+                      className={`${profile.color} relative flex aspect-square w-full items-center justify-center overflow-hidden rounded font-display text-6xl text-primary-foreground shadow-2xl ring-1 ring-white/10 sm:text-7xl`}
                     >
-                      {profile.initials}
+                      <span className="absolute inset-0 flex items-center justify-center">{profile.initials}</span>
+                      {profile.avatar && (
+                        <img
+                          src={profile.avatar}
+                          alt=""
+                          loading="lazy"
+                          className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
+                        />
+                      )}
+                      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
                     </span>
                   </span>
                   <span className="mt-4 block min-h-10 text-sm text-foreground transition-colors group-hover:text-primary sm:text-base">
