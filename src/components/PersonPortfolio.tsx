@@ -172,18 +172,8 @@ export function PersonUnavailable({
   return (
     <div className="site-shell person-shell">
       <div className="site-container flex min-h-svh flex-col items-center justify-center py-12 text-center">
-        <span className="person-coming-mark relative overflow-hidden" aria-hidden="true">
+        <span className="person-coming-mark" aria-hidden="true">
           {person === "bava" ? "A" : "?"}
-          {!missing && person === "bava" && (
-            <img
-              src="/images/profiles/anjini/anjini_main.webp"
-              alt=""
-              className="absolute inset-0 size-full object-cover"
-              onError={(event) => {
-                event.currentTarget.style.display = "none";
-              }}
-            />
-          )}
         </span>
         <p className="mt-8 font-mono text-xs text-primary">
           {missing ? "PAGE NOT FOUND" : "COMING SOON — RESUME PENDING"}
@@ -197,22 +187,6 @@ export function PersonUnavailable({
             ? "Choose a profile to continue exploring."
             : "Portfolio in progress. Her story will be added when her resume is available."}
         </p>
-        {!missing && person === "bava" && (
-          <div className="mt-8 grid w-full max-w-sm grid-cols-2 gap-3" aria-label="Anjini photo gallery">
-            {["/images/profiles/anjini/anjini_1.webp", "/images/profiles/anjini/anjini_2.webp"].map((src, index) => (
-              <img
-                key={src}
-                src={src}
-                alt={`Anjini, personal photo ${index + 1}`}
-                loading="lazy"
-                className="aspect-[4/5] w-full rounded-md border border-border object-cover"
-                onError={(event) => {
-                  event.currentTarget.style.display = "none";
-                }}
-              />
-            ))}
-          </div>
-        )}
         <Button asChild className="mt-8">
           <Link to="/profiles">
             <ArrowLeft /> Choose your profile
