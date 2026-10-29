@@ -4,6 +4,7 @@ export const PEOPLE = [
     name: "Abhishek",
     nickname: null,
     initials: "GA",
+    avatar: null,
     color: "profile-blue",
     status: "Portfolio",
   },
@@ -12,6 +13,7 @@ export const PEOPLE = [
     name: "Amulya",
     nickname: "Ammu",
     initials: "DA",
+    avatar: "/images/profiles/amulya/amulya_main.webp",
     color: "profile-green",
     status: "Portfolio",
   },
@@ -20,6 +22,7 @@ export const PEOPLE = [
     name: "Anjini",
     nickname: "Bava",
     initials: "A",
+    avatar: "/images/profiles/anjini/anjini_main.webp",
     color: "profile-purple",
     status: "Coming Soon — resume pending",
   },
@@ -28,6 +31,7 @@ export const PEOPLE = [
     name: "Sai",
     nickname: "Darling",
     initials: "DS",
+    avatar: "/images/profiles/sai/sai_main.webp",
     color: "profile-red",
     status: "Portfolio",
   },
@@ -59,6 +63,8 @@ export interface PersonPortfolio {
   displayName: string;
   nickname: string;
   initials: string;
+  portrait: string;
+  gallery: { src: string; alt: string }[];
   headline: string;
   story: string;
   summary: string;
@@ -93,6 +99,11 @@ const ammu: PersonPortfolio = {
   displayName: "Amulya",
   nickname: "Ammu",
   initials: "DA",
+  portrait: "/images/profiles/amulya/amulya_main.webp",
+  gallery: [
+    { src: "/images/profiles/amulya/amulya_1.webp", alt: "Amulya, portrait photo" },
+    { src: "/images/profiles/amulya/amulya_2.webp", alt: "Amulya, portrait photo" },
+  ],
   headline: "Data Analytics | AI & Machine Learning",
   story: "Turning structured data into useful insights and practical applications.",
   summary:
@@ -277,6 +288,11 @@ const sai: PersonPortfolio = {
   displayName: "Sai",
   nickname: "Darling",
   initials: "DS",
+  portrait: "/images/profiles/sai/sai_main.webp",
+  gallery: [
+    { src: "/images/profiles/sai/sai_1.webp", alt: "Sai, portrait photo" },
+    { src: "/images/profiles/sai/sai_2.webp", alt: "Sai, portrait photo" },
+  ],
   headline: "Software Engineer | Web Development",
   story: "Interactive websites. Responsive interfaces. Thoughtful problem-solving.",
   summary:
