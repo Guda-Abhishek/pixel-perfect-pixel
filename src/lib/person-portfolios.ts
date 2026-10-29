@@ -22,7 +22,7 @@ export const PEOPLE = [
     name: "Anjini",
     nickname: "Bava",
     initials: "A",
-    avatar: null,
+    avatar: "/images/profiles/anjini/anjini_main.jpg",
     color: "profile-purple",
     status: "Coming Soon — resume pending",
   },
