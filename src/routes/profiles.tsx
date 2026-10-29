@@ -150,11 +150,20 @@ function ProfileSelect() {
               >
                 <Link to="/people/$person" params={{ person: profile.id }} className="min-w-0">
                   <span className="block rounded ring-2 ring-transparent transition-all duration-200 group-hover:scale-[1.04] group-hover:ring-foreground group-focus-visible:ring-foreground group-active:scale-95">
-                    <span aria-hidden="true" className={`${profile.color} flex aspect-square w-full items-center justify-center rounded font-display text-6xl text-primary-foreground sm:text-7xl`}>{profile.initials}</span>
+                    <span
+                      aria-hidden="true"
+                      className={`${profile.color} flex aspect-square w-full items-center justify-center rounded font-display text-6xl text-primary-foreground sm:text-7xl`}
+                    >
+                      {profile.initials}
+                    </span>
                   </span>
                   <span className="mt-4 block min-h-10 text-sm text-foreground transition-colors group-hover:text-primary sm:text-base">
                     {profile.name}
-                     {profile.nickname && <span className="mt-1 block text-xs text-muted-foreground">({profile.nickname})</span>}
+                    {profile.nickname && (
+                      <span className="mt-1 block text-xs text-muted-foreground">
+                        ({profile.nickname})
+                      </span>
+                    )}
                   </span>
                   <span className="mt-1 block text-[10px] leading-relaxed text-muted-foreground">
                     {profile.status}

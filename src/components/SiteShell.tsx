@@ -28,7 +28,13 @@ export function SiteShell({ children }: { children: ReactNode }) {
     document.addEventListener("keydown", escape);
     return () => document.removeEventListener("keydown", escape);
   }, []);
-  if (path === "/portfolio" || path === "/profiles" || path.startsWith("/people/") || path.startsWith("/api/")) return children;
+  if (
+    path === "/portfolio" ||
+    path === "/profiles" ||
+    path.startsWith("/people/") ||
+    path.startsWith("/api/")
+  )
+    return children;
   return (
     <div className="site-shell">
       <a
