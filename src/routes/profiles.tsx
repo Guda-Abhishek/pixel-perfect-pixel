@@ -130,10 +130,14 @@ function ProfileSelect() {
                         <img
                           src={profile.avatar}
                           alt=""
-                          loading="lazy"
-                          className="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-105"
+                          loading="eager"
+                          decoding="async"
+                          fetchPriority="high"
+                          draggable={false}
+                          className="absolute inset-0 size-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                           onError={(event) => {
-                            event.currentTarget.style.display = "none";
+                            // Keep the initials layer visible as a graceful fallback.
+                            event.currentTarget.hidden = true;
                           }}
                         />
                       )}
