@@ -172,8 +172,18 @@ export function PersonUnavailable({
   return (
     <div className="site-shell person-shell">
       <div className="site-container flex min-h-svh flex-col items-center justify-center py-12 text-center">
-        <span className="person-coming-mark" aria-hidden="true">
+        <span className="person-coming-mark relative overflow-hidden" aria-hidden="true">
           {person === "bava" ? "A" : "?"}
+          {!missing && person === "bava" && (
+            <img
+              src="/images/profiles/anjini/anjini_main.webp"
+              alt=""
+              className="absolute inset-0 size-full object-cover"
+              onError={(event) => {
+                event.currentTarget.style.display = "none";
+              }}
+            />
+          )}
         </span>
         <p className="mt-8 font-mono text-xs text-primary">
           {missing ? "PAGE NOT FOUND" : "COMING SOON — RESUME PENDING"}
@@ -264,8 +274,17 @@ export function PersonHome({ profile }: { profile: PersonPortfolio }) {
       <section className="person-hero">
         <img src={backdrop} alt="" className="person-hero-backdrop" fetchPriority="high" />
         <div className="person-hero-shade" aria-hidden="true" />
-        <span className="person-hero-monogram" aria-hidden="true">
+        <span className="person-hero-monogram relative overflow-hidden" aria-hidden="true">
           {profile.initials}
+          <img
+            src={profile.portrait}
+            alt=""
+            fetchPriority="high"
+            className="absolute inset-0 size-full object-cover object-center"
+            onError={(event) => {
+              event.currentTarget.style.display = "none";
+            }}
+          />
         </span>
         <div className="site-container relative z-10 py-14 sm:py-20">
           <Reveal>
@@ -408,8 +427,39 @@ export function PersonContent({
       {section === "about" && (
         <>
           <div className="grid gap-8 md:grid-cols-[1fr_2fr]">
-            <h2 className="text-4xl">{profile.headline}</h2>
-            <p className="text-sm leading-8 text-muted-foreground">{profile.summary}</p>
+            <div>
+              <h2 className="text-4xl">{profile.headline}</h2>
+              <div className="mt-6 overflow-hidden rounded-lg border border-border bg-card">
+                <img
+                  src={profile.portrait}
+                  alt={`${profile.name} — portfolio portrait`}
+                  loading="lazy"
+                  className="max-h-[34rem] w-full object-cover object-center"
+                  onError={(event) => {
+                    event.currentTarget.style.display = "none";
+                  }}
+                />
+              </div>
+            </div>
+            <div>
+              <p className="text-sm leading-8 text-muted-foreground">{profile.summary}</p>
+              {profile.gallery.length > 0 && (
+                <div className="mt-8 grid grid-cols-2 gap-3" aria-label={`${profile.name} photo gallery`}>
+                  {profile.gallery.map((photo) => (
+                    <img
+                      key={photo.src}
+                      src={photo.src}
+                      alt={photo.alt}
+                      loading="lazy"
+                      className="aspect-[4/5] w-full rounded-md border border-border object-cover"
+                      onError={(event) => {
+                        event.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <div className="mt-12">
             <Education profile={profile} />
