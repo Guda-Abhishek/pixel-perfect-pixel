@@ -4,24 +4,23 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Play, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { ViewerAvatar } from "@/components/ViewerAvatar";
 import { AiIntro } from "@/components/AiIntro";
-import { VIEWERS } from "@/lib/viewer-profiles";
+import { PEOPLE } from "@/lib/person-portfolios";
 import { MOTION_TOKENS } from "@/lib/motion";
 
 export const Route = createFileRoute("/profiles")({
   head: () => ({
     meta: [
-      { title: "Who's Watching? — Abhishek: The Series" },
+      { title: "Who's Watching? — Choose Your Portfolio" },
       {
         name: "description",
         content:
-          "Choose your perspective on Guda Abhishek's software engineering, full-stack and AI portfolio.",
+          "Choose Abhishek, Amulya (Ammu), Anjini (Bava), or Sai (Darling) and explore their individual portfolios.",
       },
-      { property: "og:title", content: "Abhishek: The Series — Choose Your Profile" },
+      { property: "og:title", content: "Who's Watching? — Choose Your Portfolio" },
       {
         property: "og:description",
-        content: "Explore the projects, experience and AI work of Guda Abhishek.",
+        content: "Four people. Individual stories. Explore Abhishek, Amulya, Anjini, and Sai.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -132,7 +131,7 @@ function ProfileSelect() {
             variants={itemVariants}
             className="mb-4 text-[10px] uppercase tracking-[0.2em] text-muted-foreground"
           >
-            ONE DEVELOPER. MANY PERSPECTIVES.
+            CHOOSE YOUR PROFILE
           </motion.p>
           <motion.h1 variants={itemVariants} className="text-5xl font-semibold sm:text-6xl">
             Who's Watching?
@@ -141,7 +140,7 @@ function ProfileSelect() {
             variants={itemVariants}
             className="mx-auto mt-10 grid max-w-3xl grid-cols-2 gap-x-5 gap-y-8 sm:mt-12 sm:grid-cols-4 sm:gap-6"
           >
-            {VIEWERS.map((profile) => (
+            {PEOPLE.map((profile) => (
               <Button
                 key={profile.id}
                 asChild
@@ -149,15 +148,25 @@ function ProfileSelect() {
                 size="auto"
                 className="group block text-center"
               >
-                <Link to="/portfolio" search={{ profile: profile.id }} className="min-w-0">
+                <Link to="/people/$person" params={{ person: profile.id }} className="min-w-0">
                   <span className="block rounded ring-2 ring-transparent transition-all duration-200 group-hover:scale-[1.04] group-hover:ring-foreground group-focus-visible:ring-foreground group-active:scale-95">
-                    <ViewerAvatar viewer={profile.id} />
+                    <span
+                      aria-hidden="true"
+                      className={`${profile.color} flex aspect-square w-full items-center justify-center rounded font-display text-6xl text-primary-foreground sm:text-7xl`}
+                    >
+                      {profile.initials}
+                    </span>
                   </span>
                   <span className="mt-4 block min-h-10 text-sm text-foreground transition-colors group-hover:text-primary sm:text-base">
                     {profile.name}
+                    {profile.nickname && (
+                      <span className="mt-1 block text-xs text-muted-foreground">
+                        ({profile.nickname})
+                      </span>
+                    )}
                   </span>
                   <span className="mt-1 block text-[10px] leading-relaxed text-muted-foreground">
-                    {profile.caption}
+                    {profile.status}
                   </span>
                 </Link>
               </Button>
@@ -169,8 +178,8 @@ function ProfileSelect() {
               asChild
               className="min-h-11 px-6 text-xs transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0"
             >
-              <Link to="/portfolio" search={{ profile: "guest" }}>
-                Skip intro / Enter portfolio <ArrowRight />
+              <Link to="/">
+                Enter Abhishek's portfolio <ArrowRight />
               </Link>
             </Button>
             <AiIntro compact />

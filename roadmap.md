@@ -1,5 +1,10 @@
 # Netflix-inspired portfolio enhancement
 
+# Four-person portfolio update
+- [ ] Replace main audience picker with Abhishek, Amulya, Anjini and Sai.
+- [ ] Add typed person data and shared person-specific pages; preserve Abhishek routes and interactions.
+- [ ] Test person boundaries, facts, routing, navigation and mobile states; do not publish.
+
 # Multi-page cinematic update
 - [ ] Add Home, About, Skills, Projects/detail, Experience, Certifications and Contact with shared navigation/footer.
 - [ ] Preserve profile picker, legacy portfolio, portraits, optional intro and chatbot.
