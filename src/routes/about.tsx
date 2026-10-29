@@ -91,6 +91,32 @@ function About() {
             </div>
           </div>
         </section>
+        <section className="py-12 sm:py-16" aria-labelledby="personal-gallery-title">
+          <div className="mb-6">
+            <p className="chapter-kicker">BEYOND THE SCREEN</p>
+            <h2 id="personal-gallery-title" className="mt-3 text-3xl sm:text-4xl">
+              Moments along the way.
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-5">
+            {[
+              { src: "/images/profiles/abhishek/abhishek_main.webp", alt: "Abhishek at his graduation celebration" },
+              { src: "/images/profiles/abhishek/abhishek_1.webp", alt: "Abhishek presenting in a classroom" },
+              { src: "/images/profiles/abhishek/abhishek_2.webp", alt: "Abhishek standing on the college campus" },
+            ].map((photo) => (
+              <img
+                key={photo.src}
+                src={photo.src}
+                alt={photo.alt}
+                loading="lazy"
+                className="aspect-[4/5] w-full rounded-lg border border-border object-cover"
+                onError={(event) => {
+                  event.currentTarget.style.display = "none";
+                }}
+              />
+            ))}
+          </div>
+        </section>
         <Reveal>
           <figure className="about-illustration">
             <img
