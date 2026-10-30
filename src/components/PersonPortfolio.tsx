@@ -20,6 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/Reveal";
 import { TechnologyList } from "@/components/TechLogo";
+import { PersonPortfolioAssistant } from "@/components/PersonPortfolioAssistant";
 import {
   PERSON_SECTIONS,
   type PersonPortfolio,
@@ -142,6 +143,7 @@ export function PersonShell({
         )}
       </header>
       <div id="person-content">{children}</div>
+      <PersonPortfolioAssistant profile={profile} />
       <footer className="site-footer">
         <div className="site-container">
           <p className="font-mono text-xs text-primary">THE NEXT CHAPTER</p>
