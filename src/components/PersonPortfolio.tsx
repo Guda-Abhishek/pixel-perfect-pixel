@@ -115,11 +115,12 @@ export function PersonShell({
       </a>
       <header className="site-nav">
         <div className="site-container flex min-h-20 items-center justify-between gap-4">
-          <PersonLink person={profile.id} className="series-logo text-3xl">
-            {profile.displayName.toUpperCase()}
-            <span className="ml-2 font-sans text-[9px] font-normal text-muted-foreground">
-              THE SERIES
-            </span>
+          <PersonLink
+            person={profile.id}
+            className="person-brand"
+            aria-label="GA — portfolio home"
+          >
+            <span>GA</span><i aria-hidden="true">.</i>
           </PersonLink>
           <nav aria-label={`${profile.displayName} navigation`} className="person-desktop-nav">
             {nav}
