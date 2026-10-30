@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bot, Clapperboard, Menu, X, ArrowUpRight } from "lucide-react";
+import { Bot, Clapperboard, Menu, X, ArrowUpRight, UsersRound } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AiIntro } from "@/components/AiIntro";
@@ -132,9 +132,9 @@ export function PortfolioNavbar({ person }: PortfolioNavbarProps) {
             title="Explore The Series"
           >
             <Link
-              to="/portfolio"
-              search={{ profile: "guest" }}
-              aria-label="Explore The Series cinematic portfolio"
+              to={isPerson && personId ? `/people/${personId}` : "/portfolio"}
+              {...(!isPerson ? { search: { profile: "guest" as const } } : {})}
+              aria-label={`Explore ${person?.displayName ?? "The Series"} cinematic portfolio`}
             >
               <Clapperboard className="size-4" aria-hidden="true" />
             </Link>
@@ -143,10 +143,14 @@ export function PortfolioNavbar({ person }: PortfolioNavbarProps) {
           {/* 3. Choose profile control */}
           <Button
             asChild
-            variant="bare"
-            className="site-profile-link hidden sm:inline-flex"
+            variant="outline"
+            size="icon"
+            className="site-profile-link min-h-11 min-w-11"
+            title="Choose portfolio profile"
           >
-            <Link to="/profiles">Choose profile</Link>
+            <Link to="/profiles" aria-label="Choose portfolio profile">
+              <UsersRound className="size-4" aria-hidden="true" />
+            </Link>
           </Button>
 
           {/* 4. Let's talk contact button */}
@@ -216,8 +220,8 @@ export function PortfolioNavbar({ person }: PortfolioNavbarProps) {
             className="min-h-11 justify-start gap-2 text-sm"
           >
             <Link
-              to="/portfolio"
-              search={{ profile: "guest" }}
+              to={isPerson && personId ? `/people/${personId}` : "/portfolio"}
+              {...(!isPerson ? { search: { profile: "guest" as const } } : {})}
               onClick={() => setMenu(false)}
             >
               <Clapperboard className="size-4" aria-hidden="true" />
@@ -228,10 +232,11 @@ export function PortfolioNavbar({ person }: PortfolioNavbarProps) {
           <Button
             asChild
             variant="ghost"
-            className="min-h-11 justify-start text-sm sm:hidden"
+            className="min-h-11 justify-start gap-2 text-sm"
           >
             <Link to="/profiles" onClick={() => setMenu(false)}>
-              Choose profile
+              <UsersRound className="size-4" aria-hidden="true" />
+              <span>Choose profile</span>
             </Link>
           </Button>
 
