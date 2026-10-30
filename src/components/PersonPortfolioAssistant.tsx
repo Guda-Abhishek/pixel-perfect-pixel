@@ -81,7 +81,25 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ person: profile.id, mode, page: window.location.pathname, messages: history.slice(-10) }),
       });
-      if (!response.ok || !response.body) throw new Error("AI unavailable");
+      if (!response.ok || !response.body) {
+        let detail = "";
+        try {
+          const payload = await response.clone().json() as { error?: string };
+          detail = payload.error ?? "";
+        } catch {
+          /* The server may return a non-JSON error page. */
+        }
+        const reason = response.status === 503 && detail.toLowerCase().includes("not configured")
+          ? "The AI service is not configured on the server (missing LOVABLE_API_KEY)."
+          : response.status === 401 || response.status === 403
+            ? "The AI service rejected its server credentials (HTTP " + response.status + ")."
+            : response.status === 402
+              ? "The AI service has no available credits or billing access (HTTP 402)."
+              : response.status === 429
+                ? "The AI service rate limit was reached (HTTP 429). Please try again shortly."
+                : "The AI request failed (HTTP " + response.status + ").";
+        throw new Error(reason);
+      }
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       for (;;) {
@@ -91,9 +109,11 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
         setMessages([...history, { role: "assistant", content: answer }]);
       }
       if (!answer.trim()) throw new Error("Empty AI response");
-    } catch {
+    } catch (error) {
       if (abort.signal.aborted) return;
-      answer = `I couldn't connect to the live AI service just now. You can still explore ${profile.displayName}'s About, Skills, Projects, Experience, Certifications and Education pages for the latest published portfolio details.`;
+      answer = error instanceof Error && error.message
+        ? `AI assistant unavailable: ${error.message} If the issue continues, check the server's LOVABLE_API_KEY configuration and AI gateway response.`
+        : "AI assistant unavailable because the request failed. Please try again.";
       setMessages([...history, { role: "assistant", content: answer }]);
     } finally {
       setBusy(false);
