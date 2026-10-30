@@ -20,7 +20,7 @@ export const Route = createFileRoute("/api/chat")({
         const parsed = body.safeParse(await request.json().catch(() => null));
         if (!parsed.success) return Response.json({ error: "Invalid request" }, { status: 400 });
         const profile = parsed.data.person && parsed.data.person !== "abhishek" ? getPersonPortfolio(parsed.data.person) : undefined;
-        if (parsed.data.person && !profile) return Response.json({ error: "Unknown portfolio" }, { status: 400 });
+        if (parsed.data.person && parsed.data.person !== "abhishek" && !profile) return Response.json({ error: "Unknown portfolio" }, { status: 400 });
         const profilePrompt = profile
           ? [
               `You are the portfolio assistant for ${profile.name} (${profile.nickname}). Answer visitors' questions in a friendly, concise way (under 150 words) using ONLY the verified portfolio facts below. Never invent employers, dates, metrics, credentials, links, personal details or project details. If a detail is marked to be confirmed or resume pending, say so clearly. Use the current verified profile data below as the source of truth for each request. The Bava profile now contains Anjini Kumar’s resume-based details; do not treat it as a demo profile. Do not ask for sensitive personal information.`,
