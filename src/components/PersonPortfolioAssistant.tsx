@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import type { PersonPortfolio } from "@/lib/person-portfolios";
 
 type Message = { role: "user" | "assistant"; content: string };
-const uid = () => Math.random().toString(36).slice(2);
 
 function voiceFor(profile: PersonPortfolio) {
   const voices = window.speechSynthesis.getVoices();
@@ -27,7 +26,7 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
   const listRef = useRef<HTMLDivElement>(null);
   const controller = useRef<AbortController | null>(null);
   const isAmmu = profile.id === "ammu";
-  const voiceLabel = isAmmu ? "Female voice" : "Male voice";
+  const voiceLabel = isAmmu ? "Female-style voice" : "Male-style voice";
 
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
