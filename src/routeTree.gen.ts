@@ -14,7 +14,6 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as CertificationsRouteImport } from './routes/certifications'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ExperienceRouteImport } from './routes/experience'
-import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as ProfilesRouteImport } from './routes/profiles'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as SkillsRouteImport } from './routes/skills'
@@ -22,7 +21,6 @@ import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as PeoplePersonRouteImport } from './routes/people.$person'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
-import { Route as PeoplePersonIndexRouteImport } from './routes/people.$person.index'
 import { Route as PeoplePersonSectionRouteImport } from './routes/people.$person.$section'
 import { Route as PeoplePersonProjectsSlugRouteImport } from './routes/people.$person.projects.$slug'
 
@@ -49,11 +47,6 @@ const ContactRoute = ContactRouteImport.update({
 const ExperienceRoute = ExperienceRouteImport.update({
   id: '/experience',
   path: '/experience',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortfolioRoute = PortfolioRouteImport.update({
-  id: '/portfolio',
-  path: '/portfolio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfilesRoute = ProfilesRouteImport.update({
@@ -91,11 +84,6 @@ const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
   path: '/$slug',
   getParentRoute: () => ProjectsRoute,
 } as any)
-const PeoplePersonIndexRoute = PeoplePersonIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PeoplePersonRoute,
-} as any)
 const PeoplePersonSectionRoute = PeoplePersonSectionRouteImport.update({
   id: '/$section',
   path: '/$section',
@@ -114,7 +102,6 @@ export interface FileRoutesByFullPath {
   '/certifications': typeof CertificationsRoute
   '/contact': typeof ContactRoute
   '/experience': typeof ExperienceRoute
-  '/portfolio': typeof PortfolioRoute
   '/profiles': typeof ProfilesRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/skills': typeof SkillsRoute
@@ -123,7 +110,6 @@ export interface FileRoutesByFullPath {
   '/projects/$slug': typeof ProjectsSlugRoute
   '/projects/': typeof ProjectsIndexRoute
   '/people/$person/$section': typeof PeoplePersonSectionRoute
-  '/people/$person/': typeof PeoplePersonIndexRoute
   '/people/$person/projects/$slug': typeof PeoplePersonProjectsSlugRoute
 }
 export interface FileRoutesByTo {
@@ -132,7 +118,6 @@ export interface FileRoutesByTo {
   '/certifications': typeof CertificationsRoute
   '/contact': typeof ContactRoute
   '/experience': typeof ExperienceRoute
-  '/portfolio': typeof PortfolioRoute
   '/profiles': typeof ProfilesRoute
   '/skills': typeof SkillsRoute
   '/api/chat': typeof ApiChatRoute
@@ -149,7 +134,6 @@ export interface FileRoutesById {
   '/certifications': typeof CertificationsRoute
   '/contact': typeof ContactRoute
   '/experience': typeof ExperienceRoute
-  '/portfolio': typeof PortfolioRoute
   '/profiles': typeof ProfilesRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/skills': typeof SkillsRoute
@@ -158,7 +142,6 @@ export interface FileRoutesById {
   '/projects/$slug': typeof ProjectsSlugRoute
   '/projects/': typeof ProjectsIndexRoute
   '/people/$person/$section': typeof PeoplePersonSectionRoute
-  '/people/$person/': typeof PeoplePersonIndexRoute
   '/people/$person/projects/$slug': typeof PeoplePersonProjectsSlugRoute
 }
 export interface FileRouteTypes {
@@ -222,7 +205,6 @@ export interface RootRouteChildren {
   CertificationsRoute: typeof CertificationsRoute
   ContactRoute: typeof ContactRoute
   ExperienceRoute: typeof ExperienceRoute
-  PortfolioRoute: typeof PortfolioRoute
   ProfilesRoute: typeof ProfilesRoute
   ProjectsRoute: typeof ProjectsRouteWithChildren
   SkillsRoute: typeof SkillsRoute
@@ -265,13 +247,6 @@ declare module '@tanstack/react-router' {
       path: '/experience'
       fullPath: '/experience'
       preLoaderRoute: typeof ExperienceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portfolio': {
-      id: '/portfolio'
-      path: '/portfolio'
-      fullPath: '/portfolio'
-      preLoaderRoute: typeof PortfolioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profiles': {
@@ -323,13 +298,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsSlugRouteImport
       parentRoute: typeof ProjectsRoute
     }
-    '/people/$person/': {
-      id: '/people/$person/'
-      path: '/'
-      fullPath: '/people/$person/'
-      preLoaderRoute: typeof PeoplePersonIndexRouteImport
-      parentRoute: typeof PeoplePersonRoute
-    }
     '/people/$person/$section': {
       id: '/people/$person/$section'
       path: '/$section'
@@ -363,13 +331,11 @@ const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
 
 interface PeoplePersonRouteChildren {
   PeoplePersonSectionRoute: typeof PeoplePersonSectionRoute
-  PeoplePersonIndexRoute: typeof PeoplePersonIndexRoute
   PeoplePersonProjectsSlugRoute: typeof PeoplePersonProjectsSlugRoute
 }
 
 const PeoplePersonRouteChildren: PeoplePersonRouteChildren = {
   PeoplePersonSectionRoute: PeoplePersonSectionRoute,
-  PeoplePersonIndexRoute: PeoplePersonIndexRoute,
   PeoplePersonProjectsSlugRoute: PeoplePersonProjectsSlugRoute,
 }
 
