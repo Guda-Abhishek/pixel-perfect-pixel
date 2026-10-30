@@ -179,7 +179,7 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
       headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "x-content-type-options": "nosniff" },
     }) : jsonResponse({ updatedAt: null, resumes: [] }, 200);
   }
-  if (!(await isAdminRequest(request))) return privateNotFound();
+  if (!(await isAdminRequest(request, env))) return privateNotFound();
   const bucket = (env as AdminEnv | undefined)?.RESUME_BUCKET;
   if (!bucket) return bucketNotConfigured();
 
@@ -309,7 +309,7 @@ export default {
 
     // The login page is intentionally the only public admin page. Every other
     // admin URL returns the same generic 404 until a valid signed session exists.
-    if (isAdmin && path !== "/admin/login" && !(await isAdminRequest(request))) {
+    if (isAdmin && path !== "/admin/login" && !(await isAdminRequest(request, env))) {
       return privateNotFound();
     }
     if (isAdmin && path === "/admin/login" && request.method !== "GET") {
