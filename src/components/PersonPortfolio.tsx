@@ -37,9 +37,9 @@ function PersonLink({
   className,
 }: {
   person: string;
-  section?: string;
+  section?: string | undefined;
   children: ReactNode;
-  className?: string;
+  className?: string | undefined;
 }) {
   if (!section)
     return (
