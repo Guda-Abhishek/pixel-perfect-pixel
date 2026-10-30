@@ -16,6 +16,7 @@ import {
   Github,
   Linkedin,
   Clapperboard,
+  Bot,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/Reveal";
@@ -91,6 +92,17 @@ export function PersonShell({
           {section.label}
         </PersonLink>
       ))}
+      <button
+        type="button"
+        className="person-nav-ai"
+        onClick={() => {
+          setMenu(false);
+          window.dispatchEvent(new Event("portfolio:open-ai-assistant"));
+        }}
+      >
+        <Bot size={14} aria-hidden="true" />
+        AI Intro
+      </button>
     </>
   );
   return (
