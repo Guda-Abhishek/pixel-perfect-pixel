@@ -122,7 +122,7 @@ export const Route = createFileRoute("/api/chat")({
                     controller.enqueue(encoder.encode(event.delta));
                   } else if (event.type === "error" || event.type === "response.failed") {
                     console.error("Portfolio chat stream error", {
-                      provider: useOpenAI ? "openai" : "lovable",
+                      provider: "openai",
                       detail: JSON.stringify(event).slice(0, 500),
                     });
                   }
