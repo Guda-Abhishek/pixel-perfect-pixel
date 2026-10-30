@@ -1424,6 +1424,8 @@ section {
 
 /* Editorial multi-page experience; the original Series keeps its own theme. */
 .site-shell {
+  /* Shared visual tokens: the main Abhishek site and all person portfolios
+     intentionally consume the same palette, type scale, spacing and surfaces. */
   --background: oklch(0.145 0.008 280);
   --card: oklch(0.18 0.013 280);
   --secondary: oklch(0.21 0.016 285);
@@ -1433,12 +1435,18 @@ section {
   --site-shadow: 0 12px 35px oklch(0 0 0 / 15%);
   --space-page: 40px;
   --space-section: 56px;
+  --content-width: 1200px;
+  --hero-min-height: 700px;
+  --hero-title-size: 96px;
+  --section-title-size: 64px;
+  --surface-radius: 6px;
   background: var(--background);
+  color: var(--foreground);
   min-height: 100svh;
   letter-spacing: 0;
 }
 .site-container {
-  width: min(100% - 2 * var(--space-page), 1200px);
+  width: min(100% - 2 * var(--space-page), var(--content-width));
   margin-inline: auto;
 }
 .site-nav {
@@ -1493,10 +1501,42 @@ section {
 .hero-copy {
   max-width: 560px;
 }
-.home-title {
-  font-size: 96px;
+.home-title,
+.person-name {
+  font-family: var(--font-display);
+  font-size: var(--hero-title-size);
   line-height: 0.93;
   font-weight: 800;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.site-page-kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: var(--primary);
+  text-transform: uppercase;
+}
+.site-page-title {
+  font-family: var(--font-display);
+  font-size: var(--section-title-size);
+  font-weight: 800;
+  line-height: 1.03;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+.site-page-description {
+  max-width: 680px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.9;
+}
+.site-section {
+  width: min(100% - 2 * var(--space-page), var(--content-width));
+  margin-inline: auto;
+  padding-block: var(--space-section);
 }
 .home-title > span:first-of-type {
   color: var(--foreground);
@@ -1514,9 +1554,11 @@ section {
   background: var(--card);
 }
 .page-title {
-  font-size: 64px;
+  font-family: var(--font-display);
+  font-size: var(--section-title-size);
   line-height: 1.03;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 .project-card {
@@ -1578,8 +1620,13 @@ section {
   .home-hero {
     min-height: 750px;
   }
-  .home-title {
-    font-size: 68px;
+  .site-shell {
+    --hero-title-size: 68px;
+    --section-title-size: 46px;
+  }
+  .home-title,
+  .person-name {
+    font-size: var(--hero-title-size);
   }
   .home-portrait {
     width: 100%;
@@ -1601,8 +1648,9 @@ section {
     padding-top: 200px;
     padding-bottom: 42px;
   }
-  .home-title {
-    font-size: 68px;
+  .home-title,
+  .person-name {
+    font-size: var(--hero-title-size);
   }
   .portrait-credit {
     top: 18px;
@@ -1610,19 +1658,28 @@ section {
     right: 24px;
     font-size: 8px;
   }
-  .page-title {
-    font-size: 46px;
+  .page-title,
+  .site-page-title,
+  .person-section-heading .page-title {
+    font-size: var(--section-title-size);
   }
 }
 @media (max-width: 359px) {
   .site-shell {
     --space-page: 18px;
   }
-  .home-title {
-    font-size: 58px;
+  .site-shell {
+    --hero-title-size: 58px;
+    --section-title-size: 40px;
   }
-  .page-title {
-    font-size: 40px;
+  .home-title,
+  .person-name {
+    font-size: var(--hero-title-size);
+  }
+  .page-title,
+  .site-page-title,
+  .person-section-heading .page-title {
+    font-size: var(--section-title-size);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1633,9 +1690,8 @@ section {
 
 /* Shared person portfolios retain the Series palette without borrowed faces. */
 .person-shell {
-  --background: oklch(0.191 0 0);
-  --card: oklch(0.211 0.006 285.9);
-  --secondary: oklch(0.23 0.008 285);
+  /* Deliberately inherit .site-shell tokens: no alternate person-page theme. */
+  --hero-min-height: 700px;
 }
 .person-brand {
   display: inline-flex;
@@ -1773,17 +1829,13 @@ section {
   padding-block: 44px 38px;
 }
 .person-section-heading .page-title {
-  font-family: var(--font-display);
-  font-size: clamp(52px, 6vw, 76px);
-  font-weight: 800;
-  line-height: 0.98;
-  letter-spacing: -0.02em;
+  font-size: var(--section-title-size);
 }
 .person-hero {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-height: 700px;
+  min-height: var(--hero-min-height);
   background: var(--background);
 }
 .person-hero-backdrop {
@@ -1795,6 +1847,10 @@ section {
   object-fit: cover;
   opacity: 0.16;
 }
+.home-portrait,
+.person-hero-portrait {
+  object-fit: cover;
+}
 .person-hero-portrait {
   position: absolute;
   z-index: -1;
@@ -1802,8 +1858,7 @@ section {
   right: 0;
   width: 63%;
   height: 100%;
-  object-fit: cover;
-  object-position: center 24%;
+  object-position: center 25%;
   opacity: 0.88;
   filter: saturate(0.88);
 }
@@ -1812,9 +1867,10 @@ section {
   z-index: 0;
   inset: 0;
   pointer-events: none;
+  /* Same gradient recipe as Abhishek's original .hero-shade. */
   background:
-    linear-gradient(90deg, var(--background) 10%, color-mix(in oklab, var(--background) 96%, transparent) 29%, color-mix(in oklab, var(--background) 62%, transparent) 46%, color-mix(in oklab, var(--background) 8%, transparent) 73%, transparent 100%),
-    linear-gradient(0deg, var(--background), transparent 24%),
+    linear-gradient(90deg, var(--background) 10%, color-mix(in oklab, var(--background) 96%, transparent) 29%, color-mix(in oklab, var(--background) 62%, transparent) 46%, transparent 73%),
+    linear-gradient(0deg, var(--background), transparent 22%),
     linear-gradient(120deg, color-mix(in oklab, var(--ember) 8%, transparent), transparent 60%, color-mix(in oklab, var(--magenta) 9%, transparent));
 }
 .person-hero-monogram {
@@ -1832,13 +1888,6 @@ section {
 }
 .person-name {
   max-width: 760px;
-  font-family: var(--font-display);
-  font-size: 96px;
-  font-weight: 800;
-  line-height: 0.93;
-  letter-spacing: -0.025em;
-  overflow-wrap: anywhere;
-  text-wrap: balance;
 }
 .person-project-art {
   position: relative;
