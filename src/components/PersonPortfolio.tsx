@@ -119,7 +119,7 @@ export function PersonShell({
               className="person-nav-ai"
               onClick={() => {
                 setMenu(false);
-                window.dispatchEvent(new Event("portfolio:open-ai-assistant"));
+                window.dispatchEvent(new Event("portfolio:open-ai-intro"));
               }}
             >
               <Bot size={20} aria-hidden="true" />
