@@ -92,17 +92,6 @@ export function PersonShell({
           {section.label}
         </PersonLink>
       ))}
-      <button
-        type="button"
-        className="person-nav-ai"
-        onClick={() => {
-          setMenu(false);
-          window.dispatchEvent(new Event("portfolio:open-ai-assistant"));
-        }}
-      >
-        <Bot size={14} aria-hidden="true" />
-        AI Intro
-      </button>
     </>
   );
   return (
@@ -124,8 +113,19 @@ export function PersonShell({
           <nav aria-label={`${profile.displayName} navigation`} className="person-desktop-nav">
             {nav}
           </nav>
-          <div className="flex shrink-0 gap-2">
-            <Button asChild variant="outline" size="icon">
+          <div className="person-nav-actions">
+            <button
+              type="button"
+              className="person-nav-ai"
+              onClick={() => {
+                setMenu(false);
+                window.dispatchEvent(new Event("portfolio:open-ai-assistant"));
+              }}
+            >
+              <Bot size={20} aria-hidden="true" />
+              <span>AI Intro</span>
+            </button>
+            <Button asChild variant="outline" size="icon" className="person-nav-icon">
               <Link to="/profiles" aria-label="Switch profiles" title="Switch profiles">
                 <Clapperboard />
               </Link>
@@ -133,7 +133,7 @@ export function PersonShell({
             <Button
               variant="outline"
               size="icon"
-              className="xl:hidden"
+              className="person-nav-icon"
               aria-label={menu ? "Close navigation" : "Open navigation"}
               aria-expanded={menu}
               aria-controls="person-navigation"
