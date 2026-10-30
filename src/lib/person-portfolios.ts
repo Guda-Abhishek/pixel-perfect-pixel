@@ -19,12 +19,12 @@ export const PEOPLE = [
   },
   {
     id: "bava",
-    name: "Anjini",
+    name: "Anjini Kumar",
     nickname: "Bava",
     initials: "AB",
     avatar: "/images/profiles/anjini/anjini_main.jpg",
     color: "profile-purple",
-    status: "Demo portfolio · details to be confirmed",
+    status: "Data Analytics Portfolio",
   },
   {
     id: "sai",
