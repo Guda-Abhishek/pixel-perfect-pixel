@@ -34,8 +34,16 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
 
   useEffect(() => {
     const openAssistant = () => setOpen(true);
+    const openIntro = () => {
+      setOpen(true);
+      void send("Introduce this portfolio to a visitor.", "intro");
+    };
     window.addEventListener("portfolio:open-ai-assistant", openAssistant);
-    return () => window.removeEventListener("portfolio:open-ai-assistant", openAssistant);
+    window.addEventListener("portfolio:open-ai-intro", openIntro);
+    return () => {
+      window.removeEventListener("portfolio:open-ai-assistant", openAssistant);
+      window.removeEventListener("portfolio:open-ai-intro", openIntro);
+    };
   }, []);
 
   useEffect(() => () => {
@@ -55,8 +63,8 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
     window.speechSynthesis.speak(utterance);
   }
 
-  async function send() {
-    const question = input.trim();
+  async function send(questionOverride?: string, mode: "chat" | "intro" = "chat") {
+    const question = (questionOverride ?? input).trim();
     if (!question || busy) return;
     const history = [...messages, { role: "user" as const, content: question }];
     setMessages([...history, { role: "assistant", content: "" }]);
@@ -70,7 +78,7 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
         method: "POST",
         signal: abort.signal,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ person: profile.id, messages: history.slice(-10) }),
+        body: JSON.stringify({ person: profile.id, mode, page: window.location.pathname, messages: history.slice(-10) }),
       });
       if (!response.ok || !response.body) throw new Error("AI unavailable");
       const reader = response.body.getReader();
@@ -84,9 +92,7 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
       if (!answer.trim()) throw new Error("Empty AI response");
     } catch {
       if (abort.signal.aborted) return;
-      answer = profile.id === "bava"
-        ? "This is a demo portfolio. Anjini's resume has not been added yet, so I can only confirm that she studied B.Tech Information Technology at TKR College of Engineering and Technology and collaborated with Amulya on the major project. Other details are still to be confirmed."
-        : `I couldn't connect to the live AI service just now. You can still explore ${profile.displayName}'s About, Skills, Projects, Experience, Certifications and Education pages for the available portfolio details.`;
+      answer = `I couldn't connect to the live AI service just now. You can still explore ${profile.displayName}'s About, Skills, Projects, Experience, Certifications and Education pages for the latest published portfolio details.`;
       setMessages([...history, { role: "assistant", content: answer }]);
     } finally {
       setBusy(false);
@@ -102,12 +108,12 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
             <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground"><Bot size={19} /></span>
             <div className="min-w-0 flex-1">
               <h2 className="font-semibold">{profile.displayName}'s AI Assistant</h2>
-              <p className="text-xs text-muted-foreground">Portfolio facts only · {voiceLabel}</p>
+              <p className="text-xs text-muted-foreground">Live profile context · {voiceLabel}</p>
             </div>
             <Button variant="ghost" size="icon" aria-label="Close assistant" onClick={() => { setOpen(false); window.speechSynthesis?.cancel(); }}><X size={18} /></Button>
           </header>
           <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto p-4 text-sm" aria-live="polite">
-            <p className="text-muted-foreground">Ask about {profile.displayName}'s skills, projects, experience or education. Unconfirmed details won't be invented.</p>
+            <p className="text-muted-foreground">I use the latest published profile data and current page as context. Ask about skills, projects, experience, education, or ask me to introduce this portfolio. I won't invent missing facts.</p>
             {messages.map((message, index) => (
               <div key={index} className={message.role === "user" ? "ml-8 rounded-lg bg-primary p-3 text-primary-foreground" : "mr-3 whitespace-pre-wrap rounded-lg bg-secondary p-3"}>
                 {message.content || (busy && index === messages.length - 1 ? "Thinking…" : "")}
