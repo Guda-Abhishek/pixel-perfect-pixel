@@ -1643,14 +1643,32 @@ section {
   font-size: 11px;
 }
 .person-desktop-nav a,
-.person-mobile-nav a {
+.person-mobile-nav a,
+.person-nav-ai {
   transition: color 180ms ease;
 }
 .person-desktop-nav a:hover,
 .person-mobile-nav a:hover,
+.person-nav-ai:hover,
 .person-nav-active {
   color: var(--primary);
 }
+.person-nav-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.person-nav-ai:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
 .person-mobile-nav {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1658,11 +1676,15 @@ section {
   padding-block: 16px;
   border-top: 1px solid var(--border);
 }
-.person-mobile-nav a {
+.person-mobile-nav a,
+.person-mobile-nav .person-nav-ai {
   min-height: 44px;
   display: flex;
   align-items: center;
   font-size: 13px;
+}
+.person-mobile-nav .person-nav-ai {
+  justify-self: start;
 }
 .person-hero {
   position: relative;
