@@ -20,9 +20,9 @@ import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as SkillsRouteImport } from './routes/skills'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as PeoplePersonRouteImport } from './routes/people.$person'
-import { Route as PeoplePersonIndexRouteImport } from './routes/people.$person.index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
+import { Route as PeoplePersonIndexRouteImport } from './routes/people.$person.index'
 import { Route as PeoplePersonSectionRouteImport } from './routes/people.$person.$section'
 import { Route as PeoplePersonProjectsSlugRouteImport } from './routes/people.$person.projects.$slug'
 
@@ -76,11 +76,6 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PeoplePersonIndexRoute = PeoplePersonIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PeoplePersonRoute,
-} as any)
 const PeoplePersonRoute = PeoplePersonRouteImport.update({
   id: '/people/$person',
   path: '/people/$person',
@@ -95,6 +90,11 @@ const ProjectsSlugRoute = ProjectsSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => ProjectsRoute,
+} as any)
+const PeoplePersonIndexRoute = PeoplePersonIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PeoplePersonRoute,
 } as any)
 const PeoplePersonSectionRoute = PeoplePersonSectionRouteImport.update({
   id: '/$section',
@@ -120,14 +120,13 @@ export interface FileRoutesByFullPath {
   '/skills': typeof SkillsRoute
   '/api/chat': typeof ApiChatRoute
   '/people/$person': typeof PeoplePersonRouteWithChildren
-  '/people/$person/': typeof PeoplePersonIndexRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/projects/': typeof ProjectsIndexRoute
   '/people/$person/$section': typeof PeoplePersonSectionRoute
+  '/people/$person/': typeof PeoplePersonIndexRoute
   '/people/$person/projects/$slug': typeof PeoplePersonProjectsSlugRoute
 }
 export interface FileRoutesByTo {
-  '/people/$person/': typeof PeoplePersonIndexRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/certifications': typeof CertificationsRoute
@@ -137,14 +136,13 @@ export interface FileRoutesByTo {
   '/profiles': typeof ProfilesRoute
   '/skills': typeof SkillsRoute
   '/api/chat': typeof ApiChatRoute
-  '/people/$person': typeof PeoplePersonRouteWithChildren
   '/projects/$slug': typeof ProjectsSlugRoute
   '/projects': typeof ProjectsIndexRoute
   '/people/$person/$section': typeof PeoplePersonSectionRoute
+  '/people/$person': typeof PeoplePersonIndexRoute
   '/people/$person/projects/$slug': typeof PeoplePersonProjectsSlugRoute
 }
 export interface FileRoutesById {
-  '/people/$person/': typeof PeoplePersonIndexRoute
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
@@ -160,6 +158,7 @@ export interface FileRoutesById {
   '/projects/$slug': typeof ProjectsSlugRoute
   '/projects/': typeof ProjectsIndexRoute
   '/people/$person/$section': typeof PeoplePersonSectionRoute
+  '/people/$person/': typeof PeoplePersonIndexRoute
   '/people/$person/projects/$slug': typeof PeoplePersonProjectsSlugRoute
 }
 export interface FileRouteTypes {
@@ -176,10 +175,10 @@ export interface FileRouteTypes {
     | '/skills'
     | '/api/chat'
     | '/people/$person'
-    | '/people/$person/'
     | '/projects/$slug'
     | '/projects/'
     | '/people/$person/$section'
+    | '/people/$person/'
     | '/people/$person/projects/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -192,11 +191,10 @@ export interface FileRouteTypes {
     | '/profiles'
     | '/skills'
     | '/api/chat'
-    | '/people/$person'
-    | '/people/$person/'
     | '/projects/$slug'
     | '/projects'
     | '/people/$person/$section'
+    | '/people/$person'
     | '/people/$person/projects/$slug'
   id:
     | '__root__'
@@ -211,10 +209,10 @@ export interface FileRouteTypes {
     | '/skills'
     | '/api/chat'
     | '/people/$person'
-    | '/people/$person/'
     | '/projects/$slug'
     | '/projects/'
     | '/people/$person/$section'
+    | '/people/$person/'
     | '/people/$person/projects/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -364,14 +362,14 @@ const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
 )
 
 interface PeoplePersonRouteChildren {
-  PeoplePersonIndexRoute: typeof PeoplePersonIndexRoute
   PeoplePersonSectionRoute: typeof PeoplePersonSectionRoute
+  PeoplePersonIndexRoute: typeof PeoplePersonIndexRoute
   PeoplePersonProjectsSlugRoute: typeof PeoplePersonProjectsSlugRoute
 }
 
 const PeoplePersonRouteChildren: PeoplePersonRouteChildren = {
-  PeoplePersonIndexRoute: PeoplePersonIndexRoute,
   PeoplePersonSectionRoute: PeoplePersonSectionRoute,
+  PeoplePersonIndexRoute: PeoplePersonIndexRoute,
   PeoplePersonProjectsSlugRoute: PeoplePersonProjectsSlugRoute,
 }
 
