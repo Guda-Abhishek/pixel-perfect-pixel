@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Bot, Send, Volume2, VolumeX, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { PersonPortfolio } from "@/lib/person-portfolios";
+import { fallbackProfileAnswer } from "@/lib/profile-fallback";
 
 type Message = { role: "user" | "assistant"; content: string };
 
@@ -111,10 +112,9 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
       if (!answer.trim()) throw new Error("Empty AI response");
     } catch (error) {
       if (abort.signal.aborted) return;
-      answer = error instanceof Error && error.message
-        ? `AI assistant unavailable: ${error.message} If the issue continues, check the server's LOVABLE_API_KEY configuration and AI gateway response.`
-        : "AI assistant unavailable because the request failed. Please try again.";
-      setMessages([...history, { role: "assistant", content: answer }]);
+      const fallback = fallbackProfileAnswer(profile, question, mode);
+      answer = `Live AI is currently unavailable, so I am answering from verified profile data instead.\n\n${fallback}`;
+
     } finally {
       setBusy(false);
     }
@@ -130,7 +130,7 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
             <span className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground"><Bot size={19} /></span>
             <div className="min-w-0 flex-1">
               <h2 className="font-semibold">{profile.displayName}'s AI Assistant</h2>
-              <p className="text-xs text-muted-foreground">Live profile context · {voiceLabel}</p>
+              <p className="text-xs text-muted-foreground">Verified profile facts · {voiceLabel}</p>
             </div>
             <Button variant="ghost" size="icon" aria-label="Close assistant" onClick={() => { setOpen(false); window.speechSynthesis?.cancel(); }}><X size={18} /></Button>
           </header>
