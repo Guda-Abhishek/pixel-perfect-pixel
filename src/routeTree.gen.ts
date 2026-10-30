@@ -13,8 +13,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as CertificationsRouteImport } from './routes/certifications'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as ExperienceRouteImport } from './routes/experience'
 import { Route as EducationRouteImport } from './routes/education'
+import { Route as ExperienceRouteImport } from './routes/experience'
 import { Route as ProfilesRouteImport } from './routes/profiles'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as SkillsRouteImport } from './routes/skills'
@@ -45,14 +45,14 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExperienceRoute = ExperienceRouteImport.update({
-  id: '/experience',
-  path: '/experience',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const EducationRoute = EducationRouteImport.update({
   id: '/education',
   path: '/education',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperienceRoute = ExperienceRouteImport.update({
+  id: '/experience',
+  path: '/experience',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfilesRoute = ProfilesRouteImport.update({
@@ -107,8 +107,8 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/certifications': typeof CertificationsRoute
   '/contact': typeof ContactRoute
-  '/experience': typeof ExperienceRoute
   '/education': typeof EducationRoute
+  '/experience': typeof ExperienceRoute
   '/profiles': typeof ProfilesRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/skills': typeof SkillsRoute
@@ -124,6 +124,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/certifications': typeof CertificationsRoute
   '/contact': typeof ContactRoute
+  '/education': typeof EducationRoute
   '/experience': typeof ExperienceRoute
   '/profiles': typeof ProfilesRoute
   '/skills': typeof SkillsRoute
@@ -140,6 +141,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/certifications': typeof CertificationsRoute
   '/contact': typeof ContactRoute
+  '/education': typeof EducationRoute
   '/experience': typeof ExperienceRoute
   '/profiles': typeof ProfilesRoute
   '/projects': typeof ProjectsRouteWithChildren
@@ -158,8 +160,8 @@ export interface FileRouteTypes {
     | '/about'
     | '/certifications'
     | '/contact'
-    | '/experience'
     | '/education'
+    | '/experience'
     | '/profiles'
     | '/projects'
     | '/skills'
@@ -175,6 +177,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/certifications'
     | '/contact'
+    | '/education'
     | '/experience'
     | '/profiles'
     | '/skills'
@@ -190,6 +193,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/certifications'
     | '/contact'
+    | '/education'
     | '/experience'
     | '/profiles'
     | '/projects'
@@ -207,8 +211,8 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   CertificationsRoute: typeof CertificationsRoute
   ContactRoute: typeof ContactRoute
-  ExperienceRoute: typeof ExperienceRoute
   EducationRoute: typeof EducationRoute
+  ExperienceRoute: typeof ExperienceRoute
   ProfilesRoute: typeof ProfilesRoute
   ProjectsRoute: typeof ProjectsRouteWithChildren
   SkillsRoute: typeof SkillsRoute
@@ -246,18 +250,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/experience': {
-      id: '/experience'
-      path: '/experience'
-      fullPath: '/experience'
-      preLoaderRoute: typeof ExperienceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/education': {
       id: '/education'
       path: '/education'
       fullPath: '/education'
       preLoaderRoute: typeof EducationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experience': {
+      id: '/experience'
+      path: '/experience'
+      fullPath: '/experience'
+      preLoaderRoute: typeof ExperienceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profiles': {
@@ -359,8 +363,8 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   CertificationsRoute: CertificationsRoute,
   ContactRoute: ContactRoute,
-  ExperienceRoute: ExperienceRoute,
   EducationRoute: EducationRoute,
+  ExperienceRoute: ExperienceRoute,
   ProfilesRoute: ProfilesRoute,
   ProjectsRoute: ProjectsRouteWithChildren,
   SkillsRoute: SkillsRoute,
