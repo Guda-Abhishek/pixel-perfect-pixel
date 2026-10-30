@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { FileLock2, LogOut, ShieldCheck, UploadCloud } from "lucide-react";
 
 export const Route = createFileRoute("/admin/resumes")({
@@ -13,7 +13,6 @@ export const Route = createFileRoute("/admin/resumes")({
 });
 
 function ResumeManager() {
-  const navigate = useNavigate();
   const [checking, setChecking] = useState(true);
   const [signingOut, setSigningOut] = useState(false);
 
@@ -23,7 +22,7 @@ function ResumeManager() {
       .then((response) => {
         if (!response.ok) throw new Error("Not authenticated");
       })
-      .catch(() => navigate({ to: "/admin/login", replace: true }))
+      .catch(() => window.location.replace("/admin/login"))
       .finally(() => { if (active) setChecking(false); });
     return () => { active = false; };
   }, [navigate]);
@@ -36,7 +35,7 @@ function ResumeManager() {
         credentials: "same-origin",
       });
     } finally {
-      await navigate({ to: "/admin/login", replace: true });
+      window.location.replace("/admin/login");
       setSigningOut(false);
     }
   }
