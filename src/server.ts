@@ -2,6 +2,14 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import {
+  adminAuthConfigured,
+  adminCookieHeader,
+  clearAdminCookieHeader,
+  createAdminCookie,
+  isAdminRequest,
+  verifyAdminPassword,
+} from "./lib/admin-auth";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -18,25 +26,25 @@ async function getServerEntry(): Promise<ServerEntry> {
   return serverEntryPromise;
 }
 
-// Keep administration closed by default. There is intentionally no public admin
-// page or login route until server-side authentication and authorization exist.
-// Apply this guard before TanStack renders a route or serves a server handler.
-function isPrivateAdminPath(request: Request): boolean {
+// Protect every admin path before it reaches TanStack or a route handler.
+function normalizedPath(request: Request): string {
   let pathname = new URL(request.url).pathname;
   try {
     pathname = decodeURIComponent(pathname);
   } catch {
-    // Malformed paths are not allowed to bypass the guard.
+    // A malformed path remains private and is rejected below.
   }
-
-  const normalized = pathname.toLowerCase().replace(/\/+$/, "") || "/";
-  return (
-    normalized === "/admin" ||
-    normalized.startsWith("/admin/") ||
-    normalized === "/api/admin" ||
-    normalized.startsWith("/api/admin/")
-  );
+  return pathname.toLowerCase().replace(/\/+$/, "") || "/";
 }
+
+function isAdminPath(pathname: string): boolean {
+  return pathname === "/admin" || pathname.startsWith("/admin/") ||
+    pathname === "/api/admin" || pathname.startsWith("/api/admin/");
+}
+
+const loginAttempts = new Map<string, { count: number; resetAt: number }>();
+const MAX_LOGIN_ATTEMPTS = 5;
+const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 
 function privateNotFound(): Response {
   return new Response("Not Found", {
@@ -48,6 +56,230 @@ function privateNotFound(): Response {
       "x-robots-tag": "noindex, nofollow, noarchive",
     },
   });
+}
+
+function jsonResponse(body: unknown, status: number, headers?: HeadersInit): Response {
+  return Response.json(body, {
+    status,
+    headers: { "cache-control": "no-store", "x-content-type-options": "nosniff", ...Object.fromEntries(new Headers(headers)) },
+  });
+}
+
+async function handleAdminAuth(request: Request, env: unknown): Promise<Response | null> {
+  const path = normalizedPath(request);
+  if (path === "/api/admin/login" && request.method === "POST") {
+    if (!adminAuthConfigured(env)) {
+      console.error("Admin authentication is disabled: required server secrets are missing.");
+      return jsonResponse({ error: "Admin authentication is not configured." }, 503);
+    }
+    const origin = request.headers.get("origin");
+    if (!origin || origin !== new URL(request.url).origin) return privateNotFound();
+
+    const clientKey = request.headers.get("cf-connecting-ip") ??
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const now = Date.now();
+    const current = loginAttempts.get(clientKey);
+    if (current && current.resetAt > now && current.count >= MAX_LOGIN_ATTEMPTS) {
+      return jsonResponse({ error: "Too many attempts. Try again in 15 minutes." }, 429, {
+        "retry-after": String(Math.ceil((current.resetAt - now) / 1000)),
+      });
+    }
+
+    const payload = await request.json().catch(() => null) as { password?: unknown } | null;
+    const password = typeof payload?.password === "string" ? payload.password : "";
+    const valid = password.length > 0 && password.length <= 1024 && await verifyAdminPassword(password, env);
+    if (!valid) {
+      loginAttempts.set(clientKey, current && current.resetAt > now
+        ? { count: current.count + 1, resetAt: current.resetAt }
+        : { count: 1, resetAt: now + LOGIN_WINDOW_MS });
+      return jsonResponse({ error: "Invalid credentials." }, 401);
+    }
+
+    loginAttempts.delete(clientKey);
+    const cookie = await createAdminCookie(env);
+    if (!cookie) return jsonResponse({ error: "Admin authentication is not configured." }, 503);
+    return jsonResponse({ ok: true }, 200, {
+      "set-cookie": adminCookieHeader(cookie, new URL(request.url).protocol === "https:"),
+    });
+  }
+
+  if (path === "/api/admin/logout" && request.method === "POST") {
+    const origin = request.headers.get("origin");
+    if (!origin || origin !== new URL(request.url).origin) return privateNotFound();
+    if (!(await isAdminRequest(request, env))) return privateNotFound();
+    return jsonResponse({ ok: true }, 200, {
+      "set-cookie": clearAdminCookieHeader(new URL(request.url).protocol === "https:"),
+    });
+  }
+
+  if (path === "/api/admin/session" && request.method === "GET") {
+    if (!(await isAdminRequest(request, env))) return privateNotFound();
+    return jsonResponse({ authenticated: true }, 200);
+  }
+
+  return null;
+}
+
+
+type ResumeRecord = {
+  id: string;
+  filename: string;
+  contentType: string;
+  size: number;
+  uploadedAt: string;
+  status: "pending" | "approved";
+  displayName: string;
+  headline: string;
+  summary: string;
+  skills: string[];
+};
+
+type PrivateBucket = {
+  get(key: string): Promise<{ json<T>(): Promise<T>; arrayBuffer(): Promise<ArrayBuffer>; httpMetadata?: { contentType?: string } } | null>;
+  put(key: string, value: ArrayBuffer | string | Uint8Array, options?: { httpMetadata?: { contentType?: string } }): Promise<unknown>;
+  delete(key: string): Promise<unknown>;
+};
+
+type AdminEnv = {
+  RESUME_BUCKET?: PrivateBucket;
+};
+
+const RESUME_INDEX_KEY = "private-admin/resumes/index.json";
+const MAX_RESUME_BYTES = 10 * 1024 * 1024;
+const ALLOWED_RESUME_TYPES = new Set([
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
+
+async function readResumeIndex(bucket: PrivateBucket): Promise<ResumeRecord[]> {
+  const object = await bucket.get(RESUME_INDEX_KEY);
+  if (!object) return [];
+  const records = await object.json<unknown>();
+  return Array.isArray(records) ? records as ResumeRecord[] : [];
+}
+
+async function writeResumeIndex(bucket: PrivateBucket, records: ResumeRecord[]): Promise<void> {
+  await bucket.put(RESUME_INDEX_KEY, JSON.stringify(records), {
+    httpMetadata: { contentType: "application/json; charset=utf-8" },
+  });
+}
+
+function bucketNotConfigured(): Response {
+  return jsonResponse({ error: "Private resume storage is not configured." }, 503);
+}
+
+async function handleResumeApi(request: Request, env: unknown): Promise<Response | null> {
+  const path = normalizedPath(request);
+  if (!path.startsWith("/api/admin/resumes") && path !== "/api/published-resumes") return null;
+  if (path === "/api/published-resumes" && request.method === "GET") {
+    const publicBucket = (env as AdminEnv | undefined)?.RESUME_BUCKET;
+    if (!publicBucket) return jsonResponse({ updatedAt: null, resumes: [] }, 200);
+    const published = await publicBucket.get("public/approved-resumes.json");
+    return published ? new Response(await published.arrayBuffer(), {
+      headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "x-content-type-options": "nosniff" },
+    }) : jsonResponse({ updatedAt: null, resumes: [] }, 200);
+  }
+  if (!(await isAdminRequest(request, env))) return privateNotFound();
+  if (["POST", "DELETE", "PUT", "PATCH"].includes(request.method)) {
+    const origin = request.headers.get("origin");
+    if (!origin || origin !== new URL(request.url).origin) return privateNotFound();
+  }
+  if (path === "/api/admin/resumes" && request.method === "POST") {
+    const contentLength = Number(request.headers.get("content-length") ?? "0");
+    if (contentLength > MAX_RESUME_BYTES + 1024 * 1024) {
+      return jsonResponse({ error: "Upload exceeds the 10 MB limit." }, 413);
+    }
+  }
+  const bucket = (env as AdminEnv | undefined)?.RESUME_BUCKET;
+  if (!bucket) return bucketNotConfigured();
+
+  if (path === "/api/admin/resumes" && request.method === "GET") {
+    return jsonResponse({ resumes: await readResumeIndex(bucket) }, 200);
+  }
+
+  if (path === "/api/admin/resumes" && request.method === "POST") {
+    const form = await request.formData().catch(() => null);
+    const file = form?.get("file");
+    if (!(file instanceof File)) return jsonResponse({ error: "Choose a PDF or DOCX resume." }, 400);
+    const type = file.type || (file.name.toLowerCase().endsWith(".pdf")
+      ? "application/pdf"
+      : file.name.toLowerCase().endsWith(".docx")
+        ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        : "");
+    if (!ALLOWED_RESUME_TYPES.has(type)) return jsonResponse({ error: "Only PDF and DOCX files are allowed." }, 415);
+    if (file.size <= 0 || file.size > MAX_RESUME_BYTES) return jsonResponse({ error: "File must be between 1 byte and 10 MB." }, 413);
+    const safeName = file.name.replace(/[^a-zA-Z0-9._ -]/g, "_").slice(0, 120) || "resume";
+    const id = crypto.randomUUID();
+    const key = `private-admin/resumes/files/${id}`;
+    await bucket.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: type } });
+    const records = await readResumeIndex(bucket);
+    records.push({
+      id, filename: safeName, contentType: type, size: file.size,
+      uploadedAt: new Date().toISOString(), status: "pending",
+      displayName: safeName.replace(/\.(pdf|docx)$/i, ""),
+      headline: "", summary: "", skills: [],
+    });
+    await writeResumeIndex(bucket, records);
+    return jsonResponse({ resume: records[records.length - 1] }, 201);
+  }
+
+  const match = path.match(/^\/api\/admin\/resumes\/([a-f0-9-]+)(?:\/(download|publish))?$/);
+  if (match) {
+    const [, id, action] = match;
+    const records = await readResumeIndex(bucket);
+    const index = records.findIndex((record) => record.id === id);
+    if (index < 0) return privateNotFound();
+    const record = records[index];
+    const fileKey = `private-admin/resumes/files/${id}`;
+
+    if (action === "download" && request.method === "GET") {
+      const object = await bucket.get(fileKey);
+      if (!object) return privateNotFound();
+      const bytes = await object.arrayBuffer();
+      return new Response(bytes, { headers: {
+        "content-type": record.contentType,
+        "content-disposition": `attachment; filename="${record.filename.replace(/["\\\\]/g, "_")}"`,
+        "cache-control": "private, no-store",
+        "x-content-type-options": "nosniff",
+      } });
+    }
+
+    if (action === "publish" && request.method === "POST") {
+      const payload = await request.json().catch(() => null) as Partial<ResumeRecord> | null;
+      if (!payload || typeof payload.displayName !== "string" || typeof payload.headline !== "string" ||
+          typeof payload.summary !== "string" || !Array.isArray(payload.skills) ||
+          payload.skills.some((skill) => typeof skill !== "string")) {
+        return jsonResponse({ error: "Provide valid reviewed resume details." }, 400);
+      }
+      records[index] = {
+        ...record,
+        displayName: payload.displayName.slice(0, 120),
+        headline: payload.headline.slice(0, 180),
+        summary: payload.summary.slice(0, 3000),
+        skills: payload.skills.slice(0, 60).map((skill) => skill.slice(0, 80)),
+        status: "approved",
+      };
+      await writeResumeIndex(bucket, records);
+      await bucket.put("public/approved-resumes.json", JSON.stringify({
+        updatedAt: new Date().toISOString(),
+        resumes: records.filter((item) => item.status === "approved").map(({ id, displayName, headline, summary, skills }) => ({ id, displayName, headline, summary, skills })),
+      }), { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-store" } } as { httpMetadata?: { contentType?: string } });
+      return jsonResponse({ resume: records[index] }, 200);
+    }
+
+    if (request.method === "DELETE" && !action) {
+      await bucket.delete(fileKey);
+      records.splice(index, 1);
+      await writeResumeIndex(bucket, records);
+      await bucket.put("public/approved-resumes.json", JSON.stringify({
+        updatedAt: new Date().toISOString(),
+        resumes: records.filter((item) => item.status === "approved").map(({ id, displayName, headline, summary, skills }) => ({ id, displayName, headline, summary, skills })),
+      }), { httpMetadata: { contentType: "application/json; charset=utf-8" } });
+      return jsonResponse({ ok: true }, 200);
+    }
+  }
+
+  return privateNotFound();
 }
 
 // h3 swallows in-handler throws into a normal 500 Response with body
@@ -78,9 +310,21 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
-    // Fail closed: guessing /admin, /admin/resumes, or /api/admin never reaches
-    // the route renderer or any API handler.
-    if (isPrivateAdminPath(request)) return privateNotFound();
+    const path = normalizedPath(request);
+    const isAdmin = isAdminPath(path);
+    const authResponse = await handleAdminAuth(request, env);
+    if (authResponse) return authResponse;
+    const resumeResponse = await handleResumeApi(request, env);
+    if (resumeResponse) return resumeResponse;
+
+    // The login page is intentionally the only public admin page. Every other
+    // admin URL returns the same generic 404 until a valid signed session exists.
+    if (isAdmin && path !== "/admin/login" && !(await isAdminRequest(request, env))) {
+      return privateNotFound();
+    }
+    if (isAdmin && path === "/admin/login" && request.method !== "GET") {
+      return privateNotFound();
+    }
 
     try {
       const handler = await getServerEntry();

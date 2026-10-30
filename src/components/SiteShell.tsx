@@ -12,6 +12,7 @@ export function SiteShell({ children }: { children: ReactNode }) {
   if (
     path === "/portfolio" ||
     path === "/profiles" ||
+    path.startsWith("/admin") ||
     path.startsWith("/people/") ||
     path.startsWith("/api/")
   ) {

@@ -19,6 +19,8 @@ import { Route as ProfilesRouteImport } from './routes/profiles'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as SkillsRouteImport } from './routes/skills'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminResumesRouteImport } from './routes/admin.resumes'
 import { Route as PeoplePersonRouteImport } from './routes/people.$person'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
@@ -71,6 +73,16 @@ const SkillsRoute = SkillsRouteImport.update({
   path: '/skills',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminResumesRoute = AdminResumesRouteImport.update({
+  id: '/admin/resumes',
+  path: '/admin/resumes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChatRoute = ApiChatRouteImport.update({
   id: '/api/chat',
   path: '/api/chat',
@@ -118,6 +130,10 @@ export interface FileRoutesByFullPath {
   '/profiles': typeof ProfilesRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/skills': typeof SkillsRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/resumes': typeof AdminResumesRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/resumes': typeof AdminResumesRoute
   '/api/chat': typeof ApiChatRoute
   '/people/$person': typeof PeoplePersonRouteWithChildren
   '/projects/$slug': typeof ProjectsSlugRoute
@@ -173,6 +189,8 @@ export interface FileRouteTypes {
     | '/profiles'
     | '/projects'
     | '/skills'
+    | '/admin/login'
+    | '/admin/resumes'
     | '/api/chat'
     | '/people/$person'
     | '/projects/$slug'
@@ -226,6 +244,8 @@ export interface RootRouteChildren {
   ProfilesRoute: typeof ProfilesRoute
   ProjectsRoute: typeof ProjectsRouteWithChildren
   SkillsRoute: typeof SkillsRoute
+  AdminLoginRoute: typeof AdminLoginRoute
+  AdminResumesRoute: typeof AdminResumesRoute
   ApiChatRoute: typeof ApiChatRoute
   PeoplePersonRoute: typeof PeoplePersonRouteWithChildren
 }
@@ -293,6 +313,20 @@ declare module '@tanstack/react-router' {
       path: '/skills'
       fullPath: '/skills'
       preLoaderRoute: typeof SkillsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/resumes': {
+      id: '/admin/resumes'
+      path: '/admin/resumes'
+      fullPath: '/admin/resumes'
+      preLoaderRoute: typeof AdminResumesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/chat': {
@@ -387,6 +421,8 @@ const rootRouteChildren: RootRouteChildren = {
   ProfilesRoute: ProfilesRoute,
   ProjectsRoute: ProjectsRouteWithChildren,
   SkillsRoute: SkillsRoute,
+  AdminLoginRoute: AdminLoginRoute,
+  AdminResumesRoute: AdminResumesRoute,
   ApiChatRoute: ApiChatRoute,
   PeoplePersonRoute: PeoplePersonRouteWithChildren,
 }
