@@ -120,17 +120,6 @@ async function handleAdminAuth(request: Request): Promise<Response | null> {
   return null;
 }
 
-function privateNotFound(): Response {
-  return new Response("Not Found", {
-    status: 404,
-    headers: {
-      "content-type": "text/plain; charset=utf-8",
-      "cache-control": "no-store, max-age=0",
-      "x-content-type-options": "nosniff",
-      "x-robots-tag": "noindex, nofollow, noarchive",
-    },
-  });
-}
 
 // h3 swallows in-handler throws into a normal 500 Response with body
 // {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
