@@ -1,4 +1,4 @@
-const COOKIE_NAME = "__Host-portfolio_admin";
+const COOKIE_NAME = "portfolio_admin_session";
 const SESSION_SECONDS = 60 * 60 * 8;
 
 function secret(name: string): string | undefined {
