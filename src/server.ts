@@ -170,7 +170,15 @@ function bucketNotConfigured(): Response {
 
 async function handleResumeApi(request: Request, env: unknown): Promise<Response | null> {
   const path = normalizedPath(request);
-  if (!path.startsWith("/api/admin/resumes") && path !== "/api/admin/published-resumes") return null;
+  if (!path.startsWith("/api/admin/resumes") && path !== "/api/published-resumes") return null;
+  if (path === "/api/published-resumes" && request.method === "GET") {
+    const publicBucket = (env as AdminEnv | undefined)?.RESUME_BUCKET;
+    if (!publicBucket) return jsonResponse({ updatedAt: null, resumes: [] }, 200);
+    const published = await publicBucket.get("public/approved-resumes.json");
+    return published ? new Response(await published.arrayBuffer(), {
+      headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "x-content-type-options": "nosniff" },
+    }) : jsonResponse({ updatedAt: null, resumes: [] }, 200);
+  }
   if (!(await isAdminRequest(request))) return privateNotFound();
   const bucket = (env as AdminEnv | undefined)?.RESUME_BUCKET;
   if (!bucket) return bucketNotConfigured();
@@ -259,13 +267,6 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
       }), { httpMetadata: { contentType: "application/json; charset=utf-8" } });
       return jsonResponse({ ok: true }, 200);
     }
-  }
-
-  if (path === "/api/admin/published-resumes" && request.method === "GET") {
-    const object = await bucket.get("public/approved-resumes.json");
-    return object ? new Response(await object.arrayBuffer(), {
-      headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "x-content-type-options": "nosniff" },
-    }) : jsonResponse({ updatedAt: null, resumes: [] }, 200);
   }
 
   return privateNotFound();
