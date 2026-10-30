@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Bot, Minus, Send, X } from "lucide-react";
+import { Bot, Minus, Send, X, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { fallbackAnswer, SUGGESTED_PROMPTS, type ChatMessage } from "@/lib/portfolio-chat";
 import { MOTION_TOKENS } from "@/lib/motion";
@@ -38,7 +38,7 @@ function Rich({ text }: { text: string }) {
   );
 }
 
-async function askAi(history: ChatMessage[], onDelta: (t: string) => void, signal: AbortSignal) {
+async function askAi(history: ChatMessage[], onDelta: (t: string) => void, signal: AbortSignal): Promise<string> {
   const res = await fetch("/api/chat", {
     method: "POST",
     signal,
@@ -57,6 +57,7 @@ async function askAi(history: ChatMessage[], onDelta: (t: string) => void, signa
     onDelta(t);
   }
   if (!got.trim()) throw new Error("empty");
+  return got;
 }
 
 export function PortfolioChat() {
@@ -64,10 +65,26 @@ export function PortfolioChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
+  const [speakReplies, setSpeakReplies] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  function speak(text: string) {
+    if (!("speechSynthesis" in window) || !text.trim()) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text.replace(/[*#`]/g, ""));
+    const voices = window.speechSynthesis.getVoices();
+    const voice = voices.find((item) => /male|david|guy|ryan|george|mark|daniel/i.test(item.name) && item.lang.startsWith("en"))
+      ?? voices.find((item) => item.lang === "en-IN")
+      ?? voices.find((item) => item.lang.startsWith("en"));
+    if (voice) utterance.voice = voice;
+    utterance.lang = voice?.lang ?? "en-IN";
+    utterance.rate = 1.04;
+    utterance.pitch = 1.04;
+    window.speechSynthesis.speak(utterance);
+  }
 
   useEffect(() => {
     const el = listRef.current;
@@ -100,14 +117,17 @@ export function PortfolioChat() {
     const patch = (fn: (m: ChatMessage) => ChatMessage) =>
       setMessages((ms) => ms.map((m) => (m.id === replyId ? fn(m) : m)));
     try {
-      await askAi(
+      const answer = await askAi(
         history.slice(-12),
         (d) => patch((m) => ({ ...m, content: m.content + d })),
         ctrl.signal,
       );
+      if (speakReplies) speak(answer);
     } catch {
       if (ctrl.signal.aborted) return;
-      patch((m) => ({ ...m, content: fallbackAnswer(q), source: "fallback" }));
+      const answer = fallbackAnswer(q);
+      patch((m) => ({ ...m, content: answer, source: "fallback" }));
+      if (speakReplies) speak(answer);
     } finally {
       setBusy(false);
     }
@@ -170,6 +190,16 @@ export function PortfolioChat() {
                 Answers from Abhishek's portfolio only
               </p>
             </div>
+            <Button
+              variant="bare"
+              size="icon"
+              className="min-h-11 min-w-11"
+              aria-label={speakReplies ? "Turn off spoken replies" : "Turn on spoken replies"}
+              aria-pressed={speakReplies}
+              onClick={() => { setSpeakReplies(!speakReplies); if (speakReplies) window.speechSynthesis?.cancel(); }}
+            >
+              {speakReplies ? <Volume2 /> : <VolumeX />}
+            </Button>
             <Button
               variant="bare"
               size="icon"
