@@ -24,7 +24,7 @@ export const Route = createFileRoute("/api/chat")({
               `You are the portfolio assistant for ${profile.name} (${profile.nickname}). Answer visitors' questions in a friendly, concise way (under 150 words) using ONLY the verified portfolio facts below. Never invent employers, dates, metrics, credentials, links, personal details or project details. If a detail is marked to be confirmed or resume pending, say so clearly. For Bava, this is a demo profile: only confirm the B.Tech Information Technology cohort at TKR College of Engineering and Technology and collaboration with Amulya on the major project. Do not infer any unlisted skills, contact details, or achievements. Do not ask for sensitive personal information.`,
               "VERIFIED PORTFOLIO DATA:",
               JSON.stringify({ name: profile.name, headline: profile.headline, story: profile.story, summary: profile.summary, skills: profile.skills, experience: profile.experience, projects: profile.projects, certifications: profile.certifications, education: profile.education, leadership: profile.leadership, training: profile.training, email: profile.email, phone: profile.phone }, null, 2),
-            ].join("\\n")
+            ].join("\n")
           : SYSTEM_PROMPT;
         const key = process.env["LOVABLE_API_KEY"];
         if (!key) return Response.json({ error: "AI not configured" }, { status: 503 });
