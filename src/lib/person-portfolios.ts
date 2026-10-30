@@ -21,10 +21,10 @@ export const PEOPLE = [
     id: "bava",
     name: "Anjini",
     nickname: "Bava",
-    initials: "A",
+    initials: "AB",
     avatar: "/images/profiles/anjini/anjini_main.jpg",
     color: "profile-purple",
-    status: "Coming Soon — resume pending",
+    status: "Demo portfolio · details to be confirmed",
   },
   {
     id: "sai",
@@ -58,7 +58,7 @@ export interface PersonProject {
   caution?: string;
 }
 export interface PersonPortfolio {
-  id: "ammu" | "sai";
+  id: "ammu" | "sai" | "bava";
   name: string;
   displayName: string;
   nickname: string;
@@ -68,8 +68,8 @@ export interface PersonPortfolio {
   headline: string;
   story: string;
   summary: string;
-  email: string;
-  phone: string;
+  email: string | null;
+  phone: string | null;
   socialLabels: { platform: string; handle: string | null }[];
   strengths: { title: string; text: string }[];
   skills: { category: string; items: string[] }[];
@@ -391,9 +391,72 @@ const sai: PersonPortfolio = {
   leadership: [],
   training: [],
 };
-export const PERSON_PORTFOLIOS: Record<"ammu" | "sai", PersonPortfolio> = { ammu, sai };
+const bava: PersonPortfolio = {
+  id: "bava",
+  name: "Anjini",
+  displayName: "Bava",
+  nickname: "Bava",
+  initials: "AB",
+  portrait: "/images/profiles/anjini/anjini_main.jpg",
+  gallery: [
+    { src: "/images/profiles/anjini/anjini_1.jpg", alt: "Anjini — profile photo" },
+    { src: "/images/profiles/anjini/anjini_2.jpg", alt: "Anjini — profile photo" },
+  ],
+  headline: "B.Tech Information Technology Student",
+  story: "A demo portfolio for a fellow IT graduate, with details to be confirmed from the resume.",
+  summary:
+    "This is an intentionally provisional profile. Anjini studied Information Technology alongside the same B.Tech cohort at TKR College of Engineering and Technology and collaborated with Amulya on their major project. Specific skills, responsibilities, dates, achievements, and contact details will be added after her resume is provided.",
+  email: null,
+  phone: null,
+  socialLabels: [],
+  strengths: [
+    { title: "Academic foundation", text: "B.Tech · Information Technology" },
+    { title: "Project collaboration", text: "Collaborated with Amulya on the major project" },
+    { title: "Profile in progress", text: "Resume-based details will be added later" },
+  ],
+  skills: [
+    { category: "To be confirmed", items: ["Skills will be added from the resume"] },
+  ],
+  experience: [
+    {
+      role: "Major project collaboration",
+      company: "B.Tech academic project",
+      period: "Details to be confirmed",
+      context: "Collaborated with Amulya",
+      points: [
+        "Worked with Amulya on the B.Tech major project.",
+        "Individual responsibilities, technical contributions, and project dates will be updated after reviewing the resume.",
+      ],
+      tech: [],
+    },
+  ],
+  projects: [
+    {
+      slug: "major-project",
+      title: "B.Tech Major Project",
+      context: "Academic project · Demo entry",
+      overview:
+        "An academic major project completed in collaboration with Amulya. The project title, implementation details, technology stack, and individual contributions will be confirmed from the resume.",
+      points: [
+        "Collaborated with Amulya on the major project.",
+        "Project scope, responsibilities, implementation, and outcomes are placeholders pending resume review.",
+      ],
+      tech: [],
+    },
+  ],
+  certifications: [],
+  education: {
+    college: "TKR College of Engineering and Technology",
+    qualification: "B.Tech Information Technology",
+    period: "Same B.Tech cohort · exact dates to be confirmed",
+    score: "Academic details to be confirmed",
+  },
+  leadership: [],
+  training: [],
+};
+export const PERSON_PORTFOLIOS: Record<"ammu" | "sai" | "bava", PersonPortfolio> = { ammu, bava, sai };
 export function getPersonPortfolio(id: string): PersonPortfolio | undefined {
-  return id === "ammu" || id === "sai" ? PERSON_PORTFOLIOS[id] : undefined;
+  return id === "ammu" || id === "bava" || id === "sai" ? PERSON_PORTFOLIOS[id] : undefined;
 }
 export function isPerson(id: string): id is PersonId {
   return PEOPLE.some((person) => person.id === id);
