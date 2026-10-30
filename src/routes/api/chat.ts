@@ -46,23 +46,18 @@ export const Route = createFileRoute("/api/chat")({
             ? `${SYSTEM_PROMPT}\n\nCreate a warm, natural spoken AI introduction of about 90–130 words using only the verified Abhishek portfolio facts above. Introduce professional focus, education, experience, strongest skills, and one or two projects. Make clear this is an AI presenting the portfolio, not Abhishek himself or a cloned voice. Current page: ${parsed.data.page ?? "not provided"}.`
             : `${SYSTEM_PROMPT}\n\nCurrent page context: ${parsed.data.page ?? "not provided"}. Use the verified portfolio facts above as the source of truth for this response.`;
 
-        // Prefer a server-side OpenAI key when configured; retain the existing
-        // Lovable gateway as a backwards-compatible fallback.
+        // OpenAI is the only active AI provider for now. Lovable AI is paused.
         const openAiKey = process.env["OPENAI_API_KEY"];
-        const lovableKey = process.env["LOVABLE_API_KEY"];
-        if (!openAiKey && !lovableKey) {
+        if (!openAiKey) {
           return Response.json(
-            { error: "AI is not configured. Add OPENAI_API_KEY to the deployment's server-side environment secrets, then redeploy." },
+            { error: "AI is not configured. Add OPENAI_API_KEY to .env.local for local development or to the deployment's server-side environment secrets, then restart or redeploy." },
             { status: 503 },
           );
         }
 
-        const useOpenAI = Boolean(openAiKey);
-        const endpoint = useOpenAI
-          ? "https://api.openai.com/v1/responses"
-          : "https://ai.gateway.lovable.dev/v1/responses";
-        const key = openAiKey ?? lovableKey!;
-        const model = useOpenAI ? "gpt-4.1-mini" : "openai/gpt-6-astra";
+        const endpoint = "https://api.openai.com/v1/responses";
+        const key = openAiKey;
+        const model = "gpt-4.1-mini";
         const abortController = new AbortController();
         const timeout = setTimeout(() => abortController.abort(), 45_000);
 
@@ -73,16 +68,11 @@ export const Route = createFileRoute("/api/chat")({
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${key}`,
-              ...(useOpenAI ? {} : {
-                "Lovable-API-Key": key,
-                "X-Lovable-AIG-SDK": "fetch",
-              }),
             },
             body: JSON.stringify({
               model,
               stream: true,
               store: false,
-              ...(useOpenAI ? {} : { reasoning: { effort: "low" } }),
               instructions: profilePrompt,
               input: parsed.data.messages.map((message) => ({
                 role: message.role,
@@ -109,7 +99,7 @@ export const Route = createFileRoute("/api/chat")({
             : status === 429
               ? "The AI service is rate-limited or out of available quota. Check the API billing and usage limits."
               : "The AI service could not complete the request. Please try again.";
-          console.error("Portfolio chat provider error", { provider: useOpenAI ? "openai" : "lovable", status, detail: upstreamText.slice(0, 500) });
+          console.error("Portfolio chat provider error", { provider: "openai", status, detail: upstreamText.slice(0, 500) });
           return Response.json({ error: message }, { status: status >= 400 && status < 600 ? status : 502 });
         }
 
