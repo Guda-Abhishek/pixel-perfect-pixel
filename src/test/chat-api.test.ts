@@ -26,13 +26,14 @@ describe("POST /api/chat request flow", () => {
     expect(await response.json()).toEqual({ error: "Invalid request" });
   });
 
-  it("rejects unknown profiles with 400", async () => {
+  it("rejects unknown profiles with 400 and a safe message", async () => {
     const response = await post({
       person: "stranger",
       messages: [{ role: "user", content: "Hello" }],
     });
     expect(response.status).toBe(400);
-    expect(await response.json()).toEqual({ error: "Unknown portfolio" });
+    const payload = (await response.json()) as { error?: string };
+    expect(payload.error).toBe("Invalid request");
   });
 
   it("returns 503 with a safe message when LOVABLE_API_KEY is missing", async () => {
