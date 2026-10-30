@@ -38,3 +38,20 @@ The portfolio chatbot API is handled server-side by `src/routes/api/chat.ts` and
 ### Deployment
 
 Add `OPENAI_API_KEY` as a **server-side environment secret** in the hosting provider's dashboard, then redeploy. Do not put the secret into frontend build variables. No Lovable AI key is needed while Lovable AI is paused. OpenAI API access and usage billing are managed separately from ChatGPT subscriptions.
+
+## Private resume administration
+
+The private admin routes are protected in the server entry before TanStack renders them. Unauthenticated requests to `/admin/resumes` and `/api/admin/*` receive a generic 404. The only public admin screen is `/admin/login`; it does not appear in public navigation.
+
+### Configure local admin access
+
+1. Copy `.env.example` to `.env.local`.
+2. Set `PORTFOLIO_ADMIN_PASSWORD` to a strong, unique password.
+3. Generate a separate signing secret using `node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"` and put it in `PORTFOLIO_ADMIN_SESSION_SECRET`.
+4. Restart the development server, then open `/admin/login`.
+
+Never commit `.env.local`, and do not use `VITE_` prefixes for admin secrets. Configure both values as server-side deployment secrets before deploying. The session cookie is HttpOnly, SameSite=Strict, signed, and expires after eight hours. Login attempts are rate-limited per process; configure an additional edge/platform rate limit for production.
+
+### Current scope
+
+Authentication and the protected Resume Manager shell are in place. Resume upload, private persistent object storage, document parsing, review/approval, and publishing are not yet connected. They must be implemented against a private storage service before the manager can accept real resumes. Do not upload original resumes into public assets or commit them to Git.
