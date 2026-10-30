@@ -1,10 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Play } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { AiIntro } from "@/components/AiIntro";
 import { PEOPLE } from "@/lib/person-portfolios";
 import { MOTION_TOKENS } from "@/lib/motion";
 
@@ -30,25 +27,6 @@ export const Route = createFileRoute("/profiles")({
 });
 
 function ProfileSelect() {
-  const [intro, setIntro] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const reduced = useReducedMotion();
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-    },
-    [],
-  );
-  const skip = () => {
-    setIntro(false);
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = null;
-  };
-  const playIntro = () => {
-    if (timer.current) clearTimeout(timer.current);
-    setIntro(true);
-    timer.current = setTimeout(skip, reduced ? 1000 : 2400);
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -82,13 +60,6 @@ function ProfileSelect() {
             THE SERIES
           </span>
         </span>
-        <Button
-          variant="ghost"
-          onClick={playIntro}
-          className="min-h-11 text-xs transition-transform active:scale-95"
-        >
-          <Play /> Play intro
-        </Button>
       </header>
       <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center py-14">
         <motion.div
@@ -159,55 +130,11 @@ function ProfileSelect() {
               </Button>
             ))}
           </motion.div>
-          <motion.div variants={itemVariants} className="mt-10 flex flex-wrap justify-center gap-3">
-            <Button
-              variant="outline"
-              asChild
-              className="min-h-11 px-6 text-xs transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0"
-            >
-              <Link to="/">
-                Enter Abhishek's portfolio <ArrowRight />
-              </Link>
-            </Button>
-            <AiIntro compact />
-          </motion.div>
         </motion.div>
       </div>
       <footer className="text-center text-[10px] text-muted-foreground">
         GUDA ABHISHEK · SOFTWARE ENGINEER & AI DEVELOPER
       </footer>
-      <Dialog
-        open={intro}
-        onOpenChange={(open) => {
-          if (!open) skip();
-        }}
-      >
-        <DialogContent className="flex h-svh w-screen max-w-none flex-col items-center justify-center border-0 bg-background px-6 sm:rounded-none">
-          <DialogTitle className="sr-only">Abhishek series intro</DialogTitle>
-          <DialogDescription className="sr-only">
-            An optional brief cinematic title sequence.
-          </DialogDescription>
-          <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            A DEVELOPER ORIGINAL
-          </p>
-          <motion.h2
-            initial={{ scale: reduced ? 1 : 0.95 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 1.4 }}
-            className="series-logo text-center text-5xl sm:text-7xl"
-          >
-            ABHISHEK:
-            <br />
-            THE SERIES
-          </motion.h2>
-          <div className="mt-10 flex gap-4">
-            <Button autoFocus variant="outline" className="min-h-11" onClick={skip}>
-              Skip intro <ArrowRight />
-            </Button>
-            {/* Sound is intentionally omitted until a real, synchronized intro soundtrack is available. */}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
