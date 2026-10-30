@@ -25,7 +25,7 @@ function ResumeManager() {
       .catch(() => window.location.replace("/admin/login"))
       .finally(() => { if (active) setChecking(false); });
     return () => { active = false; };
-  }, [navigate]);
+  }, []);
 
   async function logout() {
     setSigningOut(true);
