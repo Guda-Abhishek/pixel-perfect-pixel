@@ -298,7 +298,7 @@ export function PersonHome({ profile }: { profile: PersonPortfolio }) {
               {profile.displayName.toUpperCase()} / THE PERSONAL SERIES
             </p>
             <h1 className="person-name mt-6">{profile.name}</h1>
-            <p className="mt-6 max-w-xl text-xl font-semibold leading-8">{profile.headline}</p>
+            <p className="mt-6 max-w-xl text-lg font-semibold leading-7">{profile.headline}</p>
             <p className="mt-5 max-w-lg text-sm leading-7 text-muted-foreground">{profile.story}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild className="min-h-11">
