@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { SYSTEM_PROMPT } from "@/lib/portfolio-chat";
 import { getPersonPortfolio } from "@/lib/person-portfolios";
+import { buildRelevantProfileKnowledge } from "@/lib/portfolio-knowledge";
 
 const body = z.object({
   person: z.enum(["abhishek", "ammu", "bava", "sai"]).optional(),
@@ -27,7 +28,7 @@ export const Route = createFileRoute("/api/chat")({
               `CURRENT PAGE CONTEXT: ${parsed.data.page ?? "not provided"}`,
               parsed.data.mode === "intro" ? "Create a warm, natural spoken AI introduction of about 90–130 words using the verified profile facts. Introduce professional focus, education, strongest skills, experience, and one or two projects. Make clear this is an AI presenting the portfolio, not the person or a cloned voice. Do not invent facts." : "Answer as a concise, friendly portfolio AI assistant using only the verified facts below. If information is missing, say so.",
               "CURRENT VERIFIED PORTFOLIO DATA (generated from the profile source of truth on every request):",
-              JSON.stringify({ id: profile.id, name: profile.name, displayName: profile.displayName, nickname: profile.nickname, headline: profile.headline, story: profile.story, summary: profile.summary, strengths: profile.strengths, skills: profile.skills, experience: profile.experience, projects: profile.projects, certifications: profile.certifications, education: profile.education, leadership: profile.leadership, training: profile.training, email: profile.email, phone: profile.phone, socialLabels: profile.socialLabels }, null, 2),
+              buildRelevantProfileKnowledge(profile, parsed.data.messages.filter((message) => message.role === "user").at(-1)?.content ?? "", parsed.data.mode === "intro" ? "intro" : "chat"),
             ].join("\n")
           : parsed.data.mode === "intro"
             ? `${SYSTEM_PROMPT}\n\nCreate a warm, natural spoken AI introduction of about 90–130 words using only the verified Abhishek portfolio facts above. Introduce professional focus, education, experience, strongest skills, and one or two projects. Make clear this is an AI presenting the portfolio, not Abhishek himself or a cloned voice. Current page: ${parsed.data.page ?? "not provided"}.`
