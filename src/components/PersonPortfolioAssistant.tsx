@@ -25,6 +25,7 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
   const [messages, setMessages] = useState<Message[]>([]);
   const listRef = useRef<HTMLDivElement>(null);
   const controller = useRef<AbortController | null>(null);
+  const sendRef = useRef<(questionOverride?: string, mode?: "chat" | "intro") => Promise<void>>(async () => {});
   const isAmmu = profile.id === "ammu";
   const voiceLabel = isAmmu ? "Female-style voice" : "Male-style voice";
 
@@ -36,7 +37,7 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
     const openAssistant = () => setOpen(true);
     const openIntro = () => {
       setOpen(true);
-      void send("Introduce this portfolio to a visitor.", "intro");
+      void sendRef.current("Introduce this portfolio to a visitor.", "intro");
     };
     window.addEventListener("portfolio:open-ai-assistant", openAssistant);
     window.addEventListener("portfolio:open-ai-intro", openIntro);
@@ -99,6 +100,7 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
     }
     if ((speakReplies || mode === "intro") && answer.trim()) speak(answer);
   }
+  sendRef.current = send;
 
   return (
     <div className="fixed bottom-20 right-4 z-40 sm:bottom-6 sm:right-6">
