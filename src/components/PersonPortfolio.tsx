@@ -423,12 +423,15 @@ export function PersonContent({
   };
   return (
     <article className="site-container py-12 sm:py-16">
-      <header className="mb-10 border-b border-border pb-8">
-        <p className="font-mono text-xs text-primary">{profile.name.toUpperCase()} / THE SERIES</p>
-        <h1 className="page-title mt-4">{title}</h1>
-        <p className="mt-5 max-w-2xl text-sm leading-7 text-muted-foreground">
-          {descriptions[section]}
-        </p>
+      <header className="person-section-heading mb-10">
+        <img src={backdrop} alt="" aria-hidden="true" className="person-section-backdrop" />
+        <div className="person-section-heading-copy">
+          <p className="font-mono text-xs text-primary">{profile.name.toUpperCase()} / THE SERIES</p>
+          <h1 className="page-title mt-4">{title}</h1>
+          <p className="mt-5 max-w-2xl text-sm leading-7 text-muted-foreground">
+            {descriptions[section]}
+          </p>
+        </div>
       </header>
       {section === "about" && (
         <>
