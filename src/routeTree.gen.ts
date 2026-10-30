@@ -20,6 +20,7 @@ import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as SkillsRouteImport } from './routes/skills'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as PeoplePersonRouteImport } from './routes/people.$person'
+import { Route as PeoplePersonIndexRouteImport } from './routes/people.$person.index'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
 import { Route as PeoplePersonSectionRouteImport } from './routes/people.$person.$section'
@@ -75,6 +76,11 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PeoplePersonIndexRoute = PeoplePersonIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PeoplePersonRoute,
+} as any)
 const PeoplePersonRoute = PeoplePersonRouteImport.update({
   id: '/people/$person',
   path: '/people/$person',
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/skills': typeof SkillsRoute
   '/api/chat': typeof ApiChatRoute
   '/people/$person': typeof PeoplePersonRouteWithChildren
+  '/people/$person/': typeof PeoplePersonIndexRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/projects/': typeof ProjectsIndexRoute
   '/people/$person/$section': typeof PeoplePersonSectionRoute
@@ -167,6 +174,7 @@ export interface FileRouteTypes {
     | '/skills'
     | '/api/chat'
     | '/people/$person'
+    | '/people/$person/'
     | '/projects/$slug'
     | '/projects/'
     | '/people/$person/$section'
@@ -313,6 +321,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsSlugRouteImport
       parentRoute: typeof ProjectsRoute
     }
+    '/people/$person/': {
+      id: '/people/$person/'
+      path: '/'
+      fullPath: '/people/$person/'
+      preLoaderRoute: typeof PeoplePersonIndexRouteImport
+      parentRoute: typeof PeoplePersonRoute
+    }
     '/people/$person/$section': {
       id: '/people/$person/$section'
       path: '/$section'
@@ -345,11 +360,13 @@ const ProjectsRouteWithChildren = ProjectsRoute._addFileChildren(
 )
 
 interface PeoplePersonRouteChildren {
+  PeoplePersonIndexRoute: typeof PeoplePersonIndexRoute
   PeoplePersonSectionRoute: typeof PeoplePersonSectionRoute
   PeoplePersonProjectsSlugRoute: typeof PeoplePersonProjectsSlugRoute
 }
 
 const PeoplePersonRouteChildren: PeoplePersonRouteChildren = {
+  PeoplePersonIndexRoute: PeoplePersonIndexRoute,
   PeoplePersonSectionRoute: PeoplePersonSectionRoute,
   PeoplePersonProjectsSlugRoute: PeoplePersonProjectsSlugRoute,
 }
