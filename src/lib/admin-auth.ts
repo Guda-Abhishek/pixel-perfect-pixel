@@ -1,8 +1,11 @@
 const COOKIE_NAME = "portfolio_admin_session";
 const SESSION_SECONDS = 60 * 60 * 8;
 
-function secret(name: string): string | undefined {
-  const value = typeof process !== "undefined" ? process.env[name] : undefined;
+type SecretEnv = Record<string, unknown>;
+
+function secret(name: string, env?: unknown): string | undefined {
+  const runtimeValue = env && typeof env === "object" ? (env as SecretEnv)[name] : undefined;
+  const value = typeof runtimeValue === "string" ? runtimeValue : typeof process !== "undefined" ? process.env[name] : undefined;
   return value?.trim() || undefined;
 }
 
@@ -40,13 +43,13 @@ function constantTimeEqual(a: Uint8Array, b: Uint8Array): boolean {
   return difference === 0;
 }
 
-export function adminAuthConfigured(): boolean {
-  return Boolean(secret("PORTFOLIO_ADMIN_PASSWORD") && secret("PORTFOLIO_ADMIN_SESSION_SECRET"));
+export function adminAuthConfigured(env?: unknown): boolean {
+  return Boolean(secret("PORTFOLIO_ADMIN_PASSWORD", env) && secret("PORTFOLIO_ADMIN_SESSION_SECRET", env));
 }
 
-export async function verifyAdminPassword(password: string): Promise<boolean> {
-  const expected = secret("PORTFOLIO_ADMIN_PASSWORD");
-  if (!expected || !secret("PORTFOLIO_ADMIN_SESSION_SECRET")) return false;
+export async function verifyAdminPassword(password: string, env?: unknown): Promise<boolean> {
+  const expected = secret("PORTFOLIO_ADMIN_PASSWORD", env);
+  if (!expected || !secret("PORTFOLIO_ADMIN_SESSION_SECRET", env)) return false;
   const [actualHash, expectedHash] = await Promise.all([
     crypto.subtle.digest("SHA-256", new TextEncoder().encode(password)),
     crypto.subtle.digest("SHA-256", new TextEncoder().encode(expected)),
@@ -54,16 +57,16 @@ export async function verifyAdminPassword(password: string): Promise<boolean> {
   return constantTimeEqual(new Uint8Array(actualHash), new Uint8Array(expectedHash));
 }
 
-export async function createAdminCookie(): Promise<string | null> {
-  const key = secret("PORTFOLIO_ADMIN_SESSION_SECRET");
+export async function createAdminCookie(env?: unknown): Promise<string | null> {
+  const key = secret("PORTFOLIO_ADMIN_SESSION_SECRET", env);
   if (!key) return null;
   const expires = Math.floor(Date.now() / 1000) + SESSION_SECONDS;
   const payload = String(expires);
   return `${payload}.${bytesToBase64Url(await hmac(payload, key))}`;
 }
 
-export async function isAdminRequest(request: Request): Promise<boolean> {
-  const key = secret("PORTFOLIO_ADMIN_SESSION_SECRET");
+export async function isAdminRequest(request: Request, env?: unknown): Promise<boolean> {
+  const key = secret("PORTFOLIO_ADMIN_SESSION_SECRET", env);
   if (!key) return false;
   const cookieHeader = request.headers.get("cookie") ?? "";
   const cookie = cookieHeader.split(";").map((part) => part.trim())
