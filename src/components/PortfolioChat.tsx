@@ -45,7 +45,25 @@ async function askAi(history: ChatMessage[], onDelta: (t: string) => void, signa
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ person: "abhishek", page: window.location.pathname, mode: "chat", messages: history.map((m) => ({ role: m.role, content: m.content })) }),
   });
-  if (!res.ok || !res.body) throw new Error(String(res.status));
+  if (!res.ok || !res.body) {
+    let detail = "";
+    try {
+      const payload = await res.clone().json() as { error?: string };
+      detail = payload.error ?? "";
+    } catch {
+      /* The server may return a non-JSON error page. */
+    }
+    const reason = res.status === 503 && detail.toLowerCase().includes("not configured")
+      ? "The AI service is not configured on the server (missing LOVABLE_API_KEY)."
+      : res.status === 401 || res.status === 403
+        ? "The AI service rejected its server credentials (HTTP " + res.status + ")."
+        : res.status === 402
+          ? "The AI service has no available credits or billing access (HTTP 402)."
+          : res.status === 429
+            ? "The AI service rate limit was reached (HTTP 429). Please try again shortly."
+            : "The AI request failed (HTTP " + res.status + ").";
+    throw new Error(reason);
+  }
   const reader = res.body.getReader();
   const dec = new TextDecoder();
   let got = "";
@@ -123,9 +141,11 @@ export function PortfolioChat() {
         ctrl.signal,
       );
       if (speakReplies) speak(answer);
-    } catch {
+    } catch (error) {
       if (ctrl.signal.aborted) return;
-      const answer = fallbackAnswer(q);
+      const fallback = fallbackAnswer(q);
+      const reason = error instanceof Error && error.message ? error.message : "The request failed.";
+      const answer = `${fallback}\n\nLive AI status: ${reason}`;
       patch((m) => ({ ...m, content: answer, source: "fallback" }));
       if (speakReplies) speak(answer);
     } finally {
