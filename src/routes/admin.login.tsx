@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { LockKeyhole, ShieldCheck } from "lucide-react";
 
@@ -18,7 +18,7 @@ function AdminLogin() {
   const [busy, setBusy] = useState(false);
   const navigate = useNavigate();
 
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
+  async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
     setBusy(true);
