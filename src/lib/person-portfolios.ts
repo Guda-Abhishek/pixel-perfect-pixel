@@ -4,6 +4,7 @@ export const PEOPLE = [
     name: "Abhishek",
     nickname: null,
     initials: "GA",
+    avatar: "/images/profiles/abhishek/abhishek_main.jpeg",
     color: "profile-blue",
     status: "Portfolio",
   },
@@ -12,22 +13,25 @@ export const PEOPLE = [
     name: "Amulya",
     nickname: "Ammu",
     initials: "DA",
+    avatar: "/images/profiles/amulya/amulya_main.webp",
     color: "profile-green",
     status: "Portfolio",
   },
   {
     id: "bava",
-    name: "Anjini",
+    name: "Anjini Kumar",
     nickname: "Bava",
-    initials: "A",
+    initials: "AB",
+    avatar: "/images/profiles/anjini/anjini_main.jpg",
     color: "profile-purple",
-    status: "Coming Soon — resume pending",
+    status: "Data Analytics Portfolio",
   },
   {
     id: "sai",
     name: "Sai",
     nickname: "Darling",
     initials: "DS",
+    avatar: "/images/profiles/sai/sai_main.png",
     color: "profile-red",
     status: "Portfolio",
   },
@@ -54,16 +58,18 @@ export interface PersonProject {
   caution?: string;
 }
 export interface PersonPortfolio {
-  id: "ammu" | "sai";
+  id: "ammu" | "sai" | "bava";
   name: string;
   displayName: string;
   nickname: string;
   initials: string;
+  portrait: string;
+  gallery: { src: string; alt: string }[];
   headline: string;
   story: string;
   summary: string;
-  email: string;
-  phone: string;
+  email: string | null;
+  phone: string | null;
   socialLabels: { platform: string; handle: string | null }[];
   strengths: { title: string; text: string }[];
   skills: { category: string; items: string[] }[];
@@ -93,6 +99,11 @@ const ammu: PersonPortfolio = {
   displayName: "Amulya",
   nickname: "Ammu",
   initials: "DA",
+  portrait: "/images/profiles/amulya/amulya_main.webp",
+  gallery: [
+    { src: "/images/profiles/amulya/amulya_1.webp", alt: "Amulya, portrait photo" },
+    { src: "/images/profiles/amulya/amulya_2.webp", alt: "Amulya, portrait photo" },
+  ],
   headline: "Data Analytics | AI & Machine Learning",
   story: "Turning structured data into useful insights and practical applications.",
   summary:
@@ -277,6 +288,11 @@ const sai: PersonPortfolio = {
   displayName: "Sai",
   nickname: "Darling",
   initials: "DS",
+  portrait: "/images/profiles/sai/sai_main.png",
+  gallery: [
+    { src: "/images/profiles/sai/sai_1.jpeg", alt: "Sai, portrait photo" },
+    { src: "/images/profiles/sai/sai_2.jpeg", alt: "Sai, portrait photo" },
+  ],
   headline: "Software Engineer | Web Development",
   story: "Interactive websites. Responsive interfaces. Thoughtful problem-solving.",
   summary:
@@ -375,9 +391,106 @@ const sai: PersonPortfolio = {
   leadership: [],
   training: [],
 };
-export const PERSON_PORTFOLIOS: Record<"ammu" | "sai", PersonPortfolio> = { ammu, sai };
+const bava: PersonPortfolio = {
+  id: "bava",
+  name: "E. Anjini Kumar",
+  displayName: "Anjini",
+  nickname: "Bava",
+  initials: "EK",
+  portrait: "/images/profiles/anjini/anjini_main.jpg",
+  gallery: [
+    { src: "/images/profiles/anjini/anjini_1.jpg", alt: "Anjini Kumar, portrait photo" },
+    { src: "/images/profiles/anjini/anjini_2.jpg", alt: "Anjini Kumar, portrait photo" },
+  ],
+  headline: "Data Analyst | Excel, SQL, Power BI & Python",
+  story: "Turning business data into clear dashboards, reliable reporting, and actionable insights.",
+  summary:
+    "Entry-level Data Analyst with a B.Tech in Information Technology and experience as a Data Analytics Intern and team lead. Skilled in data analysis, data validation, visualization, and KPI reporting using Microsoft Excel, SQL, Power BI, and Python. Focused on accuracy, consistency, structured problem-solving, and communicating useful findings from business data.",
+  email: "anjinikumaretikala@gmail.com",
+  phone: "+91 6303392505",
+  socialLabels: [],
+  strengths: [
+    { title: "Reliable data quality", text: "Data validation · Quality checking · KPI tracking" },
+    { title: "Dashboards that explain", text: "Power BI · Excel · Plotly · Chart.js" },
+    { title: "Analysis with Python", text: "Python · pandas · NumPy · SQL" },
+  ],
+  skills: [
+    {
+      category: "Data analysis & quality",
+      items: ["Data Analysis", "Data Validation", "Data Quality Checking", "KPI Tracking", "Structured Analysis", "Reporting"],
+    },
+    {
+      category: "Visualization & business intelligence",
+      items: ["Power BI", "Interactive Dashboards", "Matplotlib", "Chart.js", "Plotly", "Microsoft Excel", "Pivot Tables", "VLOOKUP", "Formulas"],
+    },
+    {
+      category: "Programming & databases",
+      items: ["Python", "pandas", "NumPy", "JavaScript", "SQL", "SQL Queries", "SQL Joins", "MongoDB"],
+    },
+    {
+      category: "AI & web application exposure",
+      items: ["Generative AI", "Prompt Engineering", "AI-Assisted Analysis", "AI Chatbot Concepts", "MERN Stack", "JWT", "bcrypt", "Helmet.js", "OAuth2"],
+    },
+    {
+      category: "Productivity & professional",
+      items: ["MS Office", "Documentation", "Image/Video Auditing", "Attention to Detail", "Analytical Thinking", "Problem Solving", "Teamwork", "Communication", "Adaptability"],
+    },
+  ],
+  experience: [
+    {
+      role: "Data Analytics Intern",
+      company: "ThinkMates Pvt. Ltd.",
+      period: "Apr 2025–Jun 2025",
+      context: "Team Lead (Intern)",
+      points: [
+        "Analyzed sales, supply-chain, product-quality, and customer datasets to identify trends, reduce returns, and support cost optimization.",
+        "Built KPI dashboards using Power BI, Excel, Python, and SQL to improve reporting visibility and support operational decision-making.",
+        "Worked with structured business data to maintain consistency in analysis outputs and deliver insights within timelines.",
+        "Coordinated the intern team and supported timely execution of analysis and reporting activities.",
+      ],
+      tech: ["Power BI", "Excel", "Python", "SQL"],
+    },
+  ],
+  projects: [
+    {
+      slug: "data-analysis-ai",
+      title: "Data Analysis and Visualization with AI",
+      context: "Academic Project · 2025–2026",
+      overview:
+        "An interactive web and mobile application concept combining data analysis, dashboards, and an AI chatbot to help users explore data and learn visualization techniques.",
+      points: [
+        "Designed dashboard capabilities using Power BI, Chart.js, and Plotly for interactive data visualization.",
+        "Applied Python-based analysis to interpret datasets and support data-driven reporting.",
+        "Included an AI chatbot concept to support learning about analytics and data visualization.",
+        "Applied MERN Stack and application-security technologies including MongoDB, JWT, bcrypt, Helmet.js, and OAuth2.",
+      ],
+      tech: ["Python", "MERN Stack", "MongoDB", "Power BI", "Chart.js", "Plotly", "JWT", "bcrypt", "Helmet.js", "OAuth2"],
+    },
+  ],
+  certifications: [
+    { title: "Website UI/UX Designing using ChatGPT", issuer: "Simplilearn" },
+    { title: "Generative AI Studio", issuer: "Simplilearn" },
+    { title: "Introduction to Prompt Engineering Fundamentals", issuer: "Simplilearn" },
+  ],
+  education: {
+    college: "TKR College of Engineering and Technology",
+    qualification: "B.Tech Information Technology",
+    period: "2022–2026",
+    score: "GPA 6.0",
+  },
+  leadership: [
+    {
+      title: "Student Coordinator, IT Branch",
+      period: "2022–2026",
+      description:
+        "Organized and led technical events involving 250+ participants, supporting coordination, communication, teamwork, and student collaboration at TKR College of Engineering and Technology.",
+    },
+  ],
+  training: [],
+};
+export const PERSON_PORTFOLIOS: Record<"ammu" | "sai" | "bava", PersonPortfolio> = { ammu, bava, sai };
 export function getPersonPortfolio(id: string): PersonPortfolio | undefined {
-  return id === "ammu" || id === "sai" ? PERSON_PORTFOLIOS[id] : undefined;
+  return id === "ammu" || id === "bava" || id === "sai" ? PERSON_PORTFOLIOS[id] : undefined;
 }
 export function isPerson(id: string): id is PersonId {
   return PEOPLE.some((person) => person.id === id);

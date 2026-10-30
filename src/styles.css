@@ -1424,6 +1424,8 @@ section {
 
 /* Editorial multi-page experience; the original Series keeps its own theme. */
 .site-shell {
+  /* Shared visual tokens: the main Abhishek site and all person portfolios
+     intentionally consume the same palette, type scale, spacing and surfaces. */
   --background: oklch(0.145 0.008 280);
   --card: oklch(0.18 0.013 280);
   --secondary: oklch(0.21 0.016 285);
@@ -1433,12 +1435,18 @@ section {
   --site-shadow: 0 12px 35px oklch(0 0 0 / 15%);
   --space-page: 40px;
   --space-section: 56px;
+  --content-width: 1200px;
+  --hero-min-height: 700px;
+  --hero-title-size: 96px;
+  --section-title-size: 64px;
+  --surface-radius: 6px;
   background: var(--background);
+  color: var(--foreground);
   min-height: 100svh;
   letter-spacing: 0;
 }
 .site-container {
-  width: min(100% - 2 * var(--space-page), 1200px);
+  width: min(100% - 2 * var(--space-page), var(--content-width));
   margin-inline: auto;
 }
 .site-nav {
@@ -1493,10 +1501,42 @@ section {
 .hero-copy {
   max-width: 560px;
 }
-.home-title {
-  font-size: 96px;
+.home-title,
+.person-name {
+  font-family: var(--font-display);
+  font-size: var(--hero-title-size);
   line-height: 0.93;
   font-weight: 800;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.site-page-kicker {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  color: var(--primary);
+  text-transform: uppercase;
+}
+.site-page-title {
+  font-family: var(--font-display);
+  font-size: var(--section-title-size);
+  font-weight: 800;
+  line-height: 1.03;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+}
+.site-page-description {
+  max-width: 680px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.9;
+}
+.site-section {
+  width: min(100% - 2 * var(--space-page), var(--content-width));
+  margin-inline: auto;
+  padding-block: var(--space-section);
 }
 .home-title > span:first-of-type {
   color: var(--foreground);
@@ -1514,9 +1554,11 @@ section {
   background: var(--card);
 }
 .page-title {
-  font-size: 64px;
+  font-family: var(--font-display);
+  font-size: var(--section-title-size);
   line-height: 1.03;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   overflow-wrap: anywhere;
 }
 .project-card {
@@ -1578,8 +1620,13 @@ section {
   .home-hero {
     min-height: 750px;
   }
-  .home-title {
-    font-size: 68px;
+  .site-shell {
+    --hero-title-size: 68px;
+    --section-title-size: 46px;
+  }
+  .home-title,
+  .person-name {
+    font-size: var(--hero-title-size);
   }
   .home-portrait {
     width: 100%;
@@ -1601,8 +1648,9 @@ section {
     padding-top: 200px;
     padding-bottom: 42px;
   }
-  .home-title {
-    font-size: 68px;
+  .home-title,
+  .person-name {
+    font-size: var(--hero-title-size);
   }
   .portrait-credit {
     top: 18px;
@@ -1610,19 +1658,28 @@ section {
     right: 24px;
     font-size: 8px;
   }
-  .page-title {
-    font-size: 46px;
+  .page-title,
+  .site-page-title,
+  .person-section-heading .page-title {
+    font-size: var(--section-title-size);
   }
 }
 @media (max-width: 359px) {
   .site-shell {
     --space-page: 18px;
   }
-  .home-title {
-    font-size: 58px;
+  .site-shell {
+    --hero-title-size: 58px;
+    --section-title-size: 40px;
   }
-  .page-title {
-    font-size: 40px;
+  .home-title,
+  .person-name {
+    font-size: var(--hero-title-size);
+  }
+  .page-title,
+  .site-page-title,
+  .person-section-heading .page-title {
+    font-size: var(--section-title-size);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1633,24 +1690,90 @@ section {
 
 /* Shared person portfolios retain the Series palette without borrowed faces. */
 .person-shell {
-  --background: oklch(0.191 0 0);
-  --card: oklch(0.211 0.006 285.9);
-  --secondary: oklch(0.23 0.008 285);
+  /* Deliberately inherit .site-shell tokens: no alternate person-page theme. */
+  --hero-min-height: 700px;
+}
+.person-brand {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.075em;
+  color: #f5f5f7;
+}
+.person-brand i {
+  color: #e50914;
+  font-style: normal;
+  letter-spacing: -0.08em;
 }
 .person-desktop-nav {
   display: none;
-  gap: 16px;
-  font-size: 11px;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(14px, 1.65vw, 28px);
+  padding-inline: 24px;
+  font-size: 16px;
+  font-weight: 550;
+  white-space: nowrap;
+}
+.person-nav-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 12px;
+}
+.person-nav-actions .person-nav-ai {
+  gap: 9px;
+  padding: 8px 4px;
+  font-size: 24px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.person-nav-actions .person-nav-icon {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  border-radius: 7px;
+}
+.person-nav-actions .person-nav-icon svg {
+  width: 23px;
+  height: 23px;
+  stroke-width: 1.8;
 }
 .person-desktop-nav a,
-.person-mobile-nav a {
+.person-mobile-nav a,
+.person-nav-ai {
   transition: color 180ms ease;
 }
 .person-desktop-nav a:hover,
 .person-mobile-nav a:hover,
+.person-nav-ai:hover,
 .person-nav-active {
-  color: var(--primary);
+  color: var(--violet);
 }
+.person-nav-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.person-nav-ai svg {
+  flex: 0 0 auto;
+}
+.person-nav-ai:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
 .person-mobile-nav {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1658,37 +1781,97 @@ section {
   padding-block: 16px;
   border-top: 1px solid var(--border);
 }
-.person-mobile-nav a {
+.person-mobile-nav a,
+.person-mobile-nav .person-nav-ai {
   min-height: 44px;
   display: flex;
   align-items: center;
   font-size: 13px;
 }
+.person-mobile-nav .person-nav-ai {
+  justify-self: start;
+}
+.person-section-heading {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 300px;
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 1px solid var(--border);
+  background: var(--background);
+}
+.person-section-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  opacity: 0.22;
+  filter: saturate(0.78);
+}
+.person-section-heading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, var(--background) 0%, color-mix(in oklab, var(--background) 84%, transparent) 45%, color-mix(in oklab, var(--background) 34%, transparent) 100%),
+    linear-gradient(0deg, var(--background) 0%, color-mix(in oklab, var(--background) 12%, transparent) 100%),
+    linear-gradient(120deg, color-mix(in oklab, var(--primary) 12%, transparent), transparent 65%);
+}
+.person-section-heading-copy {
+  width: min(100% - 2 * var(--space-page), 1200px);
+  margin-inline: auto;
+  padding-block: 44px 38px;
+}
+.person-section-heading .page-title {
+  font-size: var(--section-title-size);
+}
 .person-hero {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-height: 590px;
+  min-height: var(--hero-min-height);
+  background: var(--background);
 }
 .person-hero-backdrop {
   position: absolute;
   inset: 0;
+  z-index: -2;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0.5;
+  opacity: 0.16;
+}
+.home-portrait,
+.person-hero-portrait {
+  object-fit: cover;
+}
+.person-hero-portrait {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  right: 0;
+  width: 63%;
+  height: 100%;
+  object-position: center 25%;
+  opacity: 0.88;
+  filter: saturate(0.88);
 }
 .person-hero-shade {
   position: absolute;
+  z-index: 0;
   inset: 0;
+  pointer-events: none;
+  /* Same gradient recipe as Abhishek's original .hero-shade. */
   background:
-    linear-gradient(
-      90deg,
-      var(--background),
-      color-mix(in oklab, var(--background) 90%, transparent) 40%,
-      color-mix(in oklab, var(--background) 40%, transparent)
-    ),
-    linear-gradient(0deg, var(--background), transparent 35%);
+    linear-gradient(90deg, var(--background) 10%, color-mix(in oklab, var(--background) 96%, transparent) 29%, color-mix(in oklab, var(--background) 62%, transparent) 46%, transparent 73%),
+    linear-gradient(0deg, var(--background), transparent 22%),
+    linear-gradient(120deg, color-mix(in oklab, var(--ember) 8%, transparent), transparent 60%, color-mix(in oklab, var(--magenta) 9%, transparent));
 }
 .person-hero-monogram {
   position: absolute;
@@ -1704,11 +1887,7 @@ section {
   color: color-mix(in oklab, var(--profile-green) 38%, transparent);
 }
 .person-name {
-  max-width: 720px;
-  font-size: 80px;
-  font-weight: 800;
-  line-height: 1;
-  overflow-wrap: anywhere;
+  max-width: 760px;
 }
 .person-project-art {
   position: relative;
@@ -1808,18 +1987,63 @@ section {
   font-size: 9px;
   color: var(--muted-foreground);
 }
-@media (min-width: 1280px) {
+@media (min-width: 1200px) {
   .person-desktop-nav {
     display: flex;
   }
 }
+@media (max-width: 1199px) {
+  .person-desktop-nav {
+    display: none;
+  }
+  .person-nav-actions .person-nav-ai {
+    font-size: 20px;
+  }
+}
 @media (max-width: 767px) {
+  .person-nav-actions {
+    gap: 8px;
+  }
+  .person-nav-actions .person-nav-ai {
+    gap: 6px;
+    font-size: 16px;
+  }
+  .person-nav-actions .person-nav-icon {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+  }
+}
+@media (max-width: 767px) {
+  .person-section-heading {
+    min-height: 260px;
+  }
+  .person-section-heading-copy {
+    padding-block: 34px 28px;
+  }
+  .person-section-backdrop {
+    opacity: 0.16;
+  }
   .person-hero {
-    min-height: 610px;
+    min-height: 750px;
+  }
+  .person-hero-backdrop {
+    opacity: 0.12;
+  }
+  .person-hero-portrait {
+    width: 100%;
+    height: 440px;
+    object-position: 60% 18%;
+    opacity: 0.72;
+  }
+  .person-hero-shade {
+    background:
+      linear-gradient(0deg, var(--background) 25%, color-mix(in oklab, var(--background) 90%, transparent) 52%, color-mix(in oklab, var(--background) 36%, transparent) 78%, transparent 100%),
+      linear-gradient(90deg, color-mix(in oklab, var(--background) 24%, transparent), transparent);
   }
   .person-name {
-    font-size: 56px;
-    max-width: 480px;
+    font-size: 68px;
+    max-width: 520px;
   }
   .person-hero-monogram {
     font-size: 200px;
@@ -1835,12 +2059,17 @@ section {
     font-size: 30px;
   }
 }
+@media (max-width: 1023px) {
+  .person-brand {
+    font-size: 34px;
+  }
+}
 @media (max-width: 359px) {
   .person-name {
     font-size: 46px;
   }
-  .person-shell .series-logo {
-    font-size: 25px;
+  .person-brand {
+    font-size: 30px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

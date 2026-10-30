@@ -1,10 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion, useReducedMotion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, Play, Volume2, VolumeX } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { AiIntro } from "@/components/AiIntro";
 import { PEOPLE } from "@/lib/person-portfolios";
 import { MOTION_TOKENS } from "@/lib/motion";
 
@@ -30,54 +27,6 @@ export const Route = createFileRoute("/profiles")({
 });
 
 function ProfileSelect() {
-  const [intro, setIntro] = useState(false);
-  const [sound, setSound] = useState(false);
-  const audio = useRef<AudioContext | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const reduced = useReducedMotion();
-  useEffect(
-    () => () => {
-      if (timer.current) clearTimeout(timer.current);
-      void audio.current?.close();
-    },
-    [],
-  );
-  const skip = () => {
-    setIntro(false);
-    setSound(false);
-    if (timer.current) clearTimeout(timer.current);
-    void audio.current?.close();
-    audio.current = null;
-  };
-  const toggleSound = () => {
-    if (sound) {
-      setSound(false);
-      void audio.current?.close();
-      audio.current = null;
-      return;
-    }
-    try {
-      const context = new AudioContext();
-      audio.current = context;
-      const gain = context.createGain();
-      gain.connect(context.destination);
-      gain.gain.setValueAtTime(0.06, context.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, context.currentTime + 0.6);
-      const tone = context.createOscillator();
-      tone.type = "sine";
-      tone.frequency.setValueAtTime(146.83, context.currentTime);
-      tone.connect(gain);
-      tone.start();
-      tone.stop(context.currentTime + 0.6);
-      setSound(true);
-    } catch {
-      setSound(false);
-    }
-  };
-  const playIntro = () => {
-    setIntro(true);
-    timer.current = setTimeout(skip, reduced ? 1000 : 2400);
-  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -111,13 +60,6 @@ function ProfileSelect() {
             THE SERIES
           </span>
         </span>
-        <Button
-          variant="ghost"
-          onClick={playIntro}
-          className="min-h-11 text-xs transition-transform active:scale-95"
-        >
-          <Play /> Play intro
-        </Button>
       </header>
       <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col items-center justify-center py-14">
         <motion.div
@@ -152,9 +94,25 @@ function ProfileSelect() {
                   <span className="block rounded ring-2 ring-transparent transition-all duration-200 group-hover:scale-[1.04] group-hover:ring-foreground group-focus-visible:ring-foreground group-active:scale-95">
                     <span
                       aria-hidden="true"
-                      className={`${profile.color} flex aspect-square w-full items-center justify-center rounded font-display text-6xl text-primary-foreground sm:text-7xl`}
+                      className={`${profile.color} relative flex aspect-square w-full items-center justify-center overflow-hidden rounded font-display text-6xl text-primary-foreground shadow-2xl ring-1 ring-white/10 sm:text-7xl`}
                     >
-                      {profile.initials}
+                      <span className="absolute inset-0 flex items-center justify-center">{profile.initials}</span>
+                      {profile.avatar && (
+                        <img
+                          src={profile.avatar}
+                          alt=""
+                          loading="eager"
+                          decoding="async"
+                          fetchPriority="high"
+                          draggable={false}
+                          className="absolute inset-0 size-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                          onError={(event) => {
+                            // Keep the initials layer visible as a graceful fallback.
+                            event.currentTarget.hidden = true;
+                          }}
+                        />
+                      )}
+                      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/60 to-transparent" />
                     </span>
                   </span>
                   <span className="mt-4 block min-h-10 text-sm text-foreground transition-colors group-hover:text-primary sm:text-base">
@@ -172,57 +130,11 @@ function ProfileSelect() {
               </Button>
             ))}
           </motion.div>
-          <motion.div variants={itemVariants} className="mt-10 flex flex-wrap justify-center gap-3">
-            <Button
-              variant="outline"
-              asChild
-              className="min-h-11 px-6 text-xs transition-transform duration-200 hover:-translate-y-0.5 active:translate-y-0"
-            >
-              <Link to="/">
-                Enter Abhishek's portfolio <ArrowRight />
-              </Link>
-            </Button>
-            <AiIntro compact />
-          </motion.div>
         </motion.div>
       </div>
       <footer className="text-center text-[10px] text-muted-foreground">
         GUDA ABHISHEK · SOFTWARE ENGINEER & AI DEVELOPER
       </footer>
-      <Dialog
-        open={intro}
-        onOpenChange={(open) => {
-          if (!open) skip();
-        }}
-      >
-        <DialogContent className="flex h-svh w-screen max-w-none flex-col items-center justify-center border-0 bg-background px-6 sm:rounded-none">
-          <DialogTitle className="sr-only">Abhishek series intro</DialogTitle>
-          <DialogDescription className="sr-only">
-            An optional brief cinematic title sequence.
-          </DialogDescription>
-          <p className="mb-4 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            A DEVELOPER ORIGINAL
-          </p>
-          <motion.h2
-            initial={{ scale: reduced ? 1 : 0.95 }}
-            animate={{ scale: 1 }}
-            transition={{ duration: 1.4 }}
-            className="series-logo text-center text-5xl sm:text-7xl"
-          >
-            ABHISHEK:
-            <br />
-            THE SERIES
-          </motion.h2>
-          <div className="mt-10 flex gap-4">
-            <Button autoFocus variant="outline" className="min-h-11" onClick={skip}>
-              Skip intro <ArrowRight />
-            </Button>
-            <Button variant="ghost" className="min-h-11" onClick={toggleSound} aria-pressed={sound}>
-              {sound ? <Volume2 /> : <VolumeX />} Sound {sound ? "on" : "off"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }

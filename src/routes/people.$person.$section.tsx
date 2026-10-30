@@ -1,10 +1,8 @@
-import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/react-router";
 import { PERSON_SECTIONS, getPersonPortfolio, personHead } from "@/lib/person-portfolios";
 import { PersonContent, PersonUnavailable } from "@/components/PersonPortfolio";
 export const Route = createFileRoute("/people/$person/$section")({
   beforeLoad: ({ params }) => {
-    if (params.person === "bava")
-      throw redirect({ to: "/people/$person", params: { person: "bava" } });
     if (!PERSON_SECTIONS.some((section) => section.id === params.section)) throw notFound();
   },
   head: ({ params }) =>

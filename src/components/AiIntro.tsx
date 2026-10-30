@@ -10,172 +10,140 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DeveloperMark } from "@/components/DeveloperMark";
-import { useAiIntro } from "@/hooks/use-ai-intro";
-import { AI_INTRO_DURATION, AI_INTRO_SEGMENTS, INTRO_PORTRAITS } from "@/lib/ai-intro";
+import my1 from "@/assets/my_1.jpeg";
 import videoSet from "@/assets/video_set.mp4";
 
-const INTRO_VIDEO = { url: videoSet, name: "Introduction" };
-
-function IntroPlayer() {
-  const player = useAiIntro({ narrateOnPlay: true });
-  const [videoError, setVideoError] = useState(false);
+function DynamicIntroPlayer() {
+  const [intro, setIntro] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const [speaking, setSpeaking] = useState(false);
   const video = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    async function generate() {
+      try {
+        const response = await fetch("/api/chat", {
+          method: "POST",
+          signal: controller.signal,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            person: "abhishek",
+            mode: "intro",
+            page: window.location.pathname,
+            messages: [{ role: "user", content: "Introduce this portfolio to a visitor." }],
+          }),
+        });
+        if (!response.ok || !response.body) throw new Error("AI intro unavailable");
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let text = "";
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          text += decoder.decode(value, { stream: true });
+          setIntro(text);
+        }
+        if (!text.trim()) throw new Error("Empty AI intro");
+      } catch {
+        if (!controller.signal.aborted) setError(true);
+      } finally {
+        if (!controller.signal.aborted) setLoading(false);
+      }
+    }
+    void generate();
+    return () => {
+      controller.abort();
+      if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+    };
+  }, []);
+
   useEffect(() => {
     const element = video.current;
     if (!element) return;
-    if (player.status === "playing") void element.play().catch(() => setVideoError(true));
-    else element.pause();
+    void element.play().catch(() => undefined);
     return () => element.pause();
-  }, [player.status]);
-  const replay = () => {
-    if (video.current) video.current.currentTime = 0;
-    player.replay();
-  };
-  const segment = AI_INTRO_SEGMENTS[player.segmentIndex];
+  }, []);
+
+  function playVoice() {
+    if (!intro.trim() || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(intro.replace(/[*#`]/g, ""));
+    const voices = window.speechSynthesis.getVoices();
+    const voice = voices.find((item) => /male|david|guy|ryan|george|mark|daniel/i.test(item.name) && item.lang.startsWith("en"))
+      ?? voices.find((item) => item.lang === "en-IN")
+      ?? voices.find((item) => item.lang.startsWith("en"));
+    if (voice) utterance.voice = voice;
+    utterance.lang = voice?.lang ?? "en-IN";
+    utterance.rate = 1.02;
+    utterance.pitch = 0.96;
+    utterance.onend = () => setSpeaking(false);
+    utterance.onerror = () => setSpeaking(false);
+    setSpeaking(true);
+    window.speechSynthesis.speak(utterance);
+  }
+
+  function pauseVoice() {
+    if (!("speechSynthesis" in window)) return;
+    if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) {
+      window.speechSynthesis.pause();
+      setSpeaking(false);
+    } else if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume();
+      setSpeaking(true);
+    }
+  }
+
   return (
     <>
       <div className="grid gap-5 sm:grid-cols-[240px_1fr]">
         <div className="space-y-3">
           <div className="flex aspect-[768/1052] items-center justify-center overflow-hidden rounded border border-border bg-secondary">
-            {videoError ? (
-              <DeveloperMark className="h-28 w-28" />
-            ) : (
-              <video
-                ref={video}
-                src={INTRO_VIDEO.url}
-                muted
-                playsInline
-                loop
-                preload="metadata"
-                aria-label={`${INTRO_VIDEO.name} · AI portfolio host video`}
-                className="h-full w-full object-contain"
-                onError={() => setVideoError(true)}
-              />
-            )}
+            <video
+              ref={video}
+              src={videoSet}
+              muted
+              playsInline
+              loop
+              autoPlay
+              preload="metadata"
+              aria-label="AI portfolio host video"
+              className="h-full w-full object-contain"
+              onError={(event) => { event.currentTarget.hidden = true; }}
+            />
+            <DeveloperMark className="hidden h-28 w-28" />
           </div>
-          {videoError && (
-            <p role="status" className="text-xs text-muted-foreground">
-              Video unavailable. Narration and transcript remain available.
-            </p>
-          )}
           <p className="flex items-center gap-2 text-xs font-semibold">
             <Bot className="size-4 text-primary" /> AI portfolio host
           </p>
-          {INTRO_PORTRAITS.real && (
-            <figure>
-              <img
-                src={INTRO_PORTRAITS.real}
-                alt="Real portrait of Guda Abhishek"
-                className="aspect-square w-16 rounded object-contain"
-              />
-              <figcaption className="mt-1 text-xs text-muted-foreground">
-                Guda Abhishek · real portrait
-              </figcaption>
-            </figure>
-          )}
+          <figure>
+            <img src={my1} alt="Portrait of Guda Abhishek" className="aspect-square w-16 rounded object-cover" />
+            <figcaption className="mt-1 text-xs text-muted-foreground">Guda Abhishek · portfolio owner</figcaption>
+          </figure>
         </div>
-        <div className="flex min-w-0 flex-col justify-between gap-4">
+        <div className="flex min-w-0 flex-col gap-4">
           <div>
-            <p className="mb-3 text-[10px] uppercase text-primary">
-              A developer original · Introduction
+            <p className="mb-3 text-[10px] uppercase text-primary">LIVE PORTFOLIO CONTEXT · AI INTRODUCTION</p>
+            <p className="whitespace-pre-wrap text-sm leading-7" aria-live="polite">
+              {loading && !intro ? "Building an introduction from the latest published portfolio information…" : intro || "The live introduction is unavailable right now."}
             </p>
-            <p className="min-h-36 text-base leading-7 sm:min-h-40" aria-live="off">
-              {segment?.text}
-            </p>
+            {error && <p role="status" className="mt-3 text-xs leading-5 text-muted-foreground">The AI service could not be reached. Try again later; the portfolio itself remains available.</p>}
           </div>
-          <div className="space-y-3">
-            <progress
-              className="h-1.5 w-full accent-primary"
-              aria-label="Introduction progress"
-              max={AI_INTRO_DURATION}
-              value={player.elapsed}
-            />
-            <div className="flex justify-between gap-3 text-xs text-muted-foreground">
-              <span role="status">
-                {player.status === "ready"
-                  ? "Ready · press Play to start"
-                  : player.status === "ended"
-                    ? "Introduction complete"
-                    : player.status === "paused"
-                      ? "Paused"
-                      : player.voiceEnabled
-                        ? "Playing · browser voice"
-                        : "Playing · text only"}
-              </span>
-              <span className="shrink-0">
-                {Math.floor(player.elapsed / 1000)} / {AI_INTRO_DURATION / 1000}s
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {player.status === "playing" ? (
-                <Button onClick={player.pause} className="min-h-11">
-                  <Pause /> Pause
-                </Button>
-              ) : (
-                <Button onClick={player.play} className="min-h-11">
-                  <Play />
-                  {player.status === "paused"
-                    ? "Resume"
-                    : player.status === "ended"
-                      ? "Play again"
-                      : "Play intro"}
-                </Button>
-              )}
-              <Button
-                variant="outline"
-                size="icon"
-                className="min-h-11 min-w-11"
-                onClick={replay}
-                aria-label="Replay introduction"
-                title="Replay introduction"
-              >
-                <RotateCcw />
-              </Button>
-              <DialogClose asChild>
-                <Button variant="ghost" className="min-h-11">
-                  Skip / close <ArrowRight />
-                </Button>
-              </DialogClose>
-            </div>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={speaking ? pauseVoice : playVoice} disabled={!intro.trim() || loading}>
+              {speaking ? <Pause /> : <Play />} {speaking ? "Pause voice" : "Play introduction"}
+            </Button>
+            <Button variant="outline" className="min-h-11" onClick={playVoice} disabled={!intro.trim() || loading}>
+              <RotateCcw /> Replay
+            </Button>
+            <span className="flex items-center gap-2 text-xs text-muted-foreground"><Volume2 className="size-4" /> Optional device voice</span>
           </div>
         </div>
       </div>
-      <div className="border-y border-border py-4">
-        <label className="flex min-h-11 items-center gap-3 text-sm">
-          <input
-            type="checkbox"
-            className="size-4 accent-primary"
-            checked={player.voiceEnabled}
-            disabled={!player.voiceAvailable}
-            onChange={(event) => player.setVoiceEnabled(event.target.checked)}
-          />
-          <Volume2 className="size-4 text-muted-foreground" /> Intro narration
-        </label>
-        <p className="text-xs leading-5 text-muted-foreground">
-          {player.voiceError
-            ? "Browser voice could not play. The text introduction remains available."
-            : !player.voiceAvailable
-              ? "Browser voice is unavailable here. Read the transcript or play the text introduction."
-              : "Optional device voice. Not Abhishek’s voice, a cloned voice, or lip-synced video."}
-        </p>
-      </div>
-      <div>
-        <h3 className="mb-3 font-sans text-sm font-semibold">Full transcript</h3>
-        <div className="space-y-3 text-sm leading-6 text-muted-foreground">
-          {AI_INTRO_SEGMENTS.map((part, index) => (
-            <p
-              key={index}
-              className={
-                player.status !== "ready" && index === player.segmentIndex
-                  ? "border-l-2 border-primary pl-3 text-foreground"
-                  : "border-l-2 border-transparent pl-3"
-              }
-            >
-              {part.text}
-            </p>
-          ))}
-        </div>
-      </div>
+      <p className="border-y border-border py-3 text-xs leading-5 text-muted-foreground">
+        The introduction is generated from the current published portfolio data each time this panel opens. Browser narration uses an available device voice; it is not a cloned voice.
+      </p>
     </>
   );
 }
@@ -183,21 +151,24 @@ function IntroPlayer() {
 export function AiIntro({ compact = false }: { compact?: boolean }) {
   const [open, setOpen] = useState(false);
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(next) => {
+      setOpen(next);
+      if (!next && "speechSynthesis" in window) window.speechSynthesis.cancel();
+    }}>
       <DialogTrigger asChild>
         <Button variant="outline" className={`min-h-11 ${compact ? "text-xs" : "px-5"}`}>
           <Bot /> Meet my AI intro
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90svh] w-[calc(100%-2rem)] max-w-2xl overflow-y-auto rounded-lg p-5 sm:p-7">
-        <DialogTitle className="pr-9 font-display text-3xl leading-tight">
-          Meet Abhishek
-        </DialogTitle>
+        <DialogTitle className="pr-9 font-display text-3xl leading-tight">Meet Abhishek</DialogTitle>
         <DialogDescription className="pr-4 text-xs leading-5">
-          A first-person introduction from verified portfolio facts, presented by an AI portfolio
-          host.
+          A live, profile-aware introduction generated from verified portfolio information.
         </DialogDescription>
-        {open && <IntroPlayer />}
+        {open && <DynamicIntroPlayer />}
+        <DialogClose asChild>
+          <Button variant="ghost" className="min-h-11"><ArrowRight /> Close introduction</Button>
+        </DialogClose>
       </DialogContent>
     </Dialog>
   );
