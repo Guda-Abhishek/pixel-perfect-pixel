@@ -127,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/people/$person/projects/$slug': typeof PeoplePersonProjectsSlugRoute
 }
 export interface FileRoutesByTo {
+  '/people/$person/': typeof PeoplePersonIndexRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/certifications': typeof CertificationsRoute
@@ -143,6 +144,7 @@ export interface FileRoutesByTo {
   '/people/$person/projects/$slug': typeof PeoplePersonProjectsSlugRoute
 }
 export interface FileRoutesById {
+  '/people/$person/': typeof PeoplePersonIndexRoute
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
@@ -191,6 +193,7 @@ export interface FileRouteTypes {
     | '/skills'
     | '/api/chat'
     | '/people/$person'
+    | '/people/$person/'
     | '/projects/$slug'
     | '/projects'
     | '/people/$person/$section'
@@ -208,6 +211,7 @@ export interface FileRouteTypes {
     | '/skills'
     | '/api/chat'
     | '/people/$person'
+    | '/people/$person/'
     | '/projects/$slug'
     | '/projects/'
     | '/people/$person/$section'
