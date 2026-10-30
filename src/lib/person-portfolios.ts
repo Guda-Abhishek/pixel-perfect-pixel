@@ -408,7 +408,7 @@ const bava: PersonPortfolio = {
     "Entry-level Data Analyst with a B.Tech in Information Technology and experience as a Data Analytics Intern and team lead. Skilled in data analysis, data validation, visualization, and KPI reporting using Microsoft Excel, SQL, Power BI, and Python. Focused on accuracy, consistency, structured problem-solving, and communicating useful findings from business data.",
   email: "anjinikumaretikala@gmail.com",
   phone: "+91 6303392505",
-  socialLabels: [{ platform: "LinkedIn", handle: "Anjini Kumar" }],
+  socialLabels: [],
   strengths: [
     { title: "Reliable data quality", text: "Data validation · Quality checking · KPI tracking" },
     { title: "Dashboards that explain", text: "Power BI · Excel · Plotly · Chart.js" },
