@@ -118,7 +118,6 @@ export function PersonShell({
           <PersonLink
             person={profile.id}
             className="person-brand"
-            aria-label="GA — portfolio home"
           >
             <span>GA</span><i aria-hidden="true">.</i>
           </PersonLink>
