@@ -1655,12 +1655,38 @@ section {
 }
 .person-desktop-nav {
   display: none;
+  flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  gap: clamp(16px, 1.9vw, 30px);
+  gap: clamp(14px, 1.65vw, 28px);
+  padding-inline: 24px;
   font-size: 16px;
   font-weight: 550;
   white-space: nowrap;
+}
+.person-nav-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 12px;
+}
+.person-nav-actions .person-nav-ai {
+  gap: 9px;
+  padding: 8px 4px;
+  font-size: 24px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.person-nav-actions .person-nav-icon {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  border-radius: 7px;
+}
+.person-nav-actions .person-nav-icon svg {
+  width: 23px;
+  height: 23px;
+  stroke-width: 1.8;
 }
 .person-desktop-nav a,
 .person-mobile-nav a,
@@ -1683,6 +1709,9 @@ section {
   color: inherit;
   font: inherit;
   cursor: pointer;
+}
+.person-nav-ai svg {
+  flex: 0 0 auto;
 }
 .person-nav-ai:focus-visible {
   outline: 2px solid var(--primary);
@@ -1862,9 +1891,31 @@ section {
   font-size: 9px;
   color: var(--muted-foreground);
 }
-@media (min-width: 1024px) {
+@media (min-width: 1200px) {
   .person-desktop-nav {
     display: flex;
+  }
+}
+@media (max-width: 1199px) {
+  .person-desktop-nav {
+    display: none;
+  }
+  .person-nav-actions .person-nav-ai {
+    font-size: 20px;
+  }
+}
+@media (max-width: 767px) {
+  .person-nav-actions {
+    gap: 8px;
+  }
+  .person-nav-actions .person-nav-ai {
+    gap: 6px;
+    font-size: 16px;
+  }
+  .person-nav-actions .person-nav-icon {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
   }
 }
 @media (max-width: 767px) {
