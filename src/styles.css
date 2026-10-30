@@ -2137,17 +2137,34 @@ section {
   color: #c084fc;
   background: #18181b;
 }
-.site-nav-talk {
+.site-nav-ai,
+.site-nav-movie,
+.site-nav-talk,
+.site-nav-menu {
   min-height: 44px;
   border-color: #303036;
   background: transparent;
   color: #f4f4f5;
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease;
+}
+.site-nav-movie,
+.site-nav-menu {
+  min-width: 44px;
+}
+.site-nav-ai {
+  font-size: 14px;
+  font-weight: 550;
+}
+.site-nav-talk {
   font-size: 14px;
 }
+.site-nav-ai:hover,
+.site-nav-movie:hover,
 .site-nav-talk:hover,
 .site-nav-menu:hover {
   border-color: #55515e;
   background: #18181b;
+  color: #c084fc;
 }
 .site-mobile-nav {
   border-top: 1px solid #27272a;

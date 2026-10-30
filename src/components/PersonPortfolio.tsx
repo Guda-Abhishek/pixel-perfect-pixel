@@ -1,3 +1,4 @@
+import { PortfolioNavbar } from "@/components/navigation/PortfolioNavbar";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import {
@@ -60,40 +61,6 @@ export function PersonShell({
   profile: PersonPortfolio;
   children: ReactNode;
 }) {
-  const path = useRouterState({ select: (s) => s.location.pathname });
-  const [menu, setMenu] = useState(false);
-  useEffect(() => {
-    setMenu(false);
-  }, [path]);
-  useEffect(() => {
-    const close = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenu(false);
-    };
-    document.addEventListener("keydown", close);
-    return () => document.removeEventListener("keydown", close);
-  }, []);
-  const nav = (
-    <>
-      <PersonLink
-        person={profile.id}
-        className={path === `/people/${profile.id}` ? "person-nav-active" : undefined}
-      >
-        Home
-      </PersonLink>
-      {PERSON_SECTIONS.map((section) => (
-        <PersonLink
-          key={section.id}
-          person={profile.id}
-          section={section.id}
-          className={
-            path.startsWith(`/people/${profile.id}/${section.id}`) ? "person-nav-active" : undefined
-          }
-        >
-          {section.label}
-        </PersonLink>
-      ))}
-    </>
-  );
   return (
     <div className={`site-shell person-shell person-${profile.id}`}>
       <a
@@ -102,58 +69,7 @@ export function PersonShell({
       >
         Skip to content
       </a>
-      <header className="site-nav">
-        <div className="site-container flex min-h-20 items-center justify-between gap-4">
-          <PersonLink
-            person={profile.id}
-            className="person-brand"
-          >
-            <span>GA</span><i aria-hidden="true">.</i>
-          </PersonLink>
-          <nav aria-label={`${profile.displayName} navigation`} className="person-desktop-nav">
-            {nav}
-          </nav>
-          <div className="person-nav-actions">
-            <button
-              type="button"
-              className="person-nav-ai"
-              onClick={() => {
-                setMenu(false);
-                window.dispatchEvent(new Event("portfolio:open-ai-intro"));
-              }}
-            >
-              <Bot size={20} aria-hidden="true" />
-              <span>AI Intro</span>
-            </button>
-            <Button asChild variant="outline" size="icon" className="person-nav-icon">
-              <Link to="/profiles" aria-label="Switch profiles" title="Switch profiles">
-                <Clapperboard />
-              </Link>
-            </Button>
-            <Button
-              variant="outline"
-              size="icon"
-              className="person-nav-icon"
-              aria-label={menu ? "Close navigation" : "Open navigation"}
-              aria-expanded={menu}
-              aria-controls="person-navigation"
-              onClick={() => setMenu(!menu)}
-            >
-              {menu ? <X /> : <Menu />}
-            </Button>
-          </div>
-        </div>
-        {menu && (
-          <nav
-            id="person-navigation"
-            aria-label="Mobile portfolio navigation"
-            className="person-mobile-nav site-container"
-          >
-            {nav}
-            <Link to="/profiles">Switch profiles</Link>
-          </nav>
-        )}
-      </header>
+      <PortfolioNavbar person={profile} />
       <div id="person-content">{children}</div>
       <PersonPortfolioAssistant profile={profile} />
       <footer className="site-footer">
@@ -185,7 +101,8 @@ export function PersonUnavailable({
 }) {
   return (
     <div className="site-shell person-shell">
-      <div className="site-container flex min-h-svh flex-col items-center justify-center py-12 text-center">
+      <PortfolioNavbar />
+      <div className="site-container flex min-h-[calc(100svh-92px)] flex-col items-center justify-center py-12 text-center">
         <span className="person-coming-mark" aria-hidden="true">
           {person === "bava" ? "A" : "?"}
         </span>
