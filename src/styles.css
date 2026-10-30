@@ -1637,10 +1637,30 @@ section {
   --card: oklch(0.211 0.006 285.9);
   --secondary: oklch(0.23 0.008 285);
 }
+.person-brand {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.075em;
+  color: #f5f5f7;
+}
+.person-brand i {
+  color: #e50914;
+  font-style: normal;
+  letter-spacing: -0.08em;
+}
 .person-desktop-nav {
   display: none;
-  gap: 16px;
-  font-size: 11px;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(16px, 1.9vw, 30px);
+  font-size: 16px;
+  font-weight: 550;
+  white-space: nowrap;
 }
 .person-desktop-nav a,
 .person-mobile-nav a,
@@ -1842,7 +1862,7 @@ section {
   font-size: 9px;
   color: var(--muted-foreground);
 }
-@media (min-width: 1280px) {
+@media (min-width: 1024px) {
   .person-desktop-nav {
     display: flex;
   }
@@ -1883,12 +1903,17 @@ section {
     font-size: 30px;
   }
 }
+@media (max-width: 1023px) {
+  .person-brand {
+    font-size: 34px;
+  }
+}
 @media (max-width: 359px) {
   .person-name {
     font-size: 46px;
   }
-  .person-shell .series-logo {
-    font-size: 25px;
+  .person-brand {
+    font-size: 30px;
   }
 }
 @media (prefers-reduced-motion: reduce) {
