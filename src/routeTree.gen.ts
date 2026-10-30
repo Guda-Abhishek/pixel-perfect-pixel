@@ -124,7 +124,7 @@ export interface FileRoutesByTo {
   '/projects/$slug': typeof ProjectsSlugRoute
   '/projects': typeof ProjectsIndexRoute
   '/people/$person/$section': typeof PeoplePersonSectionRoute
-  '/people/$person': typeof PeoplePersonIndexRoute
+  '/people/$person': typeof PeoplePersonRouteWithChildren
   '/people/$person/projects/$slug': typeof PeoplePersonProjectsSlugRoute
 }
 export interface FileRoutesById {
@@ -152,7 +152,6 @@ export interface FileRouteTypes {
     | '/certifications'
     | '/contact'
     | '/experience'
-    | '/portfolio'
     | '/profiles'
     | '/projects'
     | '/skills'
@@ -161,7 +160,6 @@ export interface FileRouteTypes {
     | '/projects/$slug'
     | '/projects/'
     | '/people/$person/$section'
-    | '/people/$person/'
     | '/people/$person/projects/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -349,7 +347,6 @@ const rootRouteChildren: RootRouteChildren = {
   CertificationsRoute: CertificationsRoute,
   ContactRoute: ContactRoute,
   ExperienceRoute: ExperienceRoute,
-  PortfolioRoute: PortfolioRoute,
   ProfilesRoute: ProfilesRoute,
   ProjectsRoute: ProjectsRouteWithChildren,
   SkillsRoute: SkillsRoute,
