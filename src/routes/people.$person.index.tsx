@@ -7,7 +7,7 @@ export const Route = createFileRoute("/people/$person/")({
       params.person,
       "Home",
       getPersonPortfolio(params.person)?.story ??
-        "A demo portfolio for Anjini (Bava), with resume-based details to be confirmed.",
+        "Anjini Kumar’s data analytics portfolio featuring data quality, KPI reporting, dashboards, Python, SQL, and AI-assisted analysis.",
       `/people/${params.person}`,
     ),
   component: Home,
