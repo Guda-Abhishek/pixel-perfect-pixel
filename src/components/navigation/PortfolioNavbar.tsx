@@ -133,7 +133,7 @@ export function PortfolioNavbar({ person }: PortfolioNavbarProps) {
           >
             <Link
               to={isPerson && personId ? `/people/${personId}` : "/portfolio"}
-              {...(!isPerson ? { search: { profile: "guest" as const } } : {})}
+              search={{ profile: "guest" }}
               aria-label={`Explore ${person?.displayName ?? "The Series"} cinematic portfolio`}
             >
               <Clapperboard className="size-4" aria-hidden="true" />
@@ -221,7 +221,7 @@ export function PortfolioNavbar({ person }: PortfolioNavbarProps) {
           >
             <Link
               to={isPerson && personId ? `/people/${personId}` : "/portfolio"}
-              {...(!isPerson ? { search: { profile: "guest" as const } } : {})}
+              search={{ profile: "guest" }}
               onClick={() => setMenu(false)}
             >
               <Clapperboard className="size-4" aria-hidden="true" />
