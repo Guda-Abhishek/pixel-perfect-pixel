@@ -199,16 +199,20 @@ export function PersonUnavailable({
 function ContactActions({ profile }: { profile: PersonPortfolio }) {
   return (
     <>
-      <Button asChild className="min-h-11">
-        <a href={`mailto:${profile.email}`}>
-          <Mail /> Email {profile.displayName}
-        </a>
-      </Button>
-      <Button asChild variant="outline" className="min-h-11">
-        <a href={`tel:${profile.phone.replaceAll(" ", "")}`}>
-          <Phone /> Call {profile.displayName}
-        </a>
-      </Button>
+      {profile.email && (
+        <Button asChild className="min-h-11">
+          <a href={`mailto:${profile.email}`}>
+            <Mail /> Email {profile.displayName}
+          </a>
+        </Button>
+      )}
+      {profile.phone && (
+        <Button asChild variant="outline" className="min-h-11">
+          <a href={`tel:${profile.phone.replaceAll(" ", "")}`}>
+            <Phone /> Call {profile.displayName}
+          </a>
+        </Button>
+      )}
     </>
   );
 }
@@ -262,20 +266,18 @@ export function PersonHome({ profile }: { profile: PersonPortfolio }) {
   return (
     <>
       <section className="person-hero">
-        <img src={backdrop} alt="" className="person-hero-backdrop" fetchPriority="high" />
+        <img src={backdrop} alt="" className="person-hero-backdrop" aria-hidden="true" />
+        <img
+          src={profile.portrait}
+          alt={`${profile.name} portrait`}
+          className="person-hero-portrait"
+          fetchPriority="high"
+          decoding="async"
+          onError={(event) => {
+            event.currentTarget.style.display = "none";
+          }}
+        />
         <div className="person-hero-shade" aria-hidden="true" />
-        <span className="person-hero-monogram relative overflow-hidden" aria-hidden="true">
-          {profile.initials}
-          <img
-            src={profile.portrait}
-            alt=""
-            fetchPriority="high"
-            className="absolute inset-0 size-full object-cover object-center"
-            onError={(event) => {
-              event.currentTarget.style.display = "none";
-            }}
-          />
-        </span>
         <div className="site-container relative z-10 py-14 sm:py-20">
           <Reveal>
             <p className="font-mono text-xs text-primary">
@@ -552,17 +554,23 @@ export function PersonContent({
           <section>
             <h2 className="text-4xl">Let's talk.</h2>
             <div className="mt-7 space-y-5">
-              <a className="person-contact-detail" href={`mailto:${profile.email}`}>
-                <Mail />
-                <span>{profile.email}</span>
-              </a>
-              <a
-                className="person-contact-detail"
-                href={`tel:${profile.phone.replaceAll(" ", "")}`}
-              >
-                <Phone />
-                <span>{profile.phone}</span>
-              </a>
+              {profile.email && (
+                <a className="person-contact-detail" href={`mailto:${profile.email}`}>
+                  <Mail />
+                  <span>{profile.email}</span>
+                </a>
+              )}
+              {profile.phone && (
+                <a className="person-contact-detail" href={`tel:${profile.phone.replaceAll(" ", "")}`}>
+                  <Phone />
+                  <span>{profile.phone}</span>
+                </a>
+              )}
+              {!profile.email && !profile.phone && (
+                <p className="max-w-md text-sm leading-7 text-muted-foreground">
+                  Contact details will be added after the profile information is confirmed.
+                </p>
+              )}
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <ContactActions profile={profile} />
