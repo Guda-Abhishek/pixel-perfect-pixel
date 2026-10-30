@@ -121,10 +121,10 @@ export interface FileRoutesByTo {
   '/profiles': typeof ProfilesRoute
   '/skills': typeof SkillsRoute
   '/api/chat': typeof ApiChatRoute
+  '/people/$person': typeof PeoplePersonRouteWithChildren
   '/projects/$slug': typeof ProjectsSlugRoute
   '/projects': typeof ProjectsIndexRoute
   '/people/$person/$section': typeof PeoplePersonSectionRoute
-  '/people/$person': typeof PeoplePersonRouteWithChildren
   '/people/$person/projects/$slug': typeof PeoplePersonProjectsSlugRoute
 }
 export interface FileRoutesById {
@@ -171,10 +171,10 @@ export interface FileRouteTypes {
     | '/profiles'
     | '/skills'
     | '/api/chat'
+    | '/people/$person'
     | '/projects/$slug'
     | '/projects'
     | '/people/$person/$section'
-    | '/people/$person'
     | '/people/$person/projects/$slug'
   id:
     | '__root__'
