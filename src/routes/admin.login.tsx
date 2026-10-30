@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { LockKeyhole, ShieldCheck } from "lucide-react";
 
 export const Route = createFileRoute("/admin/login")({
@@ -16,7 +16,6 @@ function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const navigate = useNavigate();
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -34,7 +33,7 @@ function AdminLogin() {
         setError(payload.error ?? "Unable to sign in.");
         return;
       }
-      await navigate({ to: "/admin/resumes" });
+      window.location.assign("/admin/resumes");
     } catch {
       setError("Could not connect. Please try again.");
     } finally {
