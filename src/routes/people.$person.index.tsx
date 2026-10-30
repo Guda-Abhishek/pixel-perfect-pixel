@@ -5,9 +5,9 @@ export const Route = createFileRoute("/people/$person/")({
   head: ({ params }) =>
     personHead(
       params.person,
-      params.person === "bava" ? "Coming Soon" : "Home",
+      "Home",
       getPersonPortfolio(params.person)?.story ??
-        "Anjini (Bava) — Portfolio in progress. Resume pending.",
+        "A demo portfolio for Anjini (Bava), with resume-based details to be confirmed.",
       `/people/${params.person}`,
     ),
   component: Home,
