@@ -73,7 +73,8 @@ function DynamicIntroPlayer() {
   useEffect(() => {
     const element = video.current;
     if (!element) return;
-    void element.play().catch(() => undefined);
+    const played = element.play?.();
+    if (played && typeof played.catch === "function") played.catch(() => undefined);
     return () => element.pause();
   }, []);
 
