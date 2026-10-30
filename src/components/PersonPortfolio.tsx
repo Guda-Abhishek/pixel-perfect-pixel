@@ -16,10 +16,12 @@ import {
   Github,
   Linkedin,
   Clapperboard,
+  Bot,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/Reveal";
 import { TechnologyList } from "@/components/TechLogo";
+import { PersonPortfolioAssistant } from "@/components/PersonPortfolioAssistant";
 import {
   PERSON_SECTIONS,
   type PersonPortfolio,
@@ -102,17 +104,28 @@ export function PersonShell({
       </a>
       <header className="site-nav">
         <div className="site-container flex min-h-20 items-center justify-between gap-4">
-          <PersonLink person={profile.id} className="series-logo text-3xl">
-            {profile.displayName.toUpperCase()}
-            <span className="ml-2 font-sans text-[9px] font-normal text-muted-foreground">
-              THE SERIES
-            </span>
+          <PersonLink
+            person={profile.id}
+            className="person-brand"
+          >
+            <span>GA</span><i aria-hidden="true">.</i>
           </PersonLink>
           <nav aria-label={`${profile.displayName} navigation`} className="person-desktop-nav">
             {nav}
           </nav>
-          <div className="flex shrink-0 gap-2">
-            <Button asChild variant="outline" size="icon">
+          <div className="person-nav-actions">
+            <button
+              type="button"
+              className="person-nav-ai"
+              onClick={() => {
+                setMenu(false);
+                window.dispatchEvent(new Event("portfolio:open-ai-intro"));
+              }}
+            >
+              <Bot size={20} aria-hidden="true" />
+              <span>AI Intro</span>
+            </button>
+            <Button asChild variant="outline" size="icon" className="person-nav-icon">
               <Link to="/profiles" aria-label="Switch profiles" title="Switch profiles">
                 <Clapperboard />
               </Link>
@@ -120,7 +133,7 @@ export function PersonShell({
             <Button
               variant="outline"
               size="icon"
-              className="xl:hidden"
+              className="person-nav-icon"
               aria-label={menu ? "Close navigation" : "Open navigation"}
               aria-expanded={menu}
               aria-controls="person-navigation"
@@ -142,6 +155,7 @@ export function PersonShell({
         )}
       </header>
       <div id="person-content">{children}</div>
+      <PersonPortfolioAssistant profile={profile} />
       <footer className="site-footer">
         <div className="site-container">
           <p className="font-mono text-xs text-primary">THE NEXT CHAPTER</p>
@@ -199,16 +213,20 @@ export function PersonUnavailable({
 function ContactActions({ profile }: { profile: PersonPortfolio }) {
   return (
     <>
-      <Button asChild className="min-h-11">
-        <a href={`mailto:${profile.email}`}>
-          <Mail /> Email {profile.displayName}
-        </a>
-      </Button>
-      <Button asChild variant="outline" className="min-h-11">
-        <a href={`tel:${profile.phone.replaceAll(" ", "")}`}>
-          <Phone /> Call {profile.displayName}
-        </a>
-      </Button>
+      {profile.email && (
+        <Button asChild className="min-h-11">
+          <a href={`mailto:${profile.email}`}>
+            <Mail /> Email {profile.displayName}
+          </a>
+        </Button>
+      )}
+      {profile.phone && (
+        <Button asChild variant="outline" className="min-h-11">
+          <a href={`tel:${profile.phone.replaceAll(" ", "")}`}>
+            <Phone /> Call {profile.displayName}
+          </a>
+        </Button>
+      )}
     </>
   );
 }
@@ -262,18 +280,25 @@ export function PersonHome({ profile }: { profile: PersonPortfolio }) {
   return (
     <>
       <section className="person-hero">
-        <img src={backdrop} alt="" className="person-hero-backdrop" fetchPriority="high" />
+        <img src={backdrop} alt="" className="person-hero-backdrop" aria-hidden="true" />
+        <img
+          src={profile.portrait}
+          alt={`${profile.name} portrait`}
+          className="person-hero-portrait"
+          fetchPriority="high"
+          decoding="async"
+          onError={(event) => {
+            event.currentTarget.style.display = "none";
+          }}
+        />
         <div className="person-hero-shade" aria-hidden="true" />
-        <span className="person-hero-monogram" aria-hidden="true">
-          {profile.initials}
-        </span>
         <div className="site-container relative z-10 py-14 sm:py-20">
           <Reveal>
             <p className="font-mono text-xs text-primary">
               {profile.displayName.toUpperCase()} / THE PERSONAL SERIES
             </p>
             <h1 className="person-name mt-6">{profile.name}</h1>
-            <p className="mt-6 max-w-xl text-xl font-semibold leading-8">{profile.headline}</p>
+            <p className="mt-6 max-w-xl text-lg font-semibold leading-7">{profile.headline}</p>
             <p className="mt-5 max-w-lg text-sm leading-7 text-muted-foreground">{profile.story}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild className="min-h-11">
@@ -398,18 +423,52 @@ export function PersonContent({
   };
   return (
     <article className="site-container py-12 sm:py-16">
-      <header className="mb-10 border-b border-border pb-8">
-        <p className="font-mono text-xs text-primary">{profile.name.toUpperCase()} / THE SERIES</p>
-        <h1 className="page-title mt-4">{title}</h1>
-        <p className="mt-5 max-w-2xl text-sm leading-7 text-muted-foreground">
-          {descriptions[section]}
-        </p>
+      <header className="person-section-heading mb-10">
+        <img src={backdrop} alt="" aria-hidden="true" className="person-section-backdrop" />
+        <div className="person-section-heading-copy">
+          <p className="site-page-kicker">{profile.name.toUpperCase()} / THE SERIES</p>
+          <h1 className="site-page-title mt-4">{title}</h1>
+          <p className="site-page-description mt-5">
+            {descriptions[section]}
+          </p>
+        </div>
       </header>
       {section === "about" && (
         <>
           <div className="grid gap-8 md:grid-cols-[1fr_2fr]">
-            <h2 className="text-4xl">{profile.headline}</h2>
-            <p className="text-sm leading-8 text-muted-foreground">{profile.summary}</p>
+            <div>
+              <h2 className="text-4xl">{profile.headline}</h2>
+              <div className="mt-6 overflow-hidden rounded-lg border border-border bg-card">
+                <img
+                  src={profile.portrait}
+                  alt={`${profile.name} — portfolio portrait`}
+                  loading="lazy"
+                  className="max-h-[34rem] w-full object-cover object-center"
+                  onError={(event) => {
+                    event.currentTarget.style.display = "none";
+                  }}
+                />
+              </div>
+            </div>
+            <div>
+              <p className="text-sm leading-8 text-muted-foreground">{profile.summary}</p>
+              {profile.gallery.length > 0 && (
+                <div className="mt-8 grid grid-cols-2 gap-3" aria-label={`${profile.name} photo gallery`}>
+                  {profile.gallery.map((photo) => (
+                    <img
+                      key={photo.src}
+                      src={photo.src}
+                      alt={photo.alt}
+                      loading="lazy"
+                      className="aspect-[4/5] w-full rounded-md border border-border object-cover"
+                      onError={(event) => {
+                        event.currentTarget.style.display = "none";
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           <div className="mt-12">
             <Education profile={profile} />
@@ -512,17 +571,23 @@ export function PersonContent({
           <section>
             <h2 className="text-4xl">Let's talk.</h2>
             <div className="mt-7 space-y-5">
-              <a className="person-contact-detail" href={`mailto:${profile.email}`}>
-                <Mail />
-                <span>{profile.email}</span>
-              </a>
-              <a
-                className="person-contact-detail"
-                href={`tel:${profile.phone.replaceAll(" ", "")}`}
-              >
-                <Phone />
-                <span>{profile.phone}</span>
-              </a>
+              {profile.email && (
+                <a className="person-contact-detail" href={`mailto:${profile.email}`}>
+                  <Mail />
+                  <span>{profile.email}</span>
+                </a>
+              )}
+              {profile.phone && (
+                <a className="person-contact-detail" href={`tel:${profile.phone.replaceAll(" ", "")}`}>
+                  <Phone />
+                  <span>{profile.phone}</span>
+                </a>
+              )}
+              {!profile.email && !profile.phone && (
+                <p className="max-w-md text-sm leading-7 text-muted-foreground">
+                  Contact details will be added after the profile information is confirmed.
+                </p>
+              )}
             </div>
             <div className="mt-8 flex flex-wrap gap-3">
               <ContactActions profile={profile} />
