@@ -25,7 +25,7 @@ npm run dev
 
 ## AI chatbot configuration
 
-The portfolio chatbot API is handled server-side by `src/routes/api/chat.ts`. It supports the OpenAI Responses API and uses `OPENAI_API_KEY` when configured. The existing Lovable AI gateway remains as a fallback through `LOVABLE_API_KEY`.
+The portfolio chatbot API is handled server-side by `src/routes/api/chat.ts` and uses the OpenAI Responses API only. Lovable AI is currently paused and is not used as a fallback.
 
 ### Local development
 
@@ -37,4 +37,4 @@ The portfolio chatbot API is handled server-side by `src/routes/api/chat.ts`. It
 
 ### Deployment
 
-Add `OPENAI_API_KEY` as a **server-side environment secret** in the hosting provider's dashboard, then redeploy. Do not put the secret into frontend build variables. OpenAI API access and usage billing are managed separately from ChatGPT subscriptions.
+Add `OPENAI_API_KEY` as a **server-side environment secret** in the hosting provider's dashboard, then redeploy. Do not put the secret into frontend build variables. No Lovable AI key is needed while Lovable AI is paused. OpenAI API access and usage billing are managed separately from ChatGPT subscriptions.
