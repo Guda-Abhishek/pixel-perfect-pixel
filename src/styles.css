@@ -1787,11 +1787,14 @@ section {
   color: color-mix(in oklab, var(--profile-green) 38%, transparent);
 }
 .person-name {
-  max-width: 720px;
-  font-size: 80px;
+  max-width: 760px;
+  font-family: var(--font-display);
+  font-size: 96px;
   font-weight: 800;
-  line-height: 1;
+  line-height: 0.93;
+  letter-spacing: -0.025em;
   overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 .person-project-art {
   position: relative;
@@ -1937,8 +1940,8 @@ section {
       linear-gradient(90deg, color-mix(in oklab, var(--background) 24%, transparent), transparent);
   }
   .person-name {
-    font-size: 56px;
-    max-width: 480px;
+    font-size: 68px;
+    max-width: 520px;
   }
   .person-hero-monogram {
     font-size: 200px;
