@@ -43,7 +43,7 @@ async function askAi(history: ChatMessage[], onDelta: (t: string) => void, signa
     method: "POST",
     signal,
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ messages: history.map((m) => ({ role: m.role, content: m.content })) }),
+    body: JSON.stringify({ person: "abhishek", page: window.location.pathname, mode: "chat", messages: history.map((m) => ({ role: m.role, content: m.content })) }),
   });
   if (!res.ok || !res.body) throw new Error(String(res.status));
   const reader = res.body.getReader();
