@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
   adminAuthConfigured,
   createAdminCookie,
@@ -11,9 +11,6 @@ const env = {
   PORTFOLIO_ADMIN_SESSION_SECRET: "test-only-session-secret-that-is-long-enough",
 };
 
-afterEach(() => {
-  // Tests pass explicit test secrets; no process environment is modified.
-});
 
 describe("private admin authentication", () => {
   it("requires both server-side secrets", () => {
