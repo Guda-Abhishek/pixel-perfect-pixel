@@ -49,7 +49,7 @@ export function buildRelevantProfileKnowledge(
     profileId: profile.id,
     source: "current profile data; generated on each request",
     relevantSections: chosen.map(({ name, value }) => ({ section: name, facts: value })),
-    unavailableSections: sections.filter((section) => !chosen.some((item) => item.name === section.name)).map((section) => section.name),
+    omittedSections: sections.filter((section) => !chosen.some((item) => item.name === section.name)).map((section) => section.name),
   };
   return JSON.stringify(payload, null, 2);
 }
