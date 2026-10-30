@@ -168,7 +168,6 @@ export interface FileRouteTypes {
     | '/certifications'
     | '/contact'
     | '/experience'
-    | '/portfolio'
     | '/profiles'
     | '/skills'
     | '/api/chat'
@@ -184,7 +183,6 @@ export interface FileRouteTypes {
     | '/certifications'
     | '/contact'
     | '/experience'
-    | '/portfolio'
     | '/profiles'
     | '/projects'
     | '/skills'
@@ -193,7 +191,6 @@ export interface FileRouteTypes {
     | '/projects/$slug'
     | '/projects/'
     | '/people/$person/$section'
-    | '/people/$person/'
     | '/people/$person/projects/$slug'
   fileRoutesById: FileRoutesById
 }
