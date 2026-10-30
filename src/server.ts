@@ -180,6 +180,16 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
     }) : jsonResponse({ updatedAt: null, resumes: [] }, 200);
   }
   if (!(await isAdminRequest(request, env))) return privateNotFound();
+  if (["POST", "DELETE", "PUT", "PATCH"].includes(request.method)) {
+    const origin = request.headers.get("origin");
+    if (!origin || origin !== new URL(request.url).origin) return privateNotFound();
+  }
+  if (path === "/api/admin/resumes" && request.method === "POST") {
+    const contentLength = Number(request.headers.get("content-length") ?? "0");
+    if (contentLength > MAX_RESUME_BYTES + 1024 * 1024) {
+      return jsonResponse({ error: "Upload exceeds the 10 MB limit." }, 413);
+    }
+  }
   const bucket = (env as AdminEnv | undefined)?.RESUME_BUCKET;
   if (!bucket) return bucketNotConfigured();
 
