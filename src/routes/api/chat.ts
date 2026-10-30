@@ -20,69 +20,139 @@ export const Route = createFileRoute("/api/chat")({
       POST: async ({ request }) => {
         const parsed = body.safeParse(await request.json().catch(() => null));
         if (!parsed.success) return Response.json({ error: "Invalid request" }, { status: 400 });
-        const profile = parsed.data.person && parsed.data.person !== "abhishek" ? getPersonPortfolio(parsed.data.person) : undefined;
-        if (parsed.data.person && parsed.data.person !== "abhishek" && !profile) return Response.json({ error: "Unknown portfolio" }, { status: 400 });
+
+        const profile = parsed.data.person && parsed.data.person !== "abhishek"
+          ? getPersonPortfolio(parsed.data.person)
+          : undefined;
+        if (parsed.data.person && parsed.data.person !== "abhishek" && !profile) {
+          return Response.json({ error: "Unknown portfolio" }, { status: 400 });
+        }
+
         const profilePrompt = profile
           ? [
-              `You are the portfolio assistant for ${profile.name} (${profile.nickname}). Answer visitors' questions in a friendly, concise way (under 150 words) using ONLY the verified portfolio facts below. Never invent employers, dates, metrics, credentials, links, personal details or project details. If a detail is marked to be confirmed or resume pending, say so clearly. Use the current verified profile data below as the source of truth for each request. The Bava profile now contains Anjini Kumar’s resume-based details; do not treat it as a demo profile. Do not ask for sensitive personal information.`,
+              `You are the portfolio assistant for ${profile.name} (${profile.nickname}). Answer visitors' questions in a friendly, concise way (under 150 words) using ONLY the verified portfolio facts below. Never invent employers, dates, metrics, credentials, links, personal details or project details. If a detail is marked to be confirmed or resume pending, say so clearly. Use the current verified profile data below as the source of truth for each request. The Bava profile now contains Anjini Kumar’s resume-based details; do not treat it as a demo profile. Do not ask for sensitive personal information. Never use markdown link syntax — write plain emails and URLs.`,
               `CURRENT PAGE CONTEXT: ${parsed.data.page ?? "not provided"}`,
-              parsed.data.mode === "intro" ? "Create a warm, natural spoken AI introduction of about 90–130 words using the verified profile facts. Introduce professional focus, education, strongest skills, experience, and one or two projects. Make clear this is an AI presenting the portfolio, not the person or a cloned voice. Do not invent facts." : "Answer as a concise, friendly portfolio AI assistant using only the verified facts below. If information is missing, say so.",
+              parsed.data.mode === "intro"
+                ? "Create a warm, natural spoken AI introduction of about 90–130 words using the verified profile facts. Introduce professional focus, education, strongest skills, experience, and one or two projects. Make clear this is an AI presenting the portfolio, not the person or a cloned voice. Do not invent facts."
+                : "Answer as a concise, friendly portfolio AI assistant using only the verified facts below. If information is missing, say so.",
               "CURRENT VERIFIED PORTFOLIO DATA (generated from the profile source of truth on every request):",
-              buildRelevantProfileKnowledge(profile, parsed.data.messages.filter((message) => message.role === "user").at(-1)?.content ?? "", parsed.data.mode === "intro" ? "intro" : "chat"),
+              buildRelevantProfileKnowledge(
+                profile,
+                parsed.data.messages.filter((message) => message.role === "user").at(-1)?.content ?? "",
+                parsed.data.mode === "intro" ? "intro" : "chat",
+              ),
             ].join("\n")
           : parsed.data.mode === "intro"
             ? `${SYSTEM_PROMPT}\n\nCreate a warm, natural spoken AI introduction of about 90–130 words using only the verified Abhishek portfolio facts above. Introduce professional focus, education, experience, strongest skills, and one or two projects. Make clear this is an AI presenting the portfolio, not Abhishek himself or a cloned voice. Current page: ${parsed.data.page ?? "not provided"}.`
             : `${SYSTEM_PROMPT}\n\nCurrent page context: ${parsed.data.page ?? "not provided"}. Use the verified portfolio facts above as the source of truth for this response.`;
-        const key = process.env["LOVABLE_API_KEY"];
-        if (!key) return Response.json({ error: "AI not configured" }, { status: 503 });
-        const upstream = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${key}`,
-            "Lovable-API-Key": key,
-            "X-Lovable-AIG-SDK": "fetch",
-          },
-          body: JSON.stringify({
-            model: "openai/gpt-6-astra",
-            stream: true,
-            store: false,
-            reasoning: { effort: "low" },
-            instructions: profilePrompt,
-            input: parsed.data.messages.map((m) => ({ role: m.role, content: m.content })),
-          }),
-        });
-        if (!upstream.ok || !upstream.body) {
-          const text = await upstream.text().catch(() => "");
+
+        // Prefer a server-side OpenAI key when configured; retain the existing
+        // Lovable gateway as a backwards-compatible fallback.
+        const openAiKey = process.env["OPENAI_API_KEY"];
+        const lovableKey = process.env["LOVABLE_API_KEY"];
+        if (!openAiKey && !lovableKey) {
           return Response.json(
-            { error: text.slice(0, 300) || "AI request failed" },
-            { status: upstream.status || 502 },
+            { error: "AI is not configured. Add OPENAI_API_KEY to the deployment's server-side environment secrets, then redeploy." },
+            { status: 503 },
           );
         }
-        const dec = new TextDecoder();
-        const enc = new TextEncoder();
-        let buf = "";
+
+        const useOpenAI = Boolean(openAiKey);
+        const endpoint = useOpenAI
+          ? "https://api.openai.com/v1/responses"
+          : "https://ai.gateway.lovable.dev/v1/responses";
+        const key = openAiKey ?? lovableKey!;
+        const model = useOpenAI ? "gpt-4.1-mini" : "openai/gpt-6-astra";
+        const abortController = new AbortController();
+        const timeout = setTimeout(() => abortController.abort(), 45_000);
+
+        let upstream: Response;
+        try {
+          upstream = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${key}`,
+              ...(useOpenAI ? {} : {
+                "Lovable-API-Key": key,
+                "X-Lovable-AIG-SDK": "fetch",
+              }),
+            },
+            body: JSON.stringify({
+              model,
+              stream: true,
+              store: false,
+              ...(useOpenAI ? {} : { reasoning: { effort: "low" } }),
+              instructions: profilePrompt,
+              input: parsed.data.messages.map((message) => ({
+                role: message.role,
+                content: message.content,
+              })),
+            }),
+            signal: abortController.signal,
+          });
+        } catch (error) {
+          clearTimeout(timeout);
+          const message = error instanceof Error && error.name === "AbortError"
+            ? "The AI request timed out. Please try again."
+            : "Could not connect to the AI service. Please try again shortly.";
+          return Response.json({ error: message }, { status: 502 });
+        }
+
+        if (!upstream.ok || !upstream.body) {
+          clearTimeout(timeout);
+          const status = upstream.status || 502;
+          const upstreamText = await upstream.text().catch(() => "");
+          // Avoid returning raw provider errors that may contain implementation details.
+          const message = status === 401 || status === 403
+            ? "The AI provider rejected its server API key. Check the deployment secret and provider access."
+            : status === 429
+              ? "The AI service is rate-limited or out of available quota. Check the API billing and usage limits."
+              : "The AI service could not complete the request. Please try again.";
+          console.error("Portfolio chat provider error", { provider: useOpenAI ? "openai" : "lovable", status, detail: upstreamText.slice(0, 500) });
+          return Response.json({ error: message }, { status: status >= 400 && status < 600 ? status : 502 });
+        }
+
+        const decoder = new TextDecoder();
+        const encoder = new TextEncoder();
+        let buffer = "";
         const stream = upstream.body.pipeThrough(
           new TransformStream<Uint8Array, Uint8Array>({
-            transform(chunk, ctrl) {
-              buf += dec.decode(chunk, { stream: true });
-              const lines = buf.split("\n");
-              buf = lines.pop() ?? "";
+            transform(chunk, controller) {
+              buffer += decoder.decode(chunk, { stream: true });
+              const lines = buffer.split("\n");
+              buffer = lines.pop() ?? "";
               for (const line of lines) {
                 if (!line.startsWith("data:")) continue;
+                const data = line.slice(5).trim();
+                if (!data || data === "[DONE]") continue;
                 try {
-                  const ev = JSON.parse(line.slice(5).trim());
-                  if (ev.type === "response.output_text.delta" && ev.delta)
-                    ctrl.enqueue(enc.encode(ev.delta));
+                  const event = JSON.parse(data);
+                  if (event.type === "response.output_text.delta" && event.delta) {
+                    controller.enqueue(encoder.encode(event.delta));
+                  } else if (event.type === "error" || event.type === "response.failed") {
+                    console.error("Portfolio chat stream error", {
+                      provider: useOpenAI ? "openai" : "lovable",
+                      detail: JSON.stringify(event).slice(0, 500),
+                    });
+                  }
                 } catch {
-                  /* ignore non-JSON */
+                  // Ignore non-JSON SSE messages.
                 }
               }
             },
+            flush() {
+              clearTimeout(timeout);
+            },
           }),
         );
+
         return new Response(stream, {
-          headers: { "Content-Type": "text/plain; charset=utf-8", "Cache-Control": "no-cache" },
+          headers: {
+            "Content-Type": "text/plain; charset=utf-8",
+            "Cache-Control": "no-cache, no-transform",
+            "X-Content-Type-Options": "nosniff",
+          },
         });
       },
     },
