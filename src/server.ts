@@ -65,10 +65,10 @@ function jsonResponse(body: unknown, status: number, headers?: HeadersInit): Res
   });
 }
 
-async function handleAdminAuth(request: Request): Promise<Response | null> {
+async function handleAdminAuth(request: Request, env: unknown): Promise<Response | null> {
   const path = normalizedPath(request);
   if (path === "/api/admin/login" && request.method === "POST") {
-    if (!adminAuthConfigured()) {
+    if (!adminAuthConfigured(env)) {
       console.error("Admin authentication is disabled: required server secrets are missing.");
       return jsonResponse({ error: "Admin authentication is not configured." }, 503);
     }
@@ -87,7 +87,7 @@ async function handleAdminAuth(request: Request): Promise<Response | null> {
 
     const payload = await request.json().catch(() => null) as { password?: unknown } | null;
     const password = typeof payload?.password === "string" ? payload.password : "";
-    const valid = password.length > 0 && password.length <= 1024 && await verifyAdminPassword(password);
+    const valid = password.length > 0 && password.length <= 1024 && await verifyAdminPassword(password, env);
     if (!valid) {
       loginAttempts.set(clientKey, current && current.resetAt > now
         ? { count: current.count + 1, resetAt: current.resetAt }
@@ -96,7 +96,7 @@ async function handleAdminAuth(request: Request): Promise<Response | null> {
     }
 
     loginAttempts.delete(clientKey);
-    const cookie = await createAdminCookie();
+    const cookie = await createAdminCookie(env);
     if (!cookie) return jsonResponse({ error: "Admin authentication is not configured." }, 503);
     return jsonResponse({ ok: true }, 200, {
       "set-cookie": adminCookieHeader(cookie, new URL(request.url).protocol === "https:"),
@@ -106,14 +106,14 @@ async function handleAdminAuth(request: Request): Promise<Response | null> {
   if (path === "/api/admin/logout" && request.method === "POST") {
     const origin = request.headers.get("origin");
     if (!origin || origin !== new URL(request.url).origin) return privateNotFound();
-    if (!(await isAdminRequest(request))) return privateNotFound();
+    if (!(await isAdminRequest(request, env))) return privateNotFound();
     return jsonResponse({ ok: true }, 200, {
       "set-cookie": clearAdminCookieHeader(new URL(request.url).protocol === "https:"),
     });
   }
 
   if (path === "/api/admin/session" && request.method === "GET") {
-    if (!(await isAdminRequest(request))) return privateNotFound();
+    if (!(await isAdminRequest(request, env))) return privateNotFound();
     return jsonResponse({ authenticated: true }, 200);
   }
 
@@ -302,7 +302,7 @@ export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
     const path = normalizedPath(request);
     const isAdmin = isAdminPath(path);
-    const authResponse = await handleAdminAuth(request);
+    const authResponse = await handleAdminAuth(request, env);
     if (authResponse) return authResponse;
     const resumeResponse = await handleResumeApi(request, env);
     if (resumeResponse) return resumeResponse;
