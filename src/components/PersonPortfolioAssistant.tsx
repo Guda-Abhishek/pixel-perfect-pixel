@@ -32,6 +32,12 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
   }, [messages, busy]);
 
+  useEffect(() => {
+    const openAssistant = () => setOpen(true);
+    window.addEventListener("portfolio:open-ai-assistant", openAssistant);
+    return () => window.removeEventListener("portfolio:open-ai-assistant", openAssistant);
+  }, []);
+
   useEffect(() => () => {
     controller.current?.abort();
     if ("speechSynthesis" in window) window.speechSynthesis.cancel();
