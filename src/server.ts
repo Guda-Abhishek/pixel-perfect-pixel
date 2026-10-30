@@ -121,6 +121,156 @@ async function handleAdminAuth(request: Request): Promise<Response | null> {
 }
 
 
+type ResumeRecord = {
+  id: string;
+  filename: string;
+  contentType: string;
+  size: number;
+  uploadedAt: string;
+  status: "pending" | "approved";
+  displayName: string;
+  headline: string;
+  summary: string;
+  skills: string[];
+};
+
+type PrivateBucket = {
+  get(key: string): Promise<{ json<T>(): Promise<T>; arrayBuffer(): Promise<ArrayBuffer>; httpMetadata?: { contentType?: string } } | null>;
+  put(key: string, value: ArrayBuffer | string | Uint8Array, options?: { httpMetadata?: { contentType?: string } }): Promise<unknown>;
+  delete(key: string): Promise<unknown>;
+};
+
+type AdminEnv = {
+  RESUME_BUCKET?: PrivateBucket;
+};
+
+const RESUME_INDEX_KEY = "private-admin/resumes/index.json";
+const MAX_RESUME_BYTES = 10 * 1024 * 1024;
+const ALLOWED_RESUME_TYPES = new Set([
+  "application/pdf",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+]);
+
+async function readResumeIndex(bucket: PrivateBucket): Promise<ResumeRecord[]> {
+  const object = await bucket.get(RESUME_INDEX_KEY);
+  if (!object) return [];
+  const records = await object.json<unknown>();
+  return Array.isArray(records) ? records as ResumeRecord[] : [];
+}
+
+async function writeResumeIndex(bucket: PrivateBucket, records: ResumeRecord[]): Promise<void> {
+  await bucket.put(RESUME_INDEX_KEY, JSON.stringify(records), {
+    httpMetadata: { contentType: "application/json; charset=utf-8" },
+  });
+}
+
+function bucketNotConfigured(): Response {
+  return jsonResponse({ error: "Private resume storage is not configured." }, 503);
+}
+
+async function handleResumeApi(request: Request, env: unknown): Promise<Response | null> {
+  const path = normalizedPath(request);
+  if (!path.startsWith("/api/admin/resumes") && path !== "/api/admin/published-resumes") return null;
+  if (!(await isAdminRequest(request))) return privateNotFound();
+  const bucket = (env as AdminEnv | undefined)?.RESUME_BUCKET;
+  if (!bucket) return bucketNotConfigured();
+
+  if (path === "/api/admin/resumes" && request.method === "GET") {
+    return jsonResponse({ resumes: await readResumeIndex(bucket) }, 200);
+  }
+
+  if (path === "/api/admin/resumes" && request.method === "POST") {
+    const form = await request.formData().catch(() => null);
+    const file = form?.get("file");
+    if (!(file instanceof File)) return jsonResponse({ error: "Choose a PDF or DOCX resume." }, 400);
+    const type = file.type || (file.name.toLowerCase().endsWith(".pdf")
+      ? "application/pdf"
+      : file.name.toLowerCase().endsWith(".docx")
+        ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        : "");
+    if (!ALLOWED_RESUME_TYPES.has(type)) return jsonResponse({ error: "Only PDF and DOCX files are allowed." }, 415);
+    if (file.size <= 0 || file.size > MAX_RESUME_BYTES) return jsonResponse({ error: "File must be between 1 byte and 10 MB." }, 413);
+    const safeName = file.name.replace(/[^a-zA-Z0-9._ -]/g, "_").slice(0, 120) || "resume";
+    const id = crypto.randomUUID();
+    const key = `private-admin/resumes/files/${id}`;
+    await bucket.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: type } });
+    const records = await readResumeIndex(bucket);
+    records.push({
+      id, filename: safeName, contentType: type, size: file.size,
+      uploadedAt: new Date().toISOString(), status: "pending",
+      displayName: safeName.replace(/\.(pdf|docx)$/i, ""),
+      headline: "", summary: "", skills: [],
+    });
+    await writeResumeIndex(bucket, records);
+    return jsonResponse({ resume: records[records.length - 1] }, 201);
+  }
+
+  const match = path.match(/^\/api\/admin\/resumes\/([a-f0-9-]+)(?:\/(download|publish))?$/);
+  if (match) {
+    const [, id, action] = match;
+    const records = await readResumeIndex(bucket);
+    const index = records.findIndex((record) => record.id === id);
+    if (index < 0) return privateNotFound();
+    const record = records[index];
+    const fileKey = `private-admin/resumes/files/${id}`;
+
+    if (action === "download" && request.method === "GET") {
+      const object = await bucket.get(fileKey);
+      if (!object) return privateNotFound();
+      const bytes = await object.arrayBuffer();
+      return new Response(bytes, { headers: {
+        "content-type": record.contentType,
+        "content-disposition": `attachment; filename="${record.filename.replace(/["\\\\]/g, "_")}"`,
+        "cache-control": "private, no-store",
+        "x-content-type-options": "nosniff",
+      } });
+    }
+
+    if (action === "publish" && request.method === "POST") {
+      const payload = await request.json().catch(() => null) as Partial<ResumeRecord> | null;
+      if (!payload || typeof payload.displayName !== "string" || typeof payload.headline !== "string" ||
+          typeof payload.summary !== "string" || !Array.isArray(payload.skills) ||
+          payload.skills.some((skill) => typeof skill !== "string")) {
+        return jsonResponse({ error: "Provide valid reviewed resume details." }, 400);
+      }
+      records[index] = {
+        ...record,
+        displayName: payload.displayName.slice(0, 120),
+        headline: payload.headline.slice(0, 180),
+        summary: payload.summary.slice(0, 3000),
+        skills: payload.skills.slice(0, 60).map((skill) => skill.slice(0, 80)),
+        status: "approved",
+      };
+      await writeResumeIndex(bucket, records);
+      await bucket.put("public/approved-resumes.json", JSON.stringify({
+        updatedAt: new Date().toISOString(),
+        resumes: records.filter((item) => item.status === "approved").map(({ id, displayName, headline, summary, skills }) => ({ id, displayName, headline, summary, skills })),
+      }), { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-store" } } as { httpMetadata?: { contentType?: string } });
+      return jsonResponse({ resume: records[index] }, 200);
+    }
+
+    if (request.method === "DELETE" && !action) {
+      await bucket.delete(fileKey);
+      records.splice(index, 1);
+      await writeResumeIndex(bucket, records);
+      await bucket.put("public/approved-resumes.json", JSON.stringify({
+        updatedAt: new Date().toISOString(),
+        resumes: records.filter((item) => item.status === "approved").map(({ id, displayName, headline, summary, skills }) => ({ id, displayName, headline, summary, skills })),
+      }), { httpMetadata: { contentType: "application/json; charset=utf-8" } });
+      return jsonResponse({ ok: true }, 200);
+    }
+  }
+
+  if (path === "/api/admin/published-resumes" && request.method === "GET") {
+    const object = await bucket.get("public/approved-resumes.json");
+    return object ? new Response(await object.arrayBuffer(), {
+      headers: { "content-type": "application/json; charset=utf-8", "cache-control": "no-store", "x-content-type-options": "nosniff" },
+    }) : jsonResponse({ updatedAt: null, resumes: [] }, 200);
+  }
+
+  return privateNotFound();
+}
+
 // h3 swallows in-handler throws into a normal 500 Response with body
 // {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
 async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
@@ -153,6 +303,8 @@ export default {
     const isAdmin = isAdminPath(path);
     const authResponse = await handleAdminAuth(request);
     if (authResponse) return authResponse;
+    const resumeResponse = await handleResumeApi(request, env);
+    if (resumeResponse) return resumeResponse;
 
     // The login page is intentionally the only public admin page. Every other
     // admin URL returns the same generic 404 until a valid signed session exists.
