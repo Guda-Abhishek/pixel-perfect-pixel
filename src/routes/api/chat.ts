@@ -27,9 +27,11 @@ export const Route = createFileRoute("/api/chat")({
               `CURRENT PAGE CONTEXT: ${parsed.data.page ?? "not provided"}`,
               parsed.data.mode === "intro" ? "Create a warm, natural spoken AI introduction of about 90–130 words using the verified profile facts. Introduce professional focus, education, strongest skills, experience, and one or two projects. Make clear this is an AI presenting the portfolio, not the person or a cloned voice. Do not invent facts." : "Answer as a concise, friendly portfolio AI assistant using only the verified facts below. If information is missing, say so.",
               "CURRENT VERIFIED PORTFOLIO DATA (generated from the profile source of truth on every request):",
-              JSON.stringify({ name: profile.name, headline: profile.headline, story: profile.story, summary: profile.summary, skills: profile.skills, experience: profile.experience, projects: profile.projects, certifications: profile.certifications, education: profile.education, leadership: profile.leadership, training: profile.training, email: profile.email, phone: profile.phone }, null, 2),
+              JSON.stringify({ id: profile.id, name: profile.name, displayName: profile.displayName, nickname: profile.nickname, headline: profile.headline, story: profile.story, summary: profile.summary, strengths: profile.strengths, skills: profile.skills, experience: profile.experience, projects: profile.projects, certifications: profile.certifications, education: profile.education, leadership: profile.leadership, training: profile.training, email: profile.email, phone: profile.phone, socialLabels: profile.socialLabels }, null, 2),
             ].join("\n")
-          : SYSTEM_PROMPT;
+          : parsed.data.mode === "intro"
+            ? `${SYSTEM_PROMPT}\n\nCreate a warm, natural spoken AI introduction of about 90–130 words using only the verified Abhishek portfolio facts above. Introduce professional focus, education, experience, strongest skills, and one or two projects. Make clear this is an AI presenting the portfolio, not Abhishek himself or a cloned voice. Current page: ${parsed.data.page ?? "not provided"}.`
+            : `${SYSTEM_PROMPT}\n\nCurrent page context: ${parsed.data.page ?? "not provided"}. Use the verified portfolio facts above as the source of truth for this response.`;
         const key = process.env["LOVABLE_API_KEY"];
         if (!key) return Response.json({ error: "AI not configured" }, { status: 503 });
         const upstream = await fetch("https://ai.gateway.lovable.dev/v1/responses", {
