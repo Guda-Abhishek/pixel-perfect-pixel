@@ -121,10 +121,22 @@ export const Route = createFileRoute("/api/chat")({
                   if (event.type === "response.output_text.delta" && event.delta) {
                     controller.enqueue(encoder.encode(event.delta));
                   } else if (event.type === "error" || event.type === "response.failed") {
+                    const providerError = event.error ?? event.response?.error ?? {};
+                    const code = providerError.code ?? providerError.type;
                     console.error("Portfolio chat stream error", {
                       provider: "openai",
+                      code,
                       detail: JSON.stringify(event).slice(0, 500),
                     });
+                    // A 200 SSE response can still fail after streaming starts. Surface a
+                    // useful message instead of returning an empty body that looks successful.
+                    const friendlyError = code === "credit_balance_exhausted" || code === "insufficient_quota"
+                      ? "Live AI is unavailable because the OpenAI API project has no credits remaining. Add API credits in the OpenAI Platform billing settings, then try again. Your portfolio's offline answers are still available."
+                      : code === "rate_limit_exceeded"
+                        ? "Live AI is temporarily rate-limited. Please wait a moment and try again."
+                        : "Live AI could not complete this response. Please try again later.";
+                    controller.enqueue(encoder.encode("\\n\\n" + friendlyError));
+                    controller.terminate();
                   }
                 } catch {
                   // Ignore non-JSON SSE messages.
