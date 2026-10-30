@@ -97,7 +97,7 @@ export function PersonPortfolioAssistant({ profile }: { profile: PersonPortfolio
     } finally {
       setBusy(false);
     }
-    if (speakReplies && answer.trim()) speak(answer);
+    if ((speakReplies || mode === "intro") && answer.trim()) speak(answer);
   }
 
   return (
