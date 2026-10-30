@@ -18,6 +18,38 @@ async function getServerEntry(): Promise<ServerEntry> {
   return serverEntryPromise;
 }
 
+// Keep administration closed by default. There is intentionally no public admin
+// page or login route until server-side authentication and authorization exist.
+// Apply this guard before TanStack renders a route or serves a server handler.
+function isPrivateAdminPath(request: Request): boolean {
+  let pathname = new URL(request.url).pathname;
+  try {
+    pathname = decodeURIComponent(pathname);
+  } catch {
+    // Malformed paths are not allowed to bypass the guard.
+  }
+
+  const normalized = pathname.toLowerCase().replace(/\/+$/, "") || "/";
+  return (
+    normalized === "/admin" ||
+    normalized.startsWith("/admin/") ||
+    normalized === "/api/admin" ||
+    normalized.startsWith("/api/admin/")
+  );
+}
+
+function privateNotFound(): Response {
+  return new Response("Not Found", {
+    status: 404,
+    headers: {
+      "content-type": "text/plain; charset=utf-8",
+      "cache-control": "no-store, max-age=0",
+      "x-content-type-options": "nosniff",
+      "x-robots-tag": "noindex, nofollow, noarchive",
+    },
+  });
+}
+
 // h3 swallows in-handler throws into a normal 500 Response with body
 // {"unhandled":true,"message":"HTTPError"} — try/catch alone never fires for those.
 async function normalizeCatastrophicSsrResponse(response: Response): Promise<Response> {
@@ -46,6 +78,10 @@ function isH3SwallowedErrorBody(body: string): boolean {
 
 export default {
   async fetch(request: Request, env: unknown, ctx: unknown) {
+    // Fail closed: guessing /admin, /admin/resumes, or /api/admin never reaches
+    // the route renderer or any API handler.
+    if (isPrivateAdminPath(request)) return privateNotFound();
+
     try {
       const handler = await getServerEntry();
       const response = await handler.fetch(request, env, ctx);
