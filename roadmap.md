@@ -62,10 +62,10 @@ Testing and validation work is paused by user request. Continue feature implemen
    - [x] Save reviewed metadata as a private pending draft without publishing; moving an approved record back to draft removes it from the public approved-resume feed.
    - [ ] Implement document parsing/extraction with a safe manual-review/edit step before any public approval.
    - [x] Add explicit profile assignment (Abhishek, Amulya, Anjini Kumar or Sai); publishing rejects missing/invalid assignment and excludes unassigned or legacy records from the public feed.
-   - [ ] Connect approved profile-assigned resume metadata to each matching public profile page.
+   - [x] Render approved resume metadata only on its matching public profile homepage, with no source-file links and no changes to the existing hardcoded portfolio facts (commit `5373a93`).
    - [ ] Authentication/session, storage, upload/download/delete and file-boundary validation are deferred while testing is paused.
 4. **EPIC-08 — Dynamic profile updates and publishing**
-   - [ ] Connect approved resume/profile data to the correct public profile without leaking private source documents.
+   - [x] Add a public metadata-only resume highlights section filtered by profile ID; private resume files remain inaccessible from public profile pages (commit `5373a93`).
    - [ ] Verify preview, approval, publish, rollback and local/hosted behavior.
 5. **EPIC-06 — AI assistant, chat and voice**
    - [ ] Verify API configuration, grounded profile-specific answers, streaming/cancellation and honest offline fallback.
