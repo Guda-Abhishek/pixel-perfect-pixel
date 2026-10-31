@@ -1,0 +1,70 @@
+name: Portfolio CI and Artifact Integrity
+
+on:
+  push:
+    branches:
+      - devops-integrity-pipeline
+  pull_request:
+    branches:
+      - dev
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: portfolio-integrity-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      PROJECT_NAME: portfolio
+      GIT_COMMIT: ${{ github.sha }}
+      BUILD_NUMBER: ${{ github.run_number }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: ESLint checks (existing Prettier-format debt tracked separately)
+        run: "npm run lint -- --rule 'prettier/prettier: off'"
+      - name: Tests
+        run: npm test
+      - name: Create and verify SHA-256 build manifest
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -d .output ]; then
+            ARTIFACT_DIR=.output
+          elif [ -d dist ]; then
+            ARTIFACT_DIR=dist
+          else
+            echo "Build succeeded but neither .output nor dist exists." >&2
+            exit 1
+          fi
+          tar -czf portfolio-build.tar.gz -C "$ARTIFACT_DIR" .
+          node scripts/artifact-integrity.mjs create "$ARTIFACT_DIR" portfolio-manifest.json portfolio-build.tar.gz
+          node scripts/artifact-integrity.mjs verify "$ARTIFACT_DIR" portfolio-manifest.json portfolio-build.tar.gz
+          node scripts/artifact-integrity.mjs hash portfolio-build.tar.gz portfolio-build.tar.gz.sha256
+          node scripts/artifact-integrity.mjs verify-hash portfolio-build.tar.gz portfolio-build.tar.gz.sha256
+      - name: Upload verified build package and provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: portfolio-build-${{ github.run_number }}
+          path: |
+            portfolio-build.tar.gz
+            portfolio-manifest.json
+            portfolio-build.tar.gz.sha256
+          if-no-files-found: error
+          retention-days: 7
