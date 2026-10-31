@@ -33,6 +33,23 @@ function ResumeManager() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "approved">("all");
+
+  const pendingCount = resumes.filter((resume) => resume.status === "pending").length;
+  const approvedCount = resumes.filter((resume) => resume.status === "approved").length;
+  const visibleResumes = resumes.filter((resume) => {
+    const query = searchQuery.trim().toLowerCase();
+    const matchesQuery = !query || [
+      resume.filename,
+      resume.displayName,
+      resume.headline,
+      resume.summary,
+      ...resume.skills,
+    ].some((value) => value.toLowerCase().includes(query));
+    const matchesStatus = statusFilter === "all" || resume.status === statusFilter;
+    return matchesQuery && matchesStatus;
+  });
 
   async function loadResumes() {
     const response = await fetch("/api/admin/resumes", { credentials: "same-origin", cache: "no-store" });
@@ -134,7 +151,7 @@ function ResumeManager() {
         <div className="mt-6 grid gap-4 sm:grid-cols-3">
           <article className="border border-white/10 bg-white/[0.025] p-5"><p className="font-mono text-xs text-violet-300">01 / PRIVATE</p><h2 className="mt-3 font-semibold">Source documents</h2><p className="mt-2 text-sm leading-6 text-white/55">Original files stay in the private storage bucket and are served only after authentication.</p></article>
           <article className="border border-white/10 bg-white/[0.025] p-5"><p className="font-mono text-xs text-violet-300">02 / REVIEW</p><h2 className="mt-3 font-semibold">Check every field</h2><p className="mt-2 text-sm leading-6 text-white/55">Enter or correct the public details yourself. Uploading alone never publishes anything.</p></article>
-          <article className="border border-white/10 bg-white/[0.025] p-5"><p className="font-mono text-xs text-violet-300">03 / APPROVE</p><h2 className="mt-3 font-semibold">Explicit publishing</h2><p className="mt-2 text-sm leading-6 text-white/55">Only the details you approve are exposed through the public approved-resumes API.</p></article>
+          <article className="border border-white/10 bg-white/[0.025] p-5"><p className="font-mono text-xs text-violet-300">03 / APPROVE</p><h2 className="mt-3 font-semibold">Explicit publishing</h2><p className="mt-3 font-mono text-2xl text-white">{approvedCount}<span className="ml-2 text-xs font-sans text-white/45">published</span></p><p className="mt-1 text-xs text-white/45">{pendingCount} awaiting review · originals remain private</p></article>
         </div>
 
         <form onSubmit={upload} className="mt-6 border border-white/10 bg-white/[0.025] p-5 sm:p-7">
@@ -153,8 +170,26 @@ function ResumeManager() {
           <button onClick={() => loadResumes().catch((reason: unknown) => setError(reason instanceof Error ? reason.message : "Refresh failed."))} className="inline-flex min-h-10 items-center gap-2 border border-white/15 px-3 text-sm"><RefreshCw className="size-4" /> Refresh</button>
         </div>
 
+        <div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_190px]">
+          <label className="text-xs text-white/55">Search resumes
+            <input value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} placeholder="Filename, name, headline, skill…" className="mt-2 min-h-11 w-full border border-white/15 bg-black/30 px-3 text-sm text-white placeholder:text-white/30" />
+          </label>
+          <label className="text-xs text-white/55">Publication status
+            <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as "all" | "pending" | "approved")} className="mt-2 min-h-11 w-full border border-white/15 bg-black/30 px-3 text-sm text-white">
+              <option value="all">All statuses</option>
+              <option value="pending">Pending review</option>
+              <option value="approved">Approved / published</option>
+            </select>
+          </label>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between text-xs text-white/40">
+          <span>Showing {visibleResumes.length} of {resumes.length} resumes</span>
+          {(searchQuery || statusFilter !== "all") && <button type="button" onClick={() => { setSearchQuery(""); setStatusFilter("all"); }} className="min-h-8 underline underline-offset-4 hover:text-white/75">Clear filters</button>}
+        </div>
+
         <div className="mt-4 space-y-4">
-          {resumes.map((record) => (
+          {visibleResumes.map((record) => (
             <article key={record.id} className="border border-white/10 bg-white/[0.025] p-5 sm:p-6">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div><h3 className="break-all font-semibold">{record.filename}</h3><p className="mt-1 text-xs text-white/40">{(record.size / 1024).toFixed(0)} KB · Uploaded {new Date(record.uploadedAt).toLocaleString()}</p></div>
@@ -174,6 +209,7 @@ function ResumeManager() {
             </article>
           ))}
           {resumes.length === 0 && <div className="border border-dashed border-white/15 p-10 text-center text-sm text-white/45">No resumes uploaded yet. Configure private storage, then upload your first file.</div>}
+          {resumes.length > 0 && visibleResumes.length === 0 && <div className="border border-dashed border-white/15 p-10 text-center text-sm text-white/45">No resumes match these filters. Try another search or clear the filters.</div>}
         </div>
 
         <div className="mt-8 flex items-start gap-3 border border-emerald-200/15 bg-emerald-100/[0.025] p-4">
