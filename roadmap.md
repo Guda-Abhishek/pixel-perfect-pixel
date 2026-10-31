@@ -61,7 +61,8 @@ Testing and validation work is paused by user request. Continue feature implemen
    - [x] Add status filtering (all, pending review, approved/published), clear-filters action, result count and published/pending summary counts (commit `f1ed72e`).
    - [x] Save reviewed metadata as a private pending draft without publishing; moving an approved record back to draft removes it from the public approved-resume feed.
    - [ ] Implement document parsing/extraction with a safe manual-review/edit step before any public approval.
-   - [ ] Improve resume metadata and profile publishing integration.
+   - [x] Add explicit profile assignment (Abhishek, Amulya, Anjini Kumar or Sai); publishing rejects missing/invalid assignment and excludes unassigned or legacy records from the public feed.
+   - [ ] Connect approved profile-assigned resume metadata to each matching public profile page.
    - [ ] Authentication/session, storage, upload/download/delete and file-boundary validation are deferred while testing is paused.
 4. **EPIC-08 — Dynamic profile updates and publishing**
    - [ ] Connect approved resume/profile data to the correct public profile without leaking private source documents.
