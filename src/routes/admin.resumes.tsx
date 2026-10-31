@@ -240,10 +240,19 @@ function ResumeManager() {
                 <label className="text-xs text-white/60 sm:col-span-2">Public summary<textarea value={record.summary} onChange={(event) => update(record.id, { summary: event.target.value })} maxLength={3000} rows={4} placeholder="Write and verify the summary that may be public." className="mt-2 w-full border border-white/15 bg-black/30 p-3 text-sm text-white" /></label>
                 <label className="text-xs text-white/60 sm:col-span-2">Skills (comma-separated)<input value={record.skills.join(", ")} onChange={(event) => update(record.id, { skills: event.target.value.split(",").map((skill) => skill.trim()).filter(Boolean).slice(0, 60) })} className="mt-2 min-h-11 w-full border border-white/15 bg-black/30 px-3 text-sm text-white" /></label>
               </div>
+              <div className="mt-5 border border-violet-200/15 bg-violet-200/[0.035] p-4">
+                <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-violet-200/75">Public preview · {record.profileId && record.profileId !== "unassigned" ? ({ abhishek: "Abhishek", ammu: "Amulya", bava: "Anjini Kumar", sai: "Sai" } as Record<string, string>)[record.profileId] : "No profile assigned"}</p>
+                <p className="mt-3 text-sm font-semibold">{record.displayName.trim() || "Display name not set"}</p>
+                <p className="mt-1 text-lg">{record.headline.trim() || "Headline not set"}</p>
+                <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-white/60">{record.summary.trim() || "Public summary not set"}</p>
+                <div className="mt-3 flex flex-wrap gap-2">{record.skills.filter(Boolean).map((skill, index) => <span key={skill + index} className="border border-white/15 px-2 py-1 text-xs text-white/70">{skill}</span>)}</div>
+                <p className="mt-3 text-[11px] text-white/35">Only these reviewed fields are published. The source document stays private.</p>
+              </div>
               <div className="mt-5 flex flex-wrap gap-2">
                 <a href={`/api/admin/resumes/${record.id}/download`} className="inline-flex min-h-10 items-center gap-2 border border-white/15 px-3 text-xs hover:bg-white/5"><Download className="size-4" /> Download original</a>
                 <button disabled={busy} onClick={() => saveDraft(record)} className="inline-flex min-h-10 items-center gap-2 border border-white/15 px-3 text-xs hover:bg-white/5 disabled:opacity-50"><FilePenLine className="size-4" /> Save private draft</button>
                 <button disabled={busy} onClick={() => saveResume(record)} className="inline-flex min-h-10 items-center gap-2 bg-violet-300 px-3 text-xs font-semibold text-black disabled:opacity-50"><Save className="size-4" /> Approve & publish</button>
+                {record.status === "approved" && <button disabled={busy} onClick={() => unpublishResume(record)} className="inline-flex min-h-10 items-center gap-2 border border-amber-300/25 px-3 text-xs text-amber-100 hover:bg-amber-300/5 disabled:opacity-50">Unpublish / rollback</button>}
                 <button disabled={busy} onClick={() => deleteResume(record)} className="inline-flex min-h-10 items-center gap-2 border border-red-300/25 px-3 text-xs text-red-200 hover:bg-red-300/5 disabled:opacity-50"><Trash2 className="size-4" /> Delete permanently</button>
               </div>
             </article>
