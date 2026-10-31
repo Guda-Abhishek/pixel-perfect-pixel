@@ -59,6 +59,7 @@ Testing and validation work is paused by user request. Continue feature implemen
 3. **EPIC-07 — Resume Manager and document processing**
    - [x] Add client-side search across filename, display name, headline, summary and skills.
    - [x] Add status filtering (all, pending review, approved/published), clear-filters action, result count and published/pending summary counts (commit `f1ed72e`).
+   - [x] Save reviewed metadata as a private pending draft without publishing; moving an approved record back to draft removes it from the public approved-resume feed.
    - [ ] Implement document parsing/extraction with a safe manual-review/edit step before any public approval.
    - [ ] Improve resume metadata and profile publishing integration.
    - [ ] Authentication/session, storage, upload/download/delete and file-boundary validation are deferred while testing is paused.
