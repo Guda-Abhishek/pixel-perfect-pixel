@@ -273,11 +273,13 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
       const payload = await request.json().catch(() => null) as Partial<ResumeRecord> | null;
       if (!payload || typeof payload.displayName !== "string" || typeof payload.headline !== "string" ||
           typeof payload.summary !== "string" || !Array.isArray(payload.skills) ||
-          payload.skills.some((skill) => typeof skill !== "string")) {
-        return jsonResponse({ error: "Provide valid reviewed resume details." }, 400);
+          payload.skills.some((skill) => typeof skill !== "string") ||
+          !["abhishek", "ammu", "bava", "sai", "unassigned"].includes(String(payload.profileId))) {
+        return jsonResponse({ error: "Provide valid reviewed details and select the correct profile." }, 400);
       }
       records[index] = {
         ...record,
+        profileId: payload.profileId as ResumeRecord["profileId"],
         displayName: payload.displayName.slice(0, 120),
         headline: payload.headline.slice(0, 180),
         summary: payload.summary.slice(0, 3000),
