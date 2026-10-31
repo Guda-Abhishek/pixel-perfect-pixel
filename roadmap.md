@@ -40,15 +40,15 @@ Status: the roadmap below is the execution order. A checkbox is not considered c
 ## P0 — unblock engineering and establish reliable validation
 
 1. **EPIC-01 — Build stability and engineering foundation**
-   - [ ] Resolve the package manifest/lockfile mismatch. Current blocker: package.json requests `@lovable.dev/vite-tanstack-config` 2.26.5 while package-lock.json records 2.25.3; `npm ci` fails before build, lint, or tests.
-   - [ ] Regenerate package-lock.json with Node.js 24/npm in a network-enabled environment; do not hand-edit lockfile integrity/resolution metadata.
-   - [ ] Run and record `npm ci`, `npm run build`, `npm run lint`, and `npm test` successfully.
-   - [ ] Confirm the verification workflow only runs for pushes to `dev`, pull requests targeting `dev`/`main`, or a manual dispatch; stale runs for the same branch/PR should be cancelled.
+   - [x] Align the package manifest with the existing lockfile: `@lovable.dev/vite-tanstack-config` is now `2.25.3` in both files (commit `4fd8402`).
+   - [ ] If the intended dependency target is still `2.26.5`, regenerate the lockfile with Node.js 24/npm in a network-enabled environment; do not hand-edit lockfile integrity/resolution metadata.
+   - [ ] Run and record `npm ci`, `npm run build`, `npm run lint`, and `npm test` successfully. These have not yet been run against the aligned commit.
+   - [x] Verification workflow configuration is limited to pushes to `dev`, pull requests targeting `dev`/`main`, or manual dispatch, with cancellation of stale runs; a successful run is still needed.
 2. **EPIC-02 — Portfolio-wide functional validation**
-   - [ ] Build a route/interaction acceptance matrix for all four profiles.
+   - [ ] Build a route/interaction acceptance matrix for all four profiles and record browser-level results.
    - [ ] Cover desktop, tablet and mobile, including loading, empty, offline, validation and failure states.
    - [ ] Verify navigation, chat/voice, contact, resume workflows and profile-data isolation.
-   - [ ] Add or repair automated tests and browser smoke checks based on the matrix.
+   - [x] Add data-level acceptance tests for project/slug consistency, navigation data, contact destinations, experience, skills and certifications (commit `c7c407c`); run them and add browser smoke checks based on the matrix.
 
 ## P1 — complete product capabilities after P0 gates pass
 
