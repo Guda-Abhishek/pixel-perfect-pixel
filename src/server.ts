@@ -128,6 +128,7 @@ type ResumeRecord = {
   size: number;
   uploadedAt: string;
   status: "pending" | "approved";
+  profileId?: "abhishek" | "ammu" | "bava" | "sai" | "unassigned";
   displayName: string;
   headline: string;
   summary: string;
@@ -215,7 +216,7 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
     const records = await readResumeIndex(bucket);
     records.push({
       id, filename: safeName, contentType: type, size: file.size,
-      uploadedAt: new Date().toISOString(), status: "pending",
+      uploadedAt: new Date().toISOString(), status: "pending", profileId: "unassigned",
       displayName: safeName.replace(/\.(pdf|docx)$/i, ""),
       headline: "", summary: "", skills: [],
     });
@@ -248,11 +249,13 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
       const payload = await request.json().catch(() => null) as Partial<ResumeRecord> | null;
       if (!payload || typeof payload.displayName !== "string" || typeof payload.headline !== "string" ||
           typeof payload.summary !== "string" || !Array.isArray(payload.skills) ||
-          payload.skills.some((skill) => typeof skill !== "string")) {
-        return jsonResponse({ error: "Provide valid reviewed resume details." }, 400);
+          payload.skills.some((skill) => typeof skill !== "string") ||
+          !["abhishek", "ammu", "bava", "sai", "unassigned"].includes(String(payload.profileId))) {
+        return jsonResponse({ error: "Provide valid reviewed details and select the correct profile." }, 400);
       }
       records[index] = {
         ...record,
+        profileId: payload.profileId as ResumeRecord["profileId"],
         displayName: payload.displayName.slice(0, 120),
         headline: payload.headline.slice(0, 180),
         summary: payload.summary.slice(0, 3000),
@@ -262,7 +265,7 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
       await writeResumeIndex(bucket, records);
       await bucket.put("public/approved-resumes.json", JSON.stringify({
         updatedAt: new Date().toISOString(),
-        resumes: records.filter((item) => item.status === "approved").map(({ id, displayName, headline, summary, skills }) => ({ id, displayName, headline, summary, skills })),
+        resumes: records.filter((item) => item.status === "approved" && item.profileId !== "unassigned").map(({ id, profileId, displayName, headline, summary, skills }) => ({ id, profileId, displayName, headline, summary, skills })),
       }), { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-store" } } as { httpMetadata?: { contentType?: string } });
       return jsonResponse({ resume: records[index] }, 200);
     }
@@ -284,7 +287,7 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
       await writeResumeIndex(bucket, records);
       await bucket.put("public/approved-resumes.json", JSON.stringify({
         updatedAt: new Date().toISOString(),
-        resumes: records.filter((item) => item.status === "approved").map(({ id, displayName, headline, summary, skills }) => ({ id, displayName, headline, summary, skills })),
+        resumes: records.filter((item) => item.status === "approved" && item.profileId !== "unassigned").map(({ id, profileId, displayName, headline, summary, skills }) => ({ id, profileId, displayName, headline, summary, skills })),
       }), { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-store" } } as { httpMetadata?: { contentType?: string } });
       return jsonResponse({ resume: records[index] }, 200);
     }
@@ -295,7 +298,7 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
       await writeResumeIndex(bucket, records);
       await bucket.put("public/approved-resumes.json", JSON.stringify({
         updatedAt: new Date().toISOString(),
-        resumes: records.filter((item) => item.status === "approved").map(({ id, displayName, headline, summary, skills }) => ({ id, displayName, headline, summary, skills })),
+        resumes: records.filter((item) => item.status === "approved" && item.profileId !== "unassigned").map(({ id, profileId, displayName, headline, summary, skills }) => ({ id, profileId, displayName, headline, summary, skills })),
       }), { httpMetadata: { contentType: "application/json; charset=utf-8" } });
       return jsonResponse({ ok: true }, 200);
     }
