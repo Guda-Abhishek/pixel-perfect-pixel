@@ -183,7 +183,7 @@ async function verifyHash(filePath, checksumPath) {
   const stat = await lstat(file);
   if (!stat.isFile() || stat.isSymbolicLink()) throw new Error('Hash target must be a regular file.');
   const content = (await readFile(checksumPath, 'utf8')).trim();
-  const match = content.match(/^([a-f0-9]{64})\s+\\*?(.+)$/);
+  const match = content.match(/^([a-f0-9]{64})\s+\*?(.+)$/);
   if (!match || match[2] !== path.basename(file) || match[1] !== await hashFile(file)) {
     throw new Error('SHA-256 verification failed.');
   }
