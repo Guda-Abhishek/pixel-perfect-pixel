@@ -59,15 +59,34 @@ pipeline {
           powershell '''
             $ErrorActionPreference = "Stop"
             $base = $env:NEXUS_RAW_REPOSITORY_URL.TrimEnd('/')
-            $target = "$base/portfolio/$env:BUILD_NUMBER"
+            if ([string]::IsNullOrWhiteSpace($env:GIT_COMMIT)) {
+              throw "Git commit metadata is required for immutable Nexus publication paths."
+            }
+            $commit = $env:GIT_COMMIT.Substring(0, [Math]::Min(12, $env:GIT_COMMIT.Length))
+            $target = "$base/portfolio/$env:BUILD_NUMBER-$commit"
             $pair = $env:NEXUS_USER + ':' + $env:NEXUS_PASSWORD
             $encoded = [Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($pair))
             $headers = @{ Authorization = "Basic $encoded" }
-            foreach ($file in @($env:ARTIFACT_FILE, $env:MANIFEST_FILE, $env:CHECKSUM_FILE)) {
-              Invoke-WebRequest -Uri "$target/$file" -Method Put -InFile $file -Headers $headers -UseBasicParsing | Out-Null
-              Write-Output "Published $file to Nexus build $env:BUILD_NUMBER"
+            $verificationDir = Join-Path $env:WORKSPACE ".nexus-verify"
+            New-Item -ItemType Directory -Force -Path $verificationDir | Out-Null
+            try {
+              foreach ($file in @($env:ARTIFACT_FILE, $env:MANIFEST_FILE, $env:CHECKSUM_FILE)) {
+                $uri = "$target/$file"
+                Invoke-WebRequest -Uri $uri -Method Put -InFile $file -Headers $headers -UseBasicParsing | Out-Null
+                $download = Join-Path $verificationDir $file
+                Invoke-WebRequest -Uri $uri -Method Get -OutFile $download -Headers $headers -UseBasicParsing | Out-Null
+                $localHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $file).Hash
+                $remoteHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $download).Hash
+                if ($localHash -ne $remoteHash) {
+                  throw "Nexus read-back SHA-256 mismatch for $file."
+                }
+                Write-Output "Published and verified $file at immutable build path $env:BUILD_NUMBER-$commit"
+              }
+              node scripts/artifact-integrity.mjs verify-hash (Join-Path $verificationDir $env:ARTIFACT_FILE) (Join-Path $verificationDir $env:CHECKSUM_FILE)
+            } finally {
+              Remove-Item -Recurse -Force -LiteralPath $verificationDir -ErrorAction SilentlyContinue
+              Remove-Variable pair, encoded, headers -ErrorAction SilentlyContinue
             }
-            Remove-Variable pair, encoded, headers
           '''
         }
       }
