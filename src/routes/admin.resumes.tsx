@@ -92,6 +92,16 @@ function ResumeManager() {
   }
 
   async function saveResume(record: ResumeRecord) {
+    if (!record.profileId || record.profileId === "unassigned") {
+      setError("Assign this resume to the correct public profile before publishing."); setMessage(""); return;
+    }
+    if (!record.displayName.trim() || !record.headline.trim() || !record.summary.trim()) {
+      setError("Complete the display name, headline, and public summary before publishing."); setMessage(""); return;
+    }
+    if (record.skills.some((skill) => !skill.trim())) {
+      setError("Remove any empty skill entries before publishing."); setMessage(""); return;
+    }
+    if (!window.confirm("Publish these reviewed details to the selected public profile? The original resume file will remain private.")) return;
     setBusy(true); setError(""); setMessage("");
     try {
       const response = await fetch(`/api/admin/resumes/${record.id}/publish`, {
