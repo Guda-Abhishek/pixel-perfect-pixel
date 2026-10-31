@@ -125,14 +125,18 @@ export function PortfolioNavbar({ person }: PortfolioNavbarProps) {
 
           {/* 2. Movie button (Clapperboard icon button to /portfolio) */}
           <Button
-            type="button"
+            asChild
             variant="outline"
             size="icon"
             className="site-nav-movie min-h-11 min-w-11"
-            title="The Series — coming soon"
-            aria-label={`Explore ${person?.displayName ?? "The Series"} cinematic portfolio (coming soon)`}
+            title="Explore projects"
           >
-            <Clapperboard className="size-4" aria-hidden="true" />
+            <Link
+              to={isPerson && personId ? `/people/${personId}/projects` : "/projects"}
+              aria-label={`Explore ${person?.displayName ?? "Abhishek"} projects`}
+            >
+              <Clapperboard className="size-4" aria-hidden="true" />
+            </Link>
           </Button>
 
           {/* 3. Choose profile control */}
@@ -210,13 +214,17 @@ export function PortfolioNavbar({ person }: PortfolioNavbarProps) {
           </Button>
 
           <Button
-            type="button"
+            asChild
             variant="ghost"
             className="min-h-11 justify-start gap-2 text-sm"
-            aria-label="The Series (coming soon)"
           >
-            <Clapperboard className="size-4" aria-hidden="true" />
-            <span>The Series</span>
+            <Link
+              to={isPerson && personId ? `/people/${personId}/projects` : "/projects"}
+              onClick={() => setMenu(false)}
+            >
+              <Clapperboard className="size-4" aria-hidden="true" />
+              <span>Explore projects</span>
+            </Link>
           </Button>
 
           <Button
