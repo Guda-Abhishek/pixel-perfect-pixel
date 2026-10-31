@@ -33,6 +33,10 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - name: Regenerate lock metadata (temporary repair diagnostic)
+        run: npm install --package-lock-only --ignore-scripts
+      - name: Show lockfile repair diff
+        run: git diff -- package-lock.json
       - name: Install locked dependencies
         run: npm ci
       - name: Build
