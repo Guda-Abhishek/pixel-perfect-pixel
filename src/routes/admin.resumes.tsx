@@ -1,6 +1,6 @@
 import { useEffect, useState, type ChangeEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { FileLock2, LogOut, ShieldCheck, UploadCloud, Trash2, Download, Save, RefreshCw } from "lucide-react";
+import { FileLock2, LogOut, ShieldCheck, UploadCloud, Trash2, Download, Save, RefreshCw, FilePenLine } from "lucide-react";
 
 type ResumeRecord = {
   id: string;
@@ -107,6 +107,23 @@ function ResumeManager() {
     } finally { setBusy(false); }
   }
 
+  async function saveDraft(record: ResumeRecord) {
+    setBusy(true); setError(""); setMessage("");
+    try {
+      const response = await fetch(`/api/admin/resumes/${record.id}/draft`, {
+        method: "POST", credentials: "same-origin",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ displayName: record.displayName, headline: record.headline, summary: record.summary, skills: record.skills }),
+      });
+      const payload = await response.json() as { resume?: ResumeRecord; error?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Could not save the draft.");
+      setResumes((items) => items.map((item) => item.id === record.id ? (payload.resume ?? { ...record, status: "pending" }) : item));
+      setMessage("Review details saved as a private draft. Nothing from this record is published.");
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "Could not save the draft.");
+    } finally { setBusy(false); }
+  }
+
   async function deleteResume(record: ResumeRecord) {
     if (!window.confirm(`Delete ${record.filename} permanently?`)) return;
     setBusy(true); setError(""); setMessage("");
@@ -203,6 +220,7 @@ function ResumeManager() {
               </div>
               <div className="mt-5 flex flex-wrap gap-2">
                 <a href={`/api/admin/resumes/${record.id}/download`} className="inline-flex min-h-10 items-center gap-2 border border-white/15 px-3 text-xs hover:bg-white/5"><Download className="size-4" /> Download original</a>
+                <button disabled={busy} onClick={() => saveDraft(record)} className="inline-flex min-h-10 items-center gap-2 border border-white/15 px-3 text-xs hover:bg-white/5 disabled:opacity-50"><FilePenLine className="size-4" /> Save private draft</button>
                 <button disabled={busy} onClick={() => saveResume(record)} className="inline-flex min-h-10 items-center gap-2 bg-violet-300 px-3 text-xs font-semibold text-black disabled:opacity-50"><Save className="size-4" /> Approve & publish</button>
                 <button disabled={busy} onClick={() => deleteResume(record)} className="inline-flex min-h-10 items-center gap-2 border border-red-300/25 px-3 text-xs text-red-200 hover:bg-red-300/5 disabled:opacity-50"><Trash2 className="size-4" /> Delete permanently</button>
               </div>
