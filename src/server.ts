@@ -265,7 +265,7 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
       await writeResumeIndex(bucket, records);
       await bucket.put("public/approved-resumes.json", JSON.stringify({
         updatedAt: new Date().toISOString(),
-        resumes: records.filter((item) => item.status === "approved" && item.profileId !== "unassigned").map(({ id, profileId, displayName, headline, summary, skills }) => ({ id, profileId, displayName, headline, summary, skills })),
+        resumes: records.filter((item) => item.status === "approved" && !!item.profileId && item.profileId !== "unassigned").map(({ id, profileId, displayName, headline, summary, skills }) => ({ id, profileId, displayName, headline, summary, skills })),
       }), { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-store" } } as { httpMetadata?: { contentType?: string } });
       return jsonResponse({ resume: records[index] }, 200);
     }
