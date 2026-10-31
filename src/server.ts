@@ -224,7 +224,7 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
     return jsonResponse({ resume: records[records.length - 1] }, 201);
   }
 
-  const match = path.match(/^\/api\/admin\/resumes\/([a-f0-9-]+)(?:\/(download|publish|draft))?$/);
+  const match = path.match(/^\/api\/admin\/resumes\/([a-f0-9-]+)(?:\/(download|publish|draft|unpublish))?$/);
   if (match) {
     const [, id, action] = match;
     const records = await readResumeIndex(bucket);
@@ -269,6 +269,17 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
       }), { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-store" } } as { httpMetadata?: { contentType?: string } });
       return jsonResponse({ resume: records[index] }, 200);
     }
+    if (action === "unpublish" && request.method === "POST") {
+      if (record.status !== "approved") return jsonResponse({ error: "This resume is not currently published." }, 409);
+      records[index] = { ...record, status: "pending" };
+      await writeResumeIndex(bucket, records);
+      await bucket.put("public/approved-resumes.json", JSON.stringify({
+        updatedAt: new Date().toISOString(),
+        resumes: records.filter((item) => item.status === "approved" && !!item.profileId && item.profileId !== "unassigned").map(({ id, profileId, displayName, headline, summary, skills }) => ({ id, profileId, displayName, headline, summary, skills })),
+      }), { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-store" } } as { httpMetadata?: { contentType?: string } });
+      return jsonResponse({ resume: records[index] }, 200);
+    }
+
     if (action === "publish" && request.method === "POST") {
       const payload = await request.json().catch(() => null) as Partial<ResumeRecord> | null;
       if (!payload || typeof payload.displayName !== "string" || typeof payload.headline !== "string" ||
@@ -276,6 +287,9 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
           payload.skills.some((skill) => typeof skill !== "string") ||
           !["abhishek", "ammu", "bava", "sai", "unassigned"].includes(String(payload.profileId))) {
         return jsonResponse({ error: "Provide valid reviewed details and select the correct profile." }, 400);
+      }
+      if (!payload.profileId || payload.profileId === "unassigned") {
+        return jsonResponse({ error: "Assign this resume to a public profile before publishing." }, 400);
       }
       records[index] = {
         ...record,
@@ -289,7 +303,7 @@ async function handleResumeApi(request: Request, env: unknown): Promise<Response
       await writeResumeIndex(bucket, records);
       await bucket.put("public/approved-resumes.json", JSON.stringify({
         updatedAt: new Date().toISOString(),
-        resumes: records.filter((item) => item.status === "approved" && item.profileId !== "unassigned").map(({ id, profileId, displayName, headline, summary, skills }) => ({ id, profileId, displayName, headline, summary, skills })),
+        resumes: records.filter((item) => item.status === "approved" && !!item.profileId && item.profileId !== "unassigned").map(({ id, profileId, displayName, headline, summary, skills }) => ({ id, profileId, displayName, headline, summary, skills })),
       }), { httpMetadata: { contentType: "application/json; charset=utf-8", cacheControl: "no-store" } } as { httpMetadata?: { contentType?: string } });
       return jsonResponse({ resume: records[index] }, 200);
     }
