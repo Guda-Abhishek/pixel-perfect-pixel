@@ -32,3 +32,58 @@
 
 - [x] Floating launcher + chat panel, grounded AI replies with honest offline fallback.
 - [ ] GitHub sync — managed by Lovable's GitHub connector; cannot be driven from chat.
+
+# Delivery plan and release gates (2026-10-31)
+
+Status: the roadmap below is the execution order. A checkbox is not considered complete until there is evidence from a successful build/test run or documented manual acceptance. Do not merge to main or publish/deploy without explicit approval.
+
+## P0 — unblock engineering and establish reliable validation
+
+1. **EPIC-01 — Build stability and engineering foundation**
+   - [x] Align the package manifest with the existing lockfile: `@lovable.dev/vite-tanstack-config` is now `2.25.3` in both files (commit `4fd8402`).
+   - [ ] If the intended dependency target is still `2.26.5`, regenerate the lockfile with Node.js 24/npm in a network-enabled environment; do not hand-edit lockfile integrity/resolution metadata.
+   - [ ] Run and record `npm ci`, `npm run build`, `npm run lint`, and `npm test` successfully. These have not yet been run against the aligned commit.
+   - [x] Verification workflow configuration is limited to pushes to `dev`, pull requests targeting `dev`/`main`, or manual dispatch, with cancellation of stale runs; a successful run is still needed.
+2. **EPIC-02 — Portfolio-wide functional validation**
+   - [ ] Build a route/interaction acceptance matrix for all four profiles and record browser-level results.
+   - [ ] Cover desktop, tablet and mobile, including loading, empty, offline, validation and failure states.
+   - [ ] Verify navigation, chat/voice, contact, resume workflows and profile-data isolation.
+   - [x] Add data-level acceptance tests for project/slug consistency, navigation data, contact destinations, experience, skills and certifications (commit `c7c407c`); run them and add browser smoke checks based on the matrix.
+
+## Development-only execution (user direction, 2026-10-31)
+
+Testing and validation work is paused by user request. Continue feature implementation on the current feature branch; do not run tests, build, lint, browser checks, or acceptance exercises until the user resumes that work.
+
+## P1 — product capabilities
+
+3. **EPIC-07 — Resume Manager and document processing**
+   - [x] Add client-side search across filename, display name, headline, summary and skills.
+   - [x] Add status filtering (all, pending review, approved/published), clear-filters action, result count and published/pending summary counts (commit `f1ed72e`).
+   - [ ] Implement document parsing/extraction with a safe manual-review/edit step before any public approval.
+   - [ ] Improve resume metadata and profile publishing integration.
+   - [ ] Authentication/session, storage, upload/download/delete and file-boundary validation are deferred while testing is paused.
+4. **EPIC-08 — Dynamic profile updates and publishing**
+   - [ ] Connect approved resume/profile data to the correct public profile without leaking private source documents.
+   - [ ] Verify preview, approval, publish, rollback and local/hosted behavior.
+5. **EPIC-06 — AI assistant, chat and voice**
+   - [ ] Verify API configuration, grounded profile-specific answers, streaming/cancellation and honest offline fallback.
+   - [ ] Test microphone permissions, unsupported browsers, privacy disclosures and failure recovery.
+6. **EPIC-05 — Four profile experiences and content architecture**
+   - [ ] Verify typed profile data, shared page components, route compatibility and strict separation of facts across Abhishek, Amulya, Anjini and Sai.
+7. **EPIC-04 — Cinematic design and media**
+   - [ ] Verify all supplied media assets exist and are correctly licensed/attributed where required.
+   - [ ] Complete video intro playback, pause/replay, cleanup, reduced-motion behavior and mobile fallback.
+8. **EPIC-03 — Shared UI, navigation and responsive experience**
+   - [ ] Validate shared navigation/footer, active states, keyboard operation, responsive layouts and all route links.
+9. **EPIC-09 — Security, accessibility and performance**
+   - [ ] Audit access control, upload validation, public/private data boundaries, keyboard/screen-reader behavior and performance.
+10. **EPIC-10 — End-to-end acceptance and release**
+    - [ ] Run the full acceptance matrix on the candidate branch and record results.
+    - [ ] Review the complete branch diff and outstanding issues.
+    - [ ] Obtain explicit user approval before any merge to `main` or deployment.
+
+## Working rules
+- During the user-requested development-only phase, continue feature implementation and explicitly leave validation tasks pending.
+- Do not mark validation complete based only on source inspection; record the command/test or manual evidence when testing resumes.
+- Do not commit generated lockfile metadata by hand.
+- Do not merge to `main`, publish, or deploy without explicit approval.
