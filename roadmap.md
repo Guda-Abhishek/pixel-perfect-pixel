@@ -67,6 +67,7 @@ Testing and validation work is paused by user request. Continue feature implemen
 4. **EPIC-08 — Dynamic profile updates and publishing**
    - [x] Add a public metadata-only resume highlights section filtered by profile ID; private resume files remain inaccessible from public profile pages (commit `5373a93`).
    - [x] Add an in-manager public-field preview, explicit unpublish/rollback to private pending status, and require profile assignment before publishing (commits `34c10a1`, `9298ca8`, `77b4f54`).
+   - [x] Add a final publish confirmation and client-side checks for profile assignment, display name, headline, summary and empty skill entries (commit `4fad5ea`).
    - [ ] Verify preview, approval, publish, rollback and local/hosted behavior when validation resumes.
 5. **EPIC-06 — AI assistant, chat and voice**
    - [ ] Verify API configuration, grounded profile-specific answers, streaming/cancellation and honest offline fallback.
