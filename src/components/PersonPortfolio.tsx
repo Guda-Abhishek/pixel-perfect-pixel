@@ -193,6 +193,48 @@ function ProjectTile({
     </article>
   );
 }
+type PublishedResume = { id: string; profileId: string; displayName: string; headline: string; summary: string; skills: string[] };
+
+function PublishedResumeHighlights({ profileId }: { profileId: string }) {
+  const [resumes, setResumes] = useState<PublishedResume[]>([]);
+  useEffect(() => {
+    let active = true;
+    fetch("/api/published-resumes", { headers: { accept: "application/json" } })
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload: { resumes?: PublishedResume[] } | null) => {
+        if (!active || !Array.isArray(payload?.resumes)) return;
+        setResumes(payload.resumes.filter((item) => item.profileId === profileId &&
+          typeof item.id === "string" && typeof item.displayName === "string" &&
+          typeof item.headline === "string" && typeof item.summary === "string" &&
+          Array.isArray(item.skills)));
+      })
+      .catch(() => { if (active) setResumes([]); });
+    return () => { active = false; };
+  }, [profileId]);
+
+  if (resumes.length === 0) return null;
+  return (
+    <section className="site-container py-10" aria-label="Published resume highlights">
+      <div className="mb-6 border-t border-border pt-6">
+        <p className="font-mono text-xs text-primary">VERIFIED PROFILE UPDATES</p>
+        <h2 className="mt-3 text-3xl">Recently published.</h2>
+      </div>
+      <div className="grid gap-5 md:grid-cols-2">
+        {resumes.map((resume) => (
+          <article key={resume.id} className="rounded-lg border border-border bg-card p-6">
+            <p className="font-mono text-xs text-muted-foreground">{resume.displayName}</p>
+            {resume.headline && <h3 className="mt-3 text-2xl">{resume.headline}</h3>}
+            {resume.summary && <p className="mt-4 text-sm leading-7 text-muted-foreground">{resume.summary}</p>}
+            {resume.skills.length > 0 && <div className="mt-5 flex flex-wrap gap-2">
+              {resume.skills.slice(0, 20).map((skill, index) => <span key={skill + index} className="rounded-full border border-border px-3 py-1 text-xs">{skill}</span>)}
+            </div>}
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function PersonHome({ profile }: { profile: PersonPortfolio }) {
   return (
     <>
@@ -237,6 +279,7 @@ export function PersonHome({ profile }: { profile: PersonPortfolio }) {
           </Reveal>
         </div>
       </section>
+      <PublishedResumeHighlights profileId={profile.id} />
       <section className="home-disciplines">
         <div className="site-container grid gap-7 py-8 md:grid-cols-3">
           {profile.strengths.map((strength, index) => (
