@@ -9,6 +9,7 @@ type ResumeRecord = {
   size: number;
   uploadedAt: string;
   status: "pending" | "approved";
+  profileId?: "abhishek" | "ammu" | "bava" | "sai" | "unassigned";
   displayName: string;
   headline: string;
   summary: string;
@@ -96,7 +97,7 @@ function ResumeManager() {
       const response = await fetch(`/api/admin/resumes/${record.id}/publish`, {
         method: "POST", credentials: "same-origin",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ displayName: record.displayName, headline: record.headline, summary: record.summary, skills: record.skills }),
+        body: JSON.stringify({ profileId: record.profileId ?? "unassigned", displayName: record.displayName, headline: record.headline, summary: record.summary, skills: record.skills }),
       });
       const payload = await response.json() as { resume?: ResumeRecord; error?: string };
       if (!response.ok) throw new Error(payload.error ?? "Could not approve the resume.");
@@ -213,6 +214,15 @@ function ResumeManager() {
                 <span className={record.status === "approved" ? "border border-emerald-300/25 px-2 py-1 text-xs text-emerald-200" : "border border-amber-300/25 px-2 py-1 text-xs text-amber-200"}>{record.status === "approved" ? "Approved / published" : "Pending review"}</span>
               </div>
               <div className="mt-5 grid gap-4 sm:grid-cols-2">
+                <label className="text-xs text-white/60">Public profile
+                  <select value={record.profileId ?? "unassigned"} onChange={(event) => update(record.id, { profileId: event.target.value as ResumeRecord["profileId"] })} className="mt-2 min-h-11 w-full border border-white/15 bg-black/30 px-3 text-sm text-white">
+                    <option value="unassigned">Unassigned — cannot publish</option>
+                    <option value="abhishek">Abhishek</option>
+                    <option value="ammu">Amulya</option>
+                    <option value="bava">Anjini Kumar</option>
+                    <option value="sai">Sai</option>
+                  </select>
+                </label>
                 <label className="text-xs text-white/60">Display name<input value={record.displayName} onChange={(event) => update(record.id, { displayName: event.target.value })} maxLength={120} className="mt-2 min-h-11 w-full border border-white/15 bg-black/30 px-3 text-sm text-white" /></label>
                 <label className="text-xs text-white/60">Headline<input value={record.headline} onChange={(event) => update(record.id, { headline: event.target.value })} maxLength={180} placeholder="e.g. Software Developer" className="mt-2 min-h-11 w-full border border-white/15 bg-black/30 px-3 text-sm text-white" /></label>
                 <label className="text-xs text-white/60 sm:col-span-2">Public summary<textarea value={record.summary} onChange={(event) => update(record.id, { summary: event.target.value })} maxLength={3000} rows={4} placeholder="Write and verify the summary that may be public." className="mt-2 w-full border border-white/15 bg-black/30 p-3 text-sm text-white" /></label>
