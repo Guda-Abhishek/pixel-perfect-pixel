@@ -59,6 +59,17 @@ pipeline {
           powershell '''
             $ErrorActionPreference = "Stop"
             $base = $env:NEXUS_RAW_REPOSITORY_URL.TrimEnd('/')
+            $repositoryUri = $null
+            if (-not [Uri]::TryCreate($base, [UriKind]::Absolute, [ref]$repositoryUri)) {
+              throw "NEXUS_RAW_REPOSITORY_URL must be a valid absolute HTTPS repository URL."
+            }
+            if ($repositoryUri.Scheme -ne [Uri]::UriSchemeHttps -or
+                [string]::IsNullOrWhiteSpace($repositoryUri.Host) -or
+                -not [string]::IsNullOrEmpty($repositoryUri.UserInfo) -or
+                -not [string]::IsNullOrEmpty($repositoryUri.Query) -or
+                -not [string]::IsNullOrEmpty($repositoryUri.Fragment)) {
+              throw "NEXUS_RAW_REPOSITORY_URL must use HTTPS and must not contain embedded credentials, query parameters, or fragments."
+            }
             if ([string]::IsNullOrWhiteSpace($env:GIT_COMMIT)) {
               throw "Git commit metadata is required for immutable Nexus publication paths."
             }
