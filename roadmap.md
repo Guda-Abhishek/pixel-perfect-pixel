@@ -66,7 +66,8 @@ Testing and validation work is paused by user request. Continue feature implemen
    - [ ] Authentication/session, storage, upload/download/delete and file-boundary validation are deferred while testing is paused.
 4. **EPIC-08 — Dynamic profile updates and publishing**
    - [x] Add a public metadata-only resume highlights section filtered by profile ID; private resume files remain inaccessible from public profile pages (commit `5373a93`).
-   - [ ] Verify preview, approval, publish, rollback and local/hosted behavior.
+   - [x] Add an in-manager public-field preview, explicit unpublish/rollback to private pending status, and require profile assignment before publishing (commits `34c10a1`, `9298ca8`, `77b4f54`).
+   - [ ] Verify preview, approval, publish, rollback and local/hosted behavior when validation resumes.
 5. **EPIC-06 — AI assistant, chat and voice**
    - [ ] Verify API configuration, grounded profile-specific answers, streaming/cancellation and honest offline fallback.
    - [ ] Test microphone permissions, unsupported browsers, privacy disclosures and failure recovery.
