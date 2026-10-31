@@ -50,12 +50,18 @@ Status: the roadmap below is the execution order. A checkbox is not considered c
    - [ ] Verify navigation, chat/voice, contact, resume workflows and profile-data isolation.
    - [x] Add data-level acceptance tests for project/slug consistency, navigation data, contact destinations, experience, skills and certifications (commit `c7c407c`); run them and add browser smoke checks based on the matrix.
 
-## P1 — complete product capabilities after P0 gates pass
+## Development-only execution (user direction, 2026-10-31)
+
+Testing and validation work is paused by user request. Continue feature implementation on the current feature branch; do not run tests, build, lint, browser checks, or acceptance exercises until the user resumes that work.
+
+## P1 — product capabilities
 
 3. **EPIC-07 — Resume Manager and document processing**
-   - [ ] Verify authentication/session expiry, rate limiting, upload/download/delete, private original storage and error handling.
-   - [ ] Define document parsing/extraction behavior and safe review/editing before approval.
-   - [ ] Test file type/size limits and unauthorized access.
+   - [x] Add client-side search across filename, display name, headline, summary and skills.
+   - [x] Add status filtering (all, pending review, approved/published), clear-filters action, result count and published/pending summary counts (commit `f1ed72e`).
+   - [ ] Implement document parsing/extraction with a safe manual-review/edit step before any public approval.
+   - [ ] Improve resume metadata and profile publishing integration.
+   - [ ] Authentication/session, storage, upload/download/delete and file-boundary validation are deferred while testing is paused.
 4. **EPIC-08 — Dynamic profile updates and publishing**
    - [ ] Connect approved resume/profile data to the correct public profile without leaking private source documents.
    - [ ] Verify preview, approval, publish, rollback and local/hosted behavior.
@@ -77,7 +83,7 @@ Status: the roadmap below is the execution order. A checkbox is not considered c
     - [ ] Obtain explicit user approval before any merge to `main` or deployment.
 
 ## Working rules
-- Fix the earliest blocking P0 item before starting dependent feature work.
-- Do not mark work complete based only on source inspection; record the command/test or manual evidence.
+- During the user-requested development-only phase, continue feature implementation and explicitly leave validation tasks pending.
+- Do not mark validation complete based only on source inspection; record the command/test or manual evidence when testing resumes.
 - Do not commit generated lockfile metadata by hand.
 - Do not merge to `main`, publish, or deploy without explicit approval.
