@@ -18,9 +18,9 @@ import { Route as ExperienceRouteImport } from './routes/experience'
 import { Route as ProfilesRouteImport } from './routes/profiles'
 import { Route as ProjectsRouteImport } from './routes/projects'
 import { Route as SkillsRouteImport } from './routes/skills'
-import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminResumesRouteImport } from './routes/admin.resumes'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as PeoplePersonRouteImport } from './routes/people.$person'
 import { Route as ProjectsIndexRouteImport } from './routes/projects.index'
 import { Route as ProjectsSlugRouteImport } from './routes/projects.$slug'
@@ -132,8 +132,6 @@ export interface FileRoutesByFullPath {
   '/skills': typeof SkillsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/resumes': typeof AdminResumesRoute
-  '/admin/login': typeof AdminLoginRoute
-  '/admin/resumes': typeof AdminResumesRoute
   '/api/chat': typeof ApiChatRoute
   '/people/$person': typeof PeoplePersonRouteWithChildren
   '/projects/$slug': typeof ProjectsSlugRoute
@@ -151,6 +149,8 @@ export interface FileRoutesByTo {
   '/experience': typeof ExperienceRoute
   '/profiles': typeof ProfilesRoute
   '/skills': typeof SkillsRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/resumes': typeof AdminResumesRoute
   '/api/chat': typeof ApiChatRoute
   '/projects/$slug': typeof ProjectsSlugRoute
   '/projects': typeof ProjectsIndexRoute
@@ -169,6 +169,8 @@ export interface FileRoutesById {
   '/profiles': typeof ProfilesRoute
   '/projects': typeof ProjectsRouteWithChildren
   '/skills': typeof SkillsRoute
+  '/admin/login': typeof AdminLoginRoute
+  '/admin/resumes': typeof AdminResumesRoute
   '/api/chat': typeof ApiChatRoute
   '/people/$person': typeof PeoplePersonRouteWithChildren
   '/projects/$slug': typeof ProjectsSlugRoute
@@ -208,6 +210,8 @@ export interface FileRouteTypes {
     | '/experience'
     | '/profiles'
     | '/skills'
+    | '/admin/login'
+    | '/admin/resumes'
     | '/api/chat'
     | '/projects/$slug'
     | '/projects'
@@ -225,6 +229,8 @@ export interface FileRouteTypes {
     | '/profiles'
     | '/projects'
     | '/skills'
+    | '/admin/login'
+    | '/admin/resumes'
     | '/api/chat'
     | '/people/$person'
     | '/projects/$slug'
