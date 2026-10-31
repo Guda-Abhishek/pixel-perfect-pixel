@@ -114,7 +114,7 @@ function ResumeManager() {
       const response = await fetch(`/api/admin/resumes/${record.id}/draft`, {
         method: "POST", credentials: "same-origin",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ displayName: record.displayName, headline: record.headline, summary: record.summary, skills: record.skills }),
+        body: JSON.stringify({ profileId: record.profileId ?? "unassigned", displayName: record.displayName, headline: record.headline, summary: record.summary, skills: record.skills }),
       });
       const payload = await response.json() as { resume?: ResumeRecord; error?: string };
       if (!response.ok) throw new Error(payload.error ?? "Could not save the draft.");
@@ -125,6 +125,18 @@ function ResumeManager() {
     } finally { setBusy(false); }
   }
 
+  async function unpublishResume(record: ResumeRecord) {
+    if (!window.confirm(`Remove ${record.displayName || record.filename} from the public profile? It will remain privately stored as a pending draft.`)) return;
+    setBusy(true); setError(""); setMessage("");
+    try {
+      const response = await fetch(`/api/admin/resumes/${record.id}/unpublish`, { method: "POST", credentials: "same-origin" });
+      const payload = await response.json() as { resume?: ResumeRecord; error?: string };
+      if (!response.ok) throw new Error(payload.error ?? "Could not unpublish the resume.");
+      setResumes((items) => items.map((item) => item.id === record.id ? (payload.resume ?? { ...record, status: "pending" }) : item));
+      setMessage("Resume removed from the public feed. The original file and reviewed details remain private.");
+    } catch (reason) { setError(reason instanceof Error ? reason.message : "Could not unpublish."); }
+    finally { setBusy(false); }
+  }
   async function deleteResume(record: ResumeRecord) {
     if (!window.confirm(`Delete ${record.filename} permanently?`)) return;
     setBusy(true); setError(""); setMessage("");
